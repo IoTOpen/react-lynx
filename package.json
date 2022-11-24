@@ -15,11 +15,11 @@
     },
     "peerDependencies": {
         "@iotopen/node-lynx": "github:IoTOpen/node-lynx#master",
+        "paho-mqtt": "^1.1.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     },
     "devDependencies": {
-        "@iotopen/node-lynx": "git+https://github.com/IoTOpen/node-lynx.git#master",
         "@rollup/plugin-commonjs": "^22.0.2",
         "@rollup/plugin-node-resolve": "^14.0.1",
         "@rollup/plugin-typescript": "^8.5.0",

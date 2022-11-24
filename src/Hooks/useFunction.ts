@@ -1,0 +1,74 @@
+import {useGlobalLynxClient} from '../Contexts';
+import {useCallback, useLayoutEffect, useState} from 'react';
+import {ErrorResponse, Functionx, OKResponse} from '@iotopen/node-lynx';
+import {useMeta} from './useMeta';
+
+export const useFunction = (installationId: number, functionId: number) => {
+    const {lynxClient} = useGlobalLynxClient();
+    const [loading, setLoading] = useState(true);
+    const [func, setFunc] = useState<Functionx | undefined>();
+    const {
+        metaList,
+        setMeta,
+        removeMeta,
+        compile,
+        setMetaKey,
+        addMeta,
+        setMetaValue,
+        setMetaProtected
+    } = useMeta(func, [loading]);
+    const [error, setError] = useState<ErrorResponse | undefined>();
+
+    useLayoutEffect(() => {
+        lynxClient.getFunction(installationId, functionId).then(fn => {
+            if (error !== undefined) setError(undefined);
+            setFunc(fn);
+        }).catch(e => {
+            setError(e);
+        }).finally(() => {
+            setLoading(false);
+        });
+    }, [lynxClient, installationId, functionId]);
+
+    useLayoutEffect(() => {
+        if (func) setFunc({...func, ...compile()});
+    }, [func, metaList, setFunc]);
+
+    const update = useCallback(() => {
+        return new Promise<Functionx>(() => {
+            if (!func) {
+                throw new Error('update on undefined function');
+            }
+            return lynxClient.updateFunction(func);
+        });
+    }, [lynxClient, func]);
+
+    const setType = useCallback((t: string) => {
+        if (func) setFunc({...func, type: t});
+    }, [func, setFunc]);
+
+    const remove = useCallback(() => {
+        return new Promise<OKResponse>(() => {
+            if (!func) {
+                throw new Error('delete on undefined function');
+            }
+            return lynxClient.deleteFunction(func);
+        });
+    }, [func, lynxClient]);
+
+    return {
+        loading: loading,
+        error: error,
+        Function: func,
+        update: update,
+        remove: remove,
+        setType: setType,
+        metaList: metaList,
+        setMeta: setMeta,
+        addMeta: addMeta,
+        removeMeta: removeMeta,
+        setMetaKey: setMetaKey,
+        setMetaValue: setMetaValue,
+        setMetaProtected: setMetaProtected,
+    };
+};
