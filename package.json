@@ -1,0 +1,52 @@
+{
+    "name": "@iotopen/react-lynx",
+    "version": "0.1.0",
+    "main": "dist/cjs/index.js",
+    "module": "dist/esm/index.js",
+    "source": "src/index.ts",
+    "scripts": {
+        "lint": "eslint --ext js,ts,tsx --max-warnings 0 src",
+        "clean": "rimraf dist",
+        "prepare": "npm run clean && npm run build:ts",
+        "dev": "npm run dev:ts",
+        "build": "npm run build:ts",
+        "build:ts": "rollup -c",
+        "dev:ts": "rollup -c -w"
+    },
+    "peerDependencies": {
+        "@iotopen/node-lynx": "github:IoTOpen/node-lynx#master",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+        "@iotopen/node-lynx": "git+https://github.com/IoTOpen/node-lynx.git#master",
+        "@rollup/plugin-commonjs": "^22.0.2",
+        "@rollup/plugin-node-resolve": "^14.0.1",
+        "@rollup/plugin-typescript": "^8.5.0",
+        "@types/jest": "^29.0.0",
+        "@types/node": "^18.7.16",
+        "@types/react": "^18.0.18",
+        "@types/react-dom": "^18.0.6",
+        "@typescript-eslint/eslint-plugin": "^5.36.2",
+        "@typescript-eslint/parser": "^5.36.2",
+        "cross-env": "^7.0.3",
+        "eslint": "^7.32.0",
+        "eslint-plugin-react": "^7.30.1",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "rollup": "^2.79.0",
+        "rollup-plugin-dts": "^4.2.2",
+        "rollup-plugin-peer-deps-external": "^2.2.4",
+        "rollup-plugin-terser": "^7.0.2",
+        "typescript": "^4.8.2"
+    },
+    "files": [
+        "dist"
+    ],
+    "types": "dist/index.d.ts",
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    }
+}

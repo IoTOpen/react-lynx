@@ -1,0 +1,7 @@
+{
+  "files.eol": "\n",
+  "javascript.preferences.quoteStyle": "single",
+  "prettier.singleQuote": true,
+  "prettier.tabWidth": 4,
+  "prettier.printWidth": 120
+}
