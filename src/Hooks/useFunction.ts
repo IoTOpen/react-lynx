@@ -1,6 +1,6 @@
 import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
-import {ErrorResponse, Functionx, OKResponse} from '@iotopen/node-lynx';
+import {ErrorResponse, Functionx, MetaObject, OKResponse} from '@iotopen/node-lynx';
 import {useMeta} from './useMeta';
 
 export const useFunction = (installationId: number, functionId: number) => {
@@ -70,5 +70,29 @@ export const useFunction = (installationId: number, functionId: number) => {
         setMetaKey: setMetaKey,
         setMetaValue: setMetaValue,
         setMetaProtected: setMetaProtected,
+    };
+};
+
+export const useFunctionMeta = (installationId: number, functionId?: number) => {
+    const {lynxClient} = useGlobalLynxClient();
+    const create = useCallback((key: string, meta: MetaObject, funId?: number, silent?: boolean) => {
+        const id = funId ? funId : functionId ?? 0;
+        return lynxClient.createFunctionMeta(installationId, id, key, meta, silent);
+    }, [lynxClient, installationId, functionId]);
+
+    const update = useCallback((key: string, meta: MetaObject, createMissing?: boolean, funId?: number, silent?: boolean) => {
+        const id = funId ? funId : functionId ?? 0;
+        return lynxClient.updateFunctionMeta(installationId, id, key, meta, silent);
+    }, [lynxClient, installationId, functionId]);
+
+    const remove = useCallback((key: string, funId?: number, silent?: boolean) => {
+        const id = funId ? funId : functionId ?? 0;
+        return lynxClient.deleteFunctionMeta(installationId, id, key, silent);
+    }, [lynxClient, installationId, functionId]);
+
+    return {
+        createMeta: create,
+        updateMeta: update,
+        removeMeta: remove,
     };
 };
