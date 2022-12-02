@@ -1,6 +1,6 @@
 import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
-import {Devicex, ErrorResponse, OKResponse} from '@iotopen/node-lynx';
+import {Devicex, ErrorResponse, MetaObject, OKResponse} from '@iotopen/node-lynx';
 import {useMeta} from './useMeta';
 
 export const useDevice = (installationId: number, deviceId: number) => {
@@ -70,5 +70,29 @@ export const useDevice = (installationId: number, deviceId: number) => {
         setMetaKey: setMetaKey,
         setMetaValue: setMetaValue,
         setMetaProtected: setMetaProtected,
+    };
+};
+
+export const useDeviceMeta = (installationId: number, deviceId?: number) => {
+    const {lynxClient} = useGlobalLynxClient();
+    const create = useCallback((key: string, meta: MetaObject, devId?: number, silent?: boolean) => {
+        const id = devId ? devId : deviceId ?? 0;
+        return lynxClient.createDeviceMeta(installationId, id, key, meta, silent);
+    }, [lynxClient, installationId, deviceId]);
+
+    const update = useCallback((key: string, meta: MetaObject, createMissing?: boolean, devId?: number, silent?: boolean) => {
+        const id = devId ? devId : deviceId ?? 0;
+        return lynxClient.updateDeviceMeta(installationId, id, key, meta, silent);
+    }, [lynxClient, installationId, deviceId]);
+
+    const remove = useCallback((key: string, devId?: number, silent?: boolean) => {
+        const id = devId ? devId : deviceId ?? 0;
+        return lynxClient.deleteDeviceMeta(installationId, id, key, silent);
+    }, [lynxClient, installationId, deviceId]);
+
+    return {
+        createMeta: create,
+        updateMeta: update,
+        removeMeta: remove,
     };
 };
