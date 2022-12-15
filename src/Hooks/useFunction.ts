@@ -6,7 +6,15 @@ import {useMeta} from './useMeta';
 export const useFunction = (installationId: number, functionId: number) => {
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
-    const [func, setFunc] = useState<Functionx | undefined>();
+    const [func, setFunc] = useState<Functionx>({
+        id: 0,
+        installation_id: 0,
+        type: '',
+        updated: 0,
+        created: 0,
+        meta: {},
+        protected_meta: {}
+    });
     const {
         metaList,
         setMeta,

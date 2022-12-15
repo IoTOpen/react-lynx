@@ -6,7 +6,15 @@ import {useMeta} from './useMeta';
 export const useDevice = (installationId: number, deviceId: number) => {
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
-    const [dev, setDev] = useState<Devicex | undefined>();
+    const [dev, setDev] = useState<Devicex>({
+        updated: 0,
+        created: 0,
+        id: 0,
+        installation_id: 0,
+        type: '',
+        meta: {},
+        protected_meta: {}
+    });
     const {
         metaList,
         setMeta,
