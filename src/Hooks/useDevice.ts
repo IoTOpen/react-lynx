@@ -90,7 +90,7 @@ export const useDeviceMeta = (installationId: number, deviceId?: number) => {
 
     const update = useCallback((key: string, meta: MetaObject, createMissing?: boolean, devId?: number, silent?: boolean) => {
         const id = devId ? devId : deviceId ?? 0;
-        return lynxClient.updateDeviceMeta(installationId, id, key, meta, silent);
+        return lynxClient.updateDeviceMeta(installationId, id, key, meta, silent, createMissing);
     }, [lynxClient, installationId, deviceId]);
 
     const remove = useCallback((key: string, devId?: number, silent?: boolean) => {
