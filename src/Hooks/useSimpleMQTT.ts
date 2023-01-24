@@ -48,7 +48,14 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
     }
     const subs = useRef<string[]>([]);
     const bindings = useRef(new Map<string, Binding[]>([]));
+    const exactBindings = useRef(new Map<string, Binding[]>([]));
     const onMessage = useCallback((msg: Paho.Message) => {
+        const tmp = exactBindings.current.get(msg.destinationName);
+        if (tmp) {
+            tmp.forEach((cb) => {
+                cb(msg.destinationName, msg.payloadString, msg.qos, msg.retained);
+            });
+        }
         bindings.current.forEach((binds, key) => {
             const re = new RegExp(key);
             if (re.test(msg.destinationName)) {
@@ -111,6 +118,24 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         });
     }, []);
 
+
+    const bindExact = useCallback((topic: string, binder: Binding) => {
+        let binds = exactBindings.current.get(topic);
+        if (binds === undefined) {
+            binds = [binder];
+        }
+        if (binds.includes(binder)) {
+            return;
+        }
+        binds.push(binder);
+    }, []);
+
+    const unbindExact = useCallback((topic: string, binder: Binding) => {
+        const binds = exactBindings.current.get(topic);
+        if (binds === undefined) return;
+        exactBindings.current.set(topic, binds.filter((b) => b !== binder));
+    }, []);
+
     const updateSubs = useCallback((s: string[]) => {
         if (isEq(subs.current, s)) {
             return;
@@ -125,11 +150,13 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
     }, [sub, unsub]);
 
     return {
-        error: error,
-        connected: connected,
         setSubs: updateSubs,
-        bind: bind,
-        unbind: unbind,
-        pub: pub,
+        error,
+        connected,
+        bind,
+        unbind,
+        bindExact,
+        unbindExact,
+        pub,
     };
 };
