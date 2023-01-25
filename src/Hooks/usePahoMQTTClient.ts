@@ -30,7 +30,11 @@ export const usePahoMQTTClient = (uri: string,
                 setConnected(client.current.isConnected());
                 if (rct.current === undefined) {
                     rct.current = window.setInterval(() => {
-                        c.current.connect(o);
+                        if(c.current.isConnected()) {
+                            clearInterval(rct.current);
+                        } else {
+                            c.current.connect(o);
+                        }
                     }, 1000);
                 }
             },
