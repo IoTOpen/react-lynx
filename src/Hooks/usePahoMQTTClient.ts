@@ -72,6 +72,9 @@ export const usePahoMQTTClient = (uri: string,
         return () => {
             try {
                 c.current.disconnect();
+                if (rct.current !== undefined) {
+                    window.clearInterval(rct.current);
+                }
             } catch (e) {
                 console.log(e);
             }
