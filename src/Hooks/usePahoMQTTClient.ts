@@ -12,9 +12,9 @@ export const usePahoMQTTClient = (uri: string,
     handlers?: MQTTHandlers, connectionOptions?: Paho.ConnectionOptions, clientId?: string) => {
     if (clientId === undefined) {
         let uuid;
-        if(window) {
+        if(window?.crypto?.randomUUID) {
             uuid = window.crypto.randomUUID();
-        } else if(crypto) {
+        } else if(typeof crypto !== 'undefined' && crypto?.randomUUID) {
             uuid = crypto.randomUUID();
         } else {
             uuid = Math.random().toString(36).substring(2, 15);
