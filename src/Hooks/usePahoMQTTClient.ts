@@ -11,7 +11,15 @@ interface MQTTHandlers {
 export const usePahoMQTTClient = (uri: string,
     handlers?: MQTTHandlers, connectionOptions?: Paho.ConnectionOptions, clientId?: string) => {
     if (clientId === undefined) {
-        clientId = `paho-ws-mqtt-${window.crypto.randomUUID()}`;
+        let uuid;
+        if(window) {
+            uuid = window.crypto.randomUUID();
+        } else if(crypto) {
+            uuid = crypto.randomUUID();
+        } else {
+            uuid = Math.random().toString(36).substring(2, 15);
+        }
+        clientId = `paho-ws-mqtt-${uuid}`;
     }
     const client = useRef<Paho.Client>(new Paho.Client(uri, clientId));
     const opts = useRef(connectionOptions);
