@@ -17,3 +17,8 @@ export * from './useConfiguredEdgeApps';
 export * from './useEdgeApps';
 export * from './useEdgeApp';
 export * from './useEdgeAppVersions';
+
+export * from './useNewOAuth2Client';
+export * from './useOAuth2Client';
+export * from './useOAuth2Clients';
+export * from './useOAuth2Consent';
