@@ -1,6 +1,6 @@
 import {useCallback, useState} from 'react';
 import {EmptyOAuth2Client} from '@iotopen/node-lynx';
-import {useGlobalLynxClient} from '@iotopen/react-lynx';
+import {useGlobalLynxClient} from '../Contexts';
 
 
 export const useNewOAuth2Client = () => {
@@ -42,6 +42,7 @@ export const useNewOAuth2Client = () => {
     const create = useCallback(() => {
         return lynxClient.createOAuth2Client(client);
     }, [lynxClient, client]);
+
     return {
         newClient: client,
         create,

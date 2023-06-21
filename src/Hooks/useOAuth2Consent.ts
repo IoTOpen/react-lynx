@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
-import {useGlobalLynxClient} from '@iotopen/react-lynx';
 import {useOAuth2Client} from './useOAuth2Client';
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useOAuth2Consent = () => {
     const {lynxClient} = useGlobalLynxClient();
