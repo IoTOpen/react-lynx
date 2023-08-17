@@ -28,21 +28,13 @@ export const UserProvider = ({children}: UserProviderProps) => {
     useLayoutEffect(() => {
         const me = lynxClient.getMe();
         const perms = lynxClient.getPermissions();
-        let userData: User;
-        let permissionData: { [key: string]: boolean };
-        me.then((u) => {
-            userData = u;
-            return perms;
-        }).then((perm) => {
-            permissionData = perm;
-        }).catch((e) => {
+        Promise.all([me, perms]).then(([u, p]) => {
+            setUser(u);
+            setPermissions(p);
+        }).catch(e => {
             setError(e);
             setUser(null);
             setPermissions(null);
-        }).then(() => {
-            if (error !== undefined) setError(undefined);
-            setUser(userData);
-            setPermissions(permissionData);
         }).finally(() => {
             setLoading(false);
         });
