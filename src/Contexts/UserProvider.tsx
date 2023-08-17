@@ -28,6 +28,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
     useLayoutEffect(() => {
         const me = lynxClient.getMe();
         const perms = lynxClient.getPermissions();
+        setLoading(true);
         Promise.all([me, perms]).then(([u, p]) => {
             setUser(u);
             setPermissions(p);
