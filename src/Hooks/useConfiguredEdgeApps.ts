@@ -2,7 +2,8 @@ import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
 import {EdgeAppInstance, ErrorResponse} from '@iotopen/node-lynx';
 
-export const useConfiguredEdgeApps = (installationId: number) => {
+export const useConfiguredEdgeApps = (installationId: number | string) => {
+    const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
@@ -10,7 +11,7 @@ export const useConfiguredEdgeApps = (installationId: number) => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getConfiguredEdgeApps(installationId).then(apps => {
+        lynxClient.getConfiguredEdgeApps(id).then(apps => {
             if (error !== undefined) setError(undefined);
             setApps(apps);
         }).catch(e => {
@@ -18,7 +19,7 @@ export const useConfiguredEdgeApps = (installationId: number) => {
         }).finally(() => {
             setLoading(false);
         });
-    }, [installationId, lynxClient]);
+    }, [id, lynxClient]);
 
     useLayoutEffect(() => {
         refresh();

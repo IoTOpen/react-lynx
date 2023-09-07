@@ -3,14 +3,15 @@ import {useGlobalLynxClient} from '../Contexts';
 import {Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse} from '@iotopen/node-lynx';
 import {ObjectOrArray} from '../types';
 
-export const useDevices = (installationId: number, filter?: Metadata) => {
+export const useDevices = (installationId: number|string, filter?: Metadata) => {
+    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [devices, setDevices] = useState<Devicex[]>([]);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refreshCall = useCallback(() => {
         setLoading(true);
-        lynxClient.getDevices(installationId, filter).then(res => {
+        lynxClient.getDevices(iid, filter).then(res => {
             if (error !== undefined) setError(undefined);
             setDevices(res);
         }).catch(e => {
@@ -18,7 +19,7 @@ export const useDevices = (installationId: number, filter?: Metadata) => {
         }).finally(() => {
             setLoading(false);
         });
-    }, [lynxClient, installationId, filter]);
+    }, [lynxClient, iid, filter]);
 
     function removeFn<T extends Devicex | Devicex[]>(devs: T): ObjectOrArray<OKResponse, Devicex, T>
     function removeFn(devs: Devicex | Devicex[]) {

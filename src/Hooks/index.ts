@@ -9,6 +9,9 @@ export * from './useNewFunction';
 export * from './useFunctions';
 export * from './useFunction';
 
+export * from './useInstallation';
+export * from './useNewInstallation';
+
 export * from './useNewDevice';
 export * from './useDevices';
 export * from './useDevice';
