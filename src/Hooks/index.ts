@@ -25,3 +25,6 @@ export * from './useNewOAuth2Client';
 export * from './useOAuth2Client';
 export * from './useOAuth2Clients';
 export * from './useOAuth2Consent';
+
+export * from './useOrganization';
+export * from './useNewOrganization';

@@ -14,7 +14,7 @@
         "dev:ts": "rollup -c -w"
     },
     "peerDependencies": {
-        "@iotopen/node-lynx": "git+https://github.com/IoTOpen/node-lynx#master",
+        "@iotopen/node-lynx": "git+https://github.com/IoTOpen/node-lynx#fix/missing-organization-fields",
         "paho-mqtt": "^1.1.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"

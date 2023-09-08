@@ -1,6 +1,5 @@
 import {EmptyDevicex, Metadata} from '@iotopen/node-lynx';
-import {useCallback, useLayoutEffect, useState} from 'react';
-import {useMeta} from './useMeta';
+import {useCallback, useState} from 'react';
 import {useGlobalLynxClient} from '../Contexts';
 
 export type DeviceTemplate = {

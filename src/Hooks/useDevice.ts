@@ -1,7 +1,6 @@
 import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
 import {Devicex, ErrorResponse, MetaObject, OKResponse} from '@iotopen/node-lynx';
-import {useMeta} from './useMeta';
 
 export const useDevice = (installationId: number | string, deviceId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;

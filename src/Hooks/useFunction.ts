@@ -1,7 +1,6 @@
 import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
 import {ErrorResponse, Functionx, MetaObject, OKResponse} from '@iotopen/node-lynx';
-import {useMeta} from './useMeta';
 
 export const useFunction = (installationId: number | string, functionId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -22,16 +21,6 @@ export const useFunction = (installationId: number | string, functionId: number 
         meta: {},
         protected_meta: {}
     });
-    const {
-        metaList,
-        setMeta,
-        removeMeta,
-        compile,
-        setMetaKey,
-        addMeta,
-        setMetaValue,
-        setMetaProtected
-    } = useMeta(func, [loading]);
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useLayoutEffect(() => {
@@ -44,10 +33,6 @@ export const useFunction = (installationId: number | string, functionId: number 
             setLoading(false);
         });
     }, [lynxClient, iid, id]);
-
-    useLayoutEffect(() => {
-        if (func) setFunc({...func, ...compile()});
-    }, [func, metaList, setFunc]);
 
     const update = useCallback(() => {
         return new Promise<Functionx>(() => {
@@ -79,13 +64,6 @@ export const useFunction = (installationId: number | string, functionId: number 
         update: update,
         remove: remove,
         setType: setType,
-        metaList: metaList,
-        setMeta: setMeta,
-        addMeta: addMeta,
-        removeMeta: removeMeta,
-        setMetaKey: setMetaKey,
-        setMetaValue: setMetaValue,
-        setMetaProtected: setMetaProtected,
     };
 };
 
