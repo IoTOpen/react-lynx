@@ -2,36 +2,36 @@ import {Organization} from '@iotopen/node-lynx';
 import {useCallback, useEffect, useState} from 'react';
 import {useGlobalLynxClient} from '../Contexts';
 
+export const zeroOrganization = {
+    address: {
+        address: '',
+        city: '',
+        country: '',
+        zip: '',
+    },
+    children: [],
+    email: '',
+    force_sms_login: false,
+    meta: {},
+    name: '',
+    notes: '',
+    parent: 0,
+    password_valid_days: 0,
+    phone: '',
+    protected_meta: {},
+    id: 0
+};
 export const useOrganization = (organizationId: number | string) => {
     const oid = typeof organizationId === 'string' ? Number.parseInt(organizationId) : organizationId;
     if (isNaN(oid)) {
         throw new Error('invalid organizationId');
     }
-
-    const [organization, setOrganization] = useState<Organization>({
-        id: 0,
-        address: {
-            address: '',
-            city: '',
-            country: '',
-            zip: '',
-        },
-        children: [],
-        email: '',
-        force_sms_login: false,
-        parent: 0,
-        phone: '',
-        name: '',
-        notes: '',
-        meta: {},
-        password_valid_days: 0,
-        protected_meta: {},
-    });
+    const [organization, setOrganization] = useState<Organization>({...zeroOrganization});
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | undefined>();
     const {lynxClient} = useGlobalLynxClient();
 
-    const refresh = useCallback( () => {
+    const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getOrganization(oid).then(org => {
             if (error !== undefined) setError(undefined);
@@ -45,6 +45,7 @@ export const useOrganization = (organizationId: number | string) => {
 
     useEffect(() => {
         refresh();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const update = useCallback(() => {
@@ -62,5 +63,6 @@ export const useOrganization = (organizationId: number | string) => {
         error,
         update,
         remove,
+        refresh
     };
 };

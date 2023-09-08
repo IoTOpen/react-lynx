@@ -2,6 +2,16 @@ import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
 import {Devicex, ErrorResponse, MetaObject, OKResponse} from '@iotopen/node-lynx';
 
+export const zeroDevice = {
+    updated: 0,
+    created: 0,
+    id: 0,
+    installation_id: 0,
+    type: '',
+    meta: {},
+    protected_meta: {}
+};
+
 export const useDevice = (installationId: number | string, deviceId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const id = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
@@ -10,15 +20,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     }
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
-    const [dev, setDev] = useState<Devicex>({
-        updated: 0,
-        created: 0,
-        id: 0,
-        installation_id: 0,
-        type: '',
-        meta: {},
-        protected_meta: {}
-    });
+    const [dev, setDev] = useState<Devicex>({...zeroDevice});
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useLayoutEffect(() => {

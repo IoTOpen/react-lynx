@@ -2,6 +2,16 @@ import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
 import {ErrorResponse, Functionx, MetaObject, OKResponse} from '@iotopen/node-lynx';
 
+export const zeroFunction = {
+    id: 0,
+    installation_id: 0,
+    type: '',
+    updated: 0,
+    created: 0,
+    meta: {},
+    protected_meta: {}
+};
+
 export const useFunction = (installationId: number | string, functionId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const id = typeof functionId === 'string' ? Number.parseInt(functionId) : functionId;
@@ -12,15 +22,7 @@ export const useFunction = (installationId: number | string, functionId: number 
 
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
-    const [func, setFunc] = useState<Functionx>({
-        id: 0,
-        installation_id: 0,
-        type: '',
-        updated: 0,
-        created: 0,
-        meta: {},
-        protected_meta: {}
-    });
+    const [func, setFunc] = useState<Functionx>({...zeroFunction});
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useLayoutEffect(() => {

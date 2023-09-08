@@ -1,6 +1,7 @@
 import {useCallback, useState} from 'react';
 import {Address, EmptyOrganization, Metadata, OrganizationChild} from '@iotopen/node-lynx';
 import {useGlobalLynxClient} from '../Contexts';
+import {zeroOrganization} from './useOrganization';
 
 
 export type OrganizationTemplate = {
@@ -22,21 +23,7 @@ export const useNewOrganization = (parentId: number | string , template?: Organi
     }
     const {lynxClient} = useGlobalLynxClient();
     const [newOrganization, setNewOrganization] = useState<EmptyOrganization>({
-        address: {
-            address: '',
-            city: '',
-            country: '',
-            zip: '',
-        },
-        children: [],
-        email: '',
-        force_sms_login: false,
-        phone: '',
-        name: '',
-        notes: '',
-        meta: {},
-        protected_meta: {},
-        password_valid_days: 0,
+        ...zeroOrganization,
         ...template, parent: pid
     });
 
@@ -45,8 +32,8 @@ export const useNewOrganization = (parentId: number | string , template?: Organi
     }, [lynxClient, newOrganization]);
 
     return {
-        newOrganization: newOrganization,
-        setNewOrganization: setNewOrganization,
-        create: create,
+        newOrganization,
+        setNewOrganization,
+        create,
     };
 };

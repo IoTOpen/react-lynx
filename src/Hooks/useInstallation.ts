@@ -2,6 +2,18 @@ import {useCallback, useLayoutEffect, useState} from 'react';
 import {Installation} from '@iotopen/node-lynx';
 import {useGlobalLynxClient} from '../Contexts';
 
+const zeroInstallation = {
+    client_id: 0,
+    notes: '',
+    organization_id: 0,
+    id: 0,
+    name: '',
+    created: 0,
+    meta: {},
+    users: [],
+    protected_meta: {}
+};
+
 export const useInstallation = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if(isNaN(id)) {
@@ -10,17 +22,7 @@ export const useInstallation = (installationId: number | string) => {
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | undefined>(undefined);
-    const [installation, setInstallation] = useState<Installation>({
-        client_id: 0,
-        notes: '',
-        organization_id: 0,
-        id: 0,
-        name: '',
-        created: 0,
-        meta: {},
-        users: [],
-        protected_meta: {}
-    });
+    const [installation, setInstallation] = useState<Installation>({...zeroInstallation});
 
     useLayoutEffect(() => {
         lynxClient.getInstallationRow(id).then(inst => {
