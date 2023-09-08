@@ -4,6 +4,9 @@ import {EdgeAppInstance, ErrorResponse} from '@iotopen/node-lynx';
 
 export const useConfiguredEdgeApps = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
+    if(isNaN(id)) {
+        throw new Error('invalid installationId');
+    }
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();

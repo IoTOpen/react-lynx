@@ -4,6 +4,9 @@ import {useGlobalLynxClient} from '../Contexts';
 
 export const useInstallation = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
+    if(isNaN(id)) {
+        throw new Error('invalid installationId');
+    }
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | undefined>(undefined);

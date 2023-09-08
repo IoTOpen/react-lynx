@@ -5,11 +5,19 @@ import {ObjectOrArray} from '../types';
 
 export const useDevices = (installationId: number|string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
+    if(isNaN(iid) && iid !== undefined) {
+        throw new Error('invalid installationId');
+    }
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [devices, setDevices] = useState<Devicex[]>([]);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refreshCall = useCallback(() => {
+        if(iid === undefined) {
+            setLoading(false);
+            setDevices([]);
+            return;
+        }
         setLoading(true);
         lynxClient.getDevices(iid, filter).then(res => {
             if (error !== undefined) setError(undefined);

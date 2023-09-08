@@ -11,26 +11,15 @@ export type FunctionTemplate = {
 
 export const useNewFunction = (installationId: number | string, template?: FunctionTemplate) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
+    if (isNaN(id)) {
+        throw new Error('invalid installationId');
+    }
     const {lynxClient} = useGlobalLynxClient();
     const [newFunction, setNewFunction] = useState<EmptyFunctionx>({
         meta: {},
         protected_meta: {},
         type: '', ...template, installation_id: id
     });
-    const {
-        setMeta,
-        removeMeta,
-        compile,
-        metaList,
-        addMeta,
-        setMetaKey,
-        setMetaProtected,
-        setMetaValue
-    } = useMeta(newFunction, []);
-
-    useLayoutEffect(() => {
-        setNewFunction({...newFunction, ...compile()});
-    }, [compile, metaList, setNewFunction]);
 
     const setType = useCallback((t: string) => {
         setNewFunction({...newFunction, type: t});
@@ -45,12 +34,5 @@ export const useNewFunction = (installationId: number | string, template?: Funct
         setNewFunction: setNewFunction,
         create: create,
         setType: setType,
-        removeMeta: removeMeta,
-        addMeta: addMeta,
-        updateMeta: setMeta,
-        metaList: metaList,
-        setMetaKey: setMetaKey,
-        setMetaValue: setMetaValue,
-        setMetaProtected: setMetaProtected,
     };
 };

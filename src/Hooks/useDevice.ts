@@ -3,9 +3,12 @@ import {useCallback, useLayoutEffect, useState} from 'react';
 import {Devicex, ErrorResponse, MetaObject, OKResponse} from '@iotopen/node-lynx';
 import {useMeta} from './useMeta';
 
-export const useDevice = (installationId: number | string, deviceID: number | string) => {
+export const useDevice = (installationId: number | string, deviceId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const id = typeof deviceID === 'string' ? Number.parseInt(deviceID) : deviceID;
+    const id = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
+    if(isNaN(iid) || isNaN(id)) {
+        throw new Error('invalid installationId or deviceId');
+    }
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [dev, setDev] = useState<Devicex>({
@@ -17,16 +20,6 @@ export const useDevice = (installationId: number | string, deviceID: number | st
         meta: {},
         protected_meta: {}
     });
-    const {
-        metaList,
-        setMeta,
-        removeMeta,
-        compile,
-        setMetaKey,
-        addMeta,
-        setMetaValue,
-        setMetaProtected
-    } = useMeta(dev, [loading]);
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useLayoutEffect(() => {
@@ -39,10 +32,6 @@ export const useDevice = (installationId: number | string, deviceID: number | st
             setLoading(false);
         });
     }, [lynxClient, iid, id]);
-
-    useLayoutEffect(() => {
-        if (dev) setDev({...dev, ...compile()});
-    }, [dev, metaList, setDev]);
 
     const update = useCallback(() => {
         return new Promise<Devicex>(() => {
@@ -74,13 +63,6 @@ export const useDevice = (installationId: number | string, deviceID: number | st
         update: update,
         remove: remove,
         setType: setType,
-        metaList: metaList,
-        setMeta: setMeta,
-        addMeta: addMeta,
-        removeMeta: removeMeta,
-        setMetaKey: setMetaKey,
-        setMetaValue: setMetaValue,
-        setMetaProtected: setMetaProtected,
     };
 };
 

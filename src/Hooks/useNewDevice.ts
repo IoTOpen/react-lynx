@@ -11,26 +11,15 @@ export type DeviceTemplate = {
 
 export const useNewDevice = (installationId: number | string, template?: DeviceTemplate) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
+    if (isNaN(id)) {
+        throw new Error('invalid installationId');
+    }
     const {lynxClient} = useGlobalLynxClient();
     const [newDevice, setNewDevice] = useState<EmptyDevicex>({
         meta: {},
         protected_meta: {},
         type: '', ...template, installation_id: id
     });
-    const {
-        setMeta,
-        removeMeta,
-        compile,
-        metaList,
-        addMeta,
-        setMetaKey,
-        setMetaValue,
-        setMetaProtected
-    } = useMeta(newDevice, []);
-
-    useLayoutEffect(() => {
-        setNewDevice({...newDevice, ...compile()});
-    }, [compile, metaList, setNewDevice]);
 
     const setType = useCallback((t: string) => {
         setNewDevice({...newDevice, type: t});
@@ -45,12 +34,5 @@ export const useNewDevice = (installationId: number | string, template?: DeviceT
         setNewDevice: setNewDevice,
         create: create,
         setType: setType,
-        removeMeta: removeMeta,
-        addMeta: addMeta,
-        updateMeta: setMeta,
-        metaList: metaList,
-        setMetaKey: setMetaKey,
-        setMetaValue: setMetaValue,
-        setMetaProtected: setMetaProtected,
     };
 };

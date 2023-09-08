@@ -7,6 +7,10 @@ export const useFunction = (installationId: number | string, functionId: number 
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const id = typeof functionId === 'string' ? Number.parseInt(functionId) : functionId;
 
+    if (isNaN(iid) || isNaN(id)) {
+        throw new Error('invalid installationId or functionId');
+    }
+
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [func, setFunc] = useState<Functionx>({

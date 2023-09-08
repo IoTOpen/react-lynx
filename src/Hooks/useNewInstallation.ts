@@ -12,6 +12,9 @@ export type InstallationTemplate = {
 
 export const useNewInstallation = (organizationId: number | string, template?: InstallationTemplate) => {
     const oid = typeof organizationId === 'string' ? Number.parseInt(organizationId) : organizationId;
+    if (isNaN(oid)) {
+        throw new Error('invalid organizationId');
+    }
     const [newInstallation, setNewInstallation] = useState<EmptyInstallation>({
         name: '', notes: '', users: [],
         meta: {},
