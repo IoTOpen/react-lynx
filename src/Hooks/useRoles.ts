@@ -2,13 +2,6 @@ import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useEffect, useState} from 'react';
 import {Role} from '@iotopen/node-lynx';
 
-export const zeroRole: Role = {
-    name: '',
-    priority: 0,
-    permissions: {},
-    id: 0,
-};
-
 export const useRoles = () => {
     const {lynxClient} = useGlobalLynxClient();
     const [roles, setRoles] = useState<Role[]>([]);

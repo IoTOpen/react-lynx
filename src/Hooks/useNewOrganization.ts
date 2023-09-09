@@ -16,6 +16,24 @@ export type OrganizationTemplate = {
     meta?: Metadata
     protected_meta?: Metadata
 }
+export const zeroEmptyOrganization = {
+    address: {
+        address: '',
+        city: '',
+        country: '',
+        zip: '',
+    },
+    children: [],
+    email: '',
+    force_sms_login: false,
+    meta: {},
+    name: '',
+    notes: '',
+    parent: 0,
+    password_valid_days: 0,
+    phone: '',
+    protected_meta: {},
+};
 export const useNewOrganization = (parentId: number | string , template?: OrganizationTemplate) => {
     const pid = typeof parentId === 'string' ? Number.parseInt(parentId) : parentId;
     if (isNaN(pid)) {
@@ -23,7 +41,7 @@ export const useNewOrganization = (parentId: number | string , template?: Organi
     }
     const {lynxClient} = useGlobalLynxClient();
     const [newOrganization, setNewOrganization] = useState<EmptyOrganization>({
-        ...zeroOrganization,
+        ...zeroEmptyOrganization,
         ...template, parent: pid
     });
 

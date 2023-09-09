@@ -3,9 +3,22 @@ import {EmptyOAuth2Client} from '@iotopen/node-lynx';
 import {useGlobalLynxClient} from '../Contexts';
 import {zeroOAuth2Client} from './useOAuth2Client';
 
+export const zeroEmptyOAuth2Client= {
+    created: 0,
+    updated: 0,
+    name: '',
+    id: '',
+    client_secret: '',
+    trusted: false,
+    allowed_scopes: [],
+    icon_uri: '',
+    policy_uri: '',
+    tos_uri: '',
+    redirect_uris: [],
+};
 export const useNewOAuth2Client = () => {
     const {lynxClient} = useGlobalLynxClient();
-    const [client, setClient] = useState<EmptyOAuth2Client>({...zeroOAuth2Client});
+    const [client, setClient] = useState<EmptyOAuth2Client>({...zeroEmptyOAuth2Client});
 
     const setName = useCallback((name: string) => {
         setClient({...client, name: name});
