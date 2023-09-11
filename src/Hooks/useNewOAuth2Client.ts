@@ -2,7 +2,7 @@ import {useCallback, useState} from 'react';
 import {EmptyOAuth2Client} from '@iotopen/node-lynx';
 import {useGlobalLynxClient} from '../Contexts';
 
-export const zeroEmptyOAuth2Client= {
+const zeroEmptyOAuth2Client= {
     created: 0,
     updated: 0,
     name: '',

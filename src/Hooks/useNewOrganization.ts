@@ -14,7 +14,7 @@ export type OrganizationTemplate = {
     meta?: Metadata
     protected_meta?: Metadata
 }
-export const zeroEmptyOrganization = {
+const zeroEmptyOrganization = {
     address: {
         address: '',
         city: '',

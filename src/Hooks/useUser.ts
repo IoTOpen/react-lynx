@@ -2,7 +2,7 @@ import {User} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
 import {useGlobalLynxClient} from '../Contexts';
 
-export const zeroUser = {
+const zeroUser = {
     id: 0,
     address: {
         address: '',

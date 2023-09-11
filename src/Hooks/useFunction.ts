@@ -2,7 +2,7 @@ import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
 import {ErrorResponse, Functionx, MetaObject, OKResponse} from '@iotopen/node-lynx';
 
-export const zeroFunction = {
+const zeroFunction = {
     id: 0,
     installation_id: 0,
     type: '',

@@ -2,7 +2,7 @@ import {Organization} from '@iotopen/node-lynx';
 import {useCallback, useEffect, useState} from 'react';
 import {useGlobalLynxClient} from '../Contexts';
 
-export const zeroOrganization = {
+const zeroOrganization = {
     address: {
         address: '',
         city: '',
