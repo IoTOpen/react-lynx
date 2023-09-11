@@ -3,22 +3,32 @@ import {useGlobalLynxClient} from '../Contexts';
 import {EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse} from '@iotopen/node-lynx';
 import {ObjectOrArray} from '../types';
 
-export const useFunctions = (installationId: number, filter?: Metadata) => {
+export const useFunctions = (installationId: number | string, filter?: Metadata) => {
+    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
+    if(isNaN(iid) && iid !== undefined) {
+        throw new Error('invalid installationId');
+    }
     const {lynxClient} = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [functions, setFunctions] = useState<Functionx[]>([]);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refreshCall = useCallback(() => {
+        if (iid === undefined) {
+            setLoading(false);
+            setFunctions([]);
+            return;
+        }
         setLoading(true);
-        lynxClient.getFunctions(installationId, filter).then(res => {
+        lynxClient.getFunctions(iid, filter).then(res => {
             if (error !== undefined) setError(undefined);
             setFunctions(res);
+            return res;
         }).catch(e => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [lynxClient, installationId, filter]);
+    }, [lynxClient, iid, filter]);
 
     function removeFn<T extends Functionx | Functionx[]>(fns: T): ObjectOrArray<OKResponse, Functionx, T>
     function removeFn(fns: Functionx | Functionx[]) {
