@@ -1,7 +1,6 @@
-import {ErrorResponse, MinimalOrg, Organization, OrganizationSimple} from '@iotopen/node-lynx';
+import {ErrorResponse, MinimalOrg, Organization} from '@iotopen/node-lynx';
 import {useCallback, useEffect, useState} from 'react';
 import {useGlobalLynxClient} from '../Contexts';
-import {zeroOrganization} from './useOrganization';
 
 export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
     const {lynxClient} = useGlobalLynxClient();
@@ -30,8 +29,8 @@ export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
         return lynxClient.createOrganization(org);
     }, [lynxClient]);
 
-    const remove = useCallback((org: Organization | OrganizationSimple) => {
-        return lynxClient.deleteOrganization({...zeroOrganization, id: org.id});
+    const remove = useCallback((org: Organization) => {
+        return lynxClient.deleteOrganization(org);
     }, [lynxClient]);
 
     return {
