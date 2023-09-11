@@ -2,7 +2,7 @@ import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
 import {Devicex, ErrorResponse, MetaObject, OKResponse} from '@iotopen/node-lynx';
 
-export const zeroDevice = {
+const zeroDevice = {
     updated: 0,
     created: 0,
     id: 0,

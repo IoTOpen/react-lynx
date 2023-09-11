@@ -2,7 +2,7 @@ import {useCallback, useLayoutEffect, useState} from 'react';
 import {EdgeApp, ErrorResponse} from '@iotopen/node-lynx';
 import {useGlobalLynxClient} from '../Contexts';
 
-export const zeroEdgeApp = {
+const zeroEdgeApp = {
     id: 0,
     created: 0,
     updated: 0,

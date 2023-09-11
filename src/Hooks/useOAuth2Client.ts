@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
-import {EmptyOAuth2Client, ErrorResponse, OAuth2Client} from '@iotopen/node-lynx';
+import {ErrorResponse, OAuth2Client} from '@iotopen/node-lynx';
 import {useGlobalLynxClient} from '../Contexts';
 
 export const zeroOAuth2Client= {

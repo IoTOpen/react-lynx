@@ -1,5 +1,5 @@
 import {Metadata, User} from '@iotopen/node-lynx';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {useGlobalLynxClient} from '../Contexts';
 
 
