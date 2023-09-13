@@ -43,3 +43,6 @@ export * from './useNotificationMessages';
 export * from './useNewNotificationOutput';
 export * from './useNotificationOutput';
 export * from './useNotificationOutputs';
+
+export * from './useNotificationOutputExecutor';
+export * from './useNotificationOutputExecutors';
