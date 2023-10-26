@@ -10,6 +10,7 @@ export * from './useFunctions';
 export * from './useFunction';
 
 export * from './useInstallation';
+export * from './useInstallations';
 export * from './useNewInstallation';
 
 export * from './useNewDevice';
