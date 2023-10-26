@@ -1,16 +1,6 @@
 import {useCallback, useState} from 'react';
-import {EmptyOAuth2Client} from '@iotopen/node-lynx';
+import {EmptyOAuth2Client, zero} from '@iotopen/node-lynx';
 import {useGlobalLynxClient} from '../Contexts';
-
-const zeroEmptyOAuth2Client= {
-    name: '',
-    trusted: false,
-    allowed_scopes: [],
-    icon_uri: '',
-    tos_uri: '',
-    policy_uri:  '',
-    redirect_uris: []
-};
 
 export type OAuth2ClientTemplate = {
     name?: string
@@ -20,12 +10,13 @@ export type OAuth2ClientTemplate = {
     tos_uri?: string
     policy_uri?: string
     redirect_uris?: string[]
+    id_token_alg?: string
 }
 
 export const useNewOAuth2Client = (template?: OAuth2ClientTemplate) => {
     const {lynxClient} = useGlobalLynxClient();
     const [client, setClient] = useState<EmptyOAuth2Client>({
-        ...zeroEmptyOAuth2Client,
+        ...zero.getEmptyOAuth2Client(),
         ...template,
     });
 
