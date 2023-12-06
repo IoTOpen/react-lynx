@@ -1,6 +1,6 @@
 {
     "name": "@iotopen/react-lynx",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "main": "dist/cjs/index.js",
     "module": "dist/esm/index.js",
     "source": "src/index.ts",
@@ -14,7 +14,7 @@
         "dev:ts": "rollup -c -w"
     },
     "peerDependencies": {
-        "@iotopen/node-lynx": "git+https://github.com/IoTOpen/node-lynx#master",
+        "@iotopen/node-lynx": "^2.3.0",
         "paho-mqtt": "^1.1.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
