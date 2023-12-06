@@ -41,7 +41,7 @@ const MyComponent = () => {
         <div>
             {loading && <h2>Loading installations...</h2>}
             {!loading && <ul>
-                {installations.map(i => <li>i.name</li>)}
+                {installations.map(i => <li>{i.name}</li>)}
             </ul>}
         </div>
     );
