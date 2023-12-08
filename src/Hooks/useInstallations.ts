@@ -1,5 +1,5 @@
 import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useState} from 'react';
+import {useCallback, useLayoutEffect, useState} from 'react';
 import {ErrorResponse, Installation, Metadata} from '@iotopen/node-lynx';
 
 export const useInstallations = (filter?: Metadata) => {
@@ -19,6 +19,10 @@ export const useInstallations = (filter?: Metadata) => {
             setLoading(false);
         });
     }, [lynxClient, filter]);
+
+    useLayoutEffect(() => {
+        refresh();
+    }, [refresh]);
 
     return {
         loading,
