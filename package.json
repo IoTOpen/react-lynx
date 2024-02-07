@@ -6,15 +6,12 @@
     "source": "src/index.ts",
     "scripts": {
         "lint": "eslint --ext js,ts,tsx --max-warnings 0 src",
-        "clean": "rimraf dist",
-        "prepare": "npm run clean && npm run build:ts",
-        "dev": "npm run dev:ts",
-        "build": "npm run build:ts",
-        "build:ts": "rollup -c",
-        "dev:ts": "rollup -c -w"
+        "prepare": "rm -rf dist/ && rollup -c",
+        "build": "rollup -c",
+        "dev": "rollup -c -w"
     },
     "peerDependencies": {
-        "@iotopen/node-lynx": "^2.3.0",
+        "@iotopen/node-lynx": "^2.4.0",
         "paho-mqtt": "^1.1.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
