@@ -4,7 +4,7 @@ import {LynxClient} from '@iotopen/node-lynx';
 
 interface lynxClientContext {
     lynxClient: LynxClient;
-    newLynxClient: (url: string, apiKey?: string) => void;
+    newLynxClient: (url: string, apiKey?: string, bearer?: boolean) => void;
 }
 
 const defaultLynxClientContext = {
