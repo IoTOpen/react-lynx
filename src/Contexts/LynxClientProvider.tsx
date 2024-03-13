@@ -9,7 +9,7 @@ interface lynxClientContext {
 
 const defaultLynxClientContext = {
     lynxClient: new LynxClient(''),
-    newLynxClient: (url?: string, apiKey?: string) => {
+    newLynxClient: (url?: string, apiKey?: string, bearer?: boolean) => {
     }
 };
 
@@ -19,11 +19,12 @@ interface LynxClientProviderProps {
     children?: ReactNode;
     url?: string;
     apiKey?: string;
+    bearer?: boolean;
 }
 
-export const LynxClientProvider = ({children, url, apiKey}: LynxClientProviderProps) => {
-    const [client, setClient] = useState(new LynxClient(url, apiKey));
-    const newClient = useCallback((url: string, apiKey?: string) => setClient(new LynxClient(url, apiKey)), [setClient]);
+export const LynxClientProvider = ({children, url, apiKey, bearer}: LynxClientProviderProps) => {
+    const [client, setClient] = useState(new LynxClient(url, apiKey, bearer));
+    const newClient = useCallback((url: string, apiKey?: string, bearer?: boolean) => setClient(new LynxClient(url, apiKey, bearer)), [setClient]);
     const contextValue = useMemo(() => ({lynxClient: client, newLynxClient: newClient}), [client, newClient]);
     return (
         <LynxClientContext.Provider value={contextValue}>
