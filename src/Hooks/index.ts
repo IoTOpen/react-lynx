@@ -48,3 +48,5 @@ export * from './useNotificationOutputs';
 
 export * from './useNotificationOutputExecutor';
 export * from './useNotificationOutputExecutors';
+
+export * from './useCheckPermissions';

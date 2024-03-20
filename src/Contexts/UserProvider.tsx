@@ -56,5 +56,5 @@ export const useGlobalUser = () => {
 
 export const useGlobalPermissions = () => {
     const {permissions} = useGlobalUser();
-    return [permissions];
+    return permissions;
 };
