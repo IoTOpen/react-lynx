@@ -34,14 +34,14 @@ export const useOrganization = (organizationId: number | string) => {
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getOrganization(oid).then(org => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setOrganization(org);
         }).catch(e => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [error, lynxClient, oid]);
+    }, [lynxClient, oid]);
 
     useEffect(() => {
         refresh();

@@ -15,7 +15,7 @@ export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) =
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getEdgeAppVersions(id, untagged).then((versions) => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setVersions(versions);
         }).catch(e => {
             setError(e);

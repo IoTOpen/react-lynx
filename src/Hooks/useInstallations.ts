@@ -11,10 +11,10 @@ export const useInstallations = (filter?: Metadata) => {
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.listInstallations(filter).then(res => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setInstallations(res);
         }).catch(e => {
-            setError(e);
+            setError(() => e);
         }).finally(() => {
             setLoading(false);
         });

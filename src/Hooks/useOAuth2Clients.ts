@@ -9,14 +9,14 @@ export const useOAuth2Clients = () => {
     const [clients, setClients] = useState<OAuth2Client[]>([]);
     const refresh = useCallback(() => {
         lynxClient.getOAuth2Clients().then(clients => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setClients(clients);
         }).catch(e => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [lynxClient, error]);
+    }, [lynxClient]);
 
     useEffect(() => {
         refresh();

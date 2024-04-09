@@ -38,7 +38,7 @@ export const useUser = (userId: number | string) => {
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getUser(id).then((user) => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setUser(user);
         }).catch(e => {
             setError(e);

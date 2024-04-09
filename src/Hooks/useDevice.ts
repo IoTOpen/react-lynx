@@ -25,7 +25,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
 
     useLayoutEffect(() => {
         lynxClient.getDevice(iid, id).then(fn => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setDev(fn);
         }).catch(e => {
             setError(e);

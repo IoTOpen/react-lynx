@@ -26,7 +26,7 @@ export const useInstallation = (installationId: number | string) => {
 
     useLayoutEffect(() => {
         lynxClient.getInstallationRow(id).then(inst => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setInstallation(inst);
         }).catch(e => {
             setError(e);

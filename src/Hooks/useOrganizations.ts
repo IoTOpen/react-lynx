@@ -11,7 +11,7 @@ export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getOrganizations(minimal === true).then(orgs => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setOrganizations(<MinimalOrg<T>[]>orgs);
         }).catch(e => {
             setError(e);

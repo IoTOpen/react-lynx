@@ -30,6 +30,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
         const perms = lynxClient.getPermissions();
         setLoading(true);
         Promise.all([me, perms]).then(([u, p]) => {
+            setError((err) => err !== undefined ? undefined : err);
             setUser(u);
             setPermissions(p);
         }).catch(e => {

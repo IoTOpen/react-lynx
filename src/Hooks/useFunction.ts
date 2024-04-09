@@ -27,7 +27,7 @@ export const useFunction = (installationId: number | string, functionId: number 
 
     useLayoutEffect(() => {
         lynxClient.getFunction(iid, id).then(fn => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setFunc(fn);
         }).catch(e => {
             setError(e);

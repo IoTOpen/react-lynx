@@ -20,7 +20,7 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         }
         setLoading(true);
         lynxClient.getFunctions(iid, filter).then(res => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setFunctions(res);
             return res;
         }).catch(e => {

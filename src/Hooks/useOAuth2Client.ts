@@ -10,14 +10,14 @@ export const useOAuth2Client = (id: string) => {
     const refresh = useCallback(() => {
         if (!loading) setLoading(true);
         lynxClient.getOAuth2Client(id).then(client => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setClient(client);
         }).catch(e => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [loading, lynxClient, id, error]);
+    }, [loading, lynxClient, id]);
 
     useEffect(() => {
         refresh();
