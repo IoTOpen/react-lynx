@@ -15,14 +15,14 @@ export const useUsers = (filter?: Metadata) => {
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getUsers(filter).then((users) => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setUsers(users);
         }).catch((e) => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [lynxClient, filter, error]);
+    }, [lynxClient, filter]);
 
     return {
         users,

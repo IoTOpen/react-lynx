@@ -11,14 +11,14 @@ export const useIDTokenAlgorithms = () => {
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getIDTokenAlgorithms().then(res => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setAlgs(res);
         }).catch(e => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [error, lynxClient]);
+    }, [lynxClient]);
 
     useEffect(() => {
         refresh();

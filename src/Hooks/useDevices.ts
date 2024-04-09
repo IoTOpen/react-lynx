@@ -20,7 +20,7 @@ export const useDevices = (installationId: number|string, filter?: Metadata) => 
         }
         setLoading(true);
         lynxClient.getDevices(iid, filter).then(res => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setDevices(res);
         }).catch(e => {
             setError(e);

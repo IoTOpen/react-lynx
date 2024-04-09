@@ -11,7 +11,7 @@ export const useInstallationInfo = (assignedOnly?: boolean) => {
     const refreshCall = useCallback(() => {
         setLoading(true);
         lynxClient.getInstallations(assignedOnly).then((res) => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setInstallations(res);
         }).catch((e: ErrorResponse) => {
             setError(e);

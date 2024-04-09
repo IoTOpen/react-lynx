@@ -28,14 +28,14 @@ export const useNotificationMessage = (installationId: number | string, notifica
         if(iid === 0 || id === 0) return;
         setLoading(true);
         lynxClient.getNotificationMessage(iid, id).then(res => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setMessage(res);
         }).catch(e => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [error, id, iid, lynxClient]);
+    }, [id, iid, lynxClient]);
 
     const update = useCallback(() => {
         if (error !== undefined) setError(undefined);

@@ -13,14 +13,14 @@ export const useNotificationOutputExecutors = (installationId: number | string) 
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refresh = useCallback(() => {
         lynxClient.getNotificationOutputExecutors(iid).then(res => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setNotificationExecutors(res);
         }).catch(e => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [error, iid, lynxClient]);
+    }, [iid, lynxClient]);
 
     useEffect(() => {
         refresh();

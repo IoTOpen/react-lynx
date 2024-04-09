@@ -15,7 +15,7 @@ export const useConfiguredEdgeApps = (installationId: number | string) => {
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getConfiguredEdgeApps(id).then(apps => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setApps(apps);
         }).catch(e => {
             setError(e);

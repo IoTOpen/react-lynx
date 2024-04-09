@@ -11,7 +11,7 @@ export const useTokens = () => {
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getTokens().then((tokens) => {
-            if (error !== undefined) setError(undefined);
+            setError((err) => err !== undefined ? undefined : err);
             setTokens(tokens);
         }).catch((e) => {
             setError(e);
