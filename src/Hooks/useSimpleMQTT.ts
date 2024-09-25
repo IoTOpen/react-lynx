@@ -1,6 +1,6 @@
 import {usePahoMQTTClient} from './usePahoMQTTClient';
 import {useCallback, useRef} from 'react';
-import Paho, {Qos} from 'paho-mqtt';
+import Paho, {Qos, TypedArray} from 'paho-mqtt';
 
 export type Binding = (topic: string, payload: string, qos: Qos, retained: boolean) => void;
 
@@ -16,7 +16,9 @@ function isEq<T>(a: T[], b: T[]): boolean {
     return false;
 }
 
-function unsubscribe(unsub: (topic: string) => void, subs: string[]): Promise<void> {
+type Unsub = (topic: string) => void | Promise<void>;
+
+function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
     return new Promise<void>((resolve) => {
         subs.forEach(async (s) => {
             try {
@@ -29,7 +31,7 @@ function unsubscribe(unsub: (topic: string) => void, subs: string[]): Promise<vo
     });
 }
 
-function subscribe(sub: (topic: string, qos?: Qos) => void, subs: string[]): Promise<void> {
+function subscribe(sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
     return new Promise<void>((resolve) => {
         subs.forEach(async (s) => {
             try {
@@ -40,6 +42,17 @@ function subscribe(sub: (topic: string, qos?: Qos) => void, subs: string[]): Pro
         });
         resolve();
     });
+}
+
+export interface SimpleMQTT {
+    setSubs: (subscriptions: string[]) => void;
+    error?: Paho.MQTTError;
+    connected: boolean;
+    bind: (topic: RegExp | string, binder: Binding) => void;
+    unbind: (binder: Binding) => void;
+    bindExact: (topic: string, binder: Binding) => void;
+    unbindExact: (topic: string, binder: Binding) => void;
+    pub: (topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => void;
 }
 
 export const useSimpleMQTT = (uri?: string, username?: string, password?: string) => {
@@ -158,5 +171,5 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         bindExact,
         unbindExact,
         pub,
-    };
+    } as SimpleMQTT;
 };
