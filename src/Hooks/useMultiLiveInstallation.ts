@@ -50,8 +50,6 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
             newClientIdMap.set(inst.client_id, inst);
             newTopics.push(`${inst.client_id}/#`);
         });
-        setClientIdMap(() => newClientIdMap);
-        setInstallationMap(() => newInstallationMap);
 
         // This is a flag to prevent new fetches during the initial fetch
         let done = false;
@@ -90,6 +88,8 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
             }).catch(reject);
         });
         work.finally(() => {
+            setClientIdMap(() => newClientIdMap);
+            setInstallationMap(() => newInstallationMap);
             setFunctionMap(() => newFunctionMap);
             setDeviceMap(() => newDeviceMap);
             // Now we can accept updates from mqtt
