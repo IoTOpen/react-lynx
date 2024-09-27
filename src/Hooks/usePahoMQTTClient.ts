@@ -79,7 +79,7 @@ export const usePahoMQTTClient = (uri: string,
         } catch (e) {
             window.setTimeout(() => {
                 c.current.connect(o);
-            }, 1000);
+            }, 5000);
         }
         return () => {
             try {
