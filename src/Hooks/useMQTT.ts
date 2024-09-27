@@ -4,5 +4,10 @@ import {useSimpleMQTT} from './useSimpleMQTT';
 export const useMQTT = () => {
     const client = useGlobalLynxClient();
     const {user} = useGlobalUser();
-    return useSimpleMQTT(client.lynxClient.baseURL, user?.email ?? 'api-key', client.lynxClient.apiKey);
+    const baseURLObj = new URL(client.lynxClient.baseURL);
+    const protocol = baseURLObj.protocol === 'http:' ? 'ws:' : 'wss:';
+    const hostname = baseURLObj.hostname;
+    const port = baseURLObj.port ? `:${baseURLObj.port}` : '';
+    const wsURL = `${protocol}//${hostname}${port}`;
+    return useSimpleMQTT(wsURL, user?.email ?? 'api-key', client.lynxClient.apiKey);
 };
