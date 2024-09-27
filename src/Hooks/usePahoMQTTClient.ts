@@ -43,7 +43,7 @@ export const usePahoMQTTClient = (uri: string,
                         } else {
                             c.current.connect(o);
                         }
-                    }, 1000);
+                    }, 5000);
                 }
             },
             onSuccess: () => {
