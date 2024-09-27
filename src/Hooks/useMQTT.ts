@@ -9,5 +9,9 @@ export const useMQTT = () => {
     const hostname = baseURLObj.hostname;
     const port = baseURLObj.port ? `:${baseURLObj.port}` : '';
     const wsURL = `${protocol}//${hostname}${port}/mqtt`;
-    return useSimpleMQTT(wsURL, user?.email ?? 'api-key', client.lynxClient.apiKey);
+    let username = user?.email ?? 'api-key';
+    if (client.lynxClient.bearer) {
+        username = 'bearer';
+    }
+    return useSimpleMQTT(wsURL, username, client.lynxClient.apiKey);
 };
