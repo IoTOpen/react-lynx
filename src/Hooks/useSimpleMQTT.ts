@@ -1,5 +1,5 @@
 import {usePahoMQTTClient} from './usePahoMQTTClient';
-import {useCallback, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import Paho, {Qos, TypedArray} from 'paho-mqtt';
 
 export type Binding = (topic: string, payload: string, qos: Qos, retained: boolean) => void;
@@ -78,6 +78,7 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
             }
         });
     }, []);
+    const c = useRef<boolean>(false);
 
     const options = {
         cleanSession: true,
@@ -101,8 +102,12 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
             subs.current.forEach(s => {
                 sub(s).then().catch();
             });
-        }
+        },
     }, options);
+
+    useEffect(() => {
+        c.current = connected;
+    }, [connected]);
 
     const bind = useCallback((topic: RegExp | string, binder: Binding) => {
         let re: RegExp;
@@ -153,13 +158,12 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         if (isEq(subs.current, s)) {
             return;
         }
-        if (connected) {
+        if (c.current) {
             unsubscribe(unsub, subs.current).then(() => {
                 subscribe(sub, s).then().catch();
             }).catch();
         }
         subs.current = s;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sub, unsub]);
 
     return {

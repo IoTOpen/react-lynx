@@ -16,6 +16,8 @@ export interface MultiLiveInstallation {
 export const useMultiLiveInstallation = (installations: Installation[]) => {
     const {lynxClient} = useGlobalLynxClient();
     const mqtt = useMQTT();
+    const {bind, unbind, setSubs} = mqtt;
+
 
     // To keep track of client id => installation
     const [clientIdMap, setClientIdMap] = useState<Map<number, Installation>>(new Map());
@@ -41,7 +43,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
     }, [clientIdMap]);
 
     useEffect(() => {
-        if(installations.length === 0) {
+        if (installations.length === 0) {
             return;
         }
         const newInstallationMap = new Map<number, Installation>();
@@ -117,14 +119,15 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
                 setDeviceMap((p) => new Map([...p, [inst.id, devs]]));
             });
         };
-        mqtt.setSubs(newTopics);
-        mqtt.bind(/^[0-9]+\/evt\/functionx\/updated$/, fnRefresh);
-        mqtt.bind(/^[0-9]+\/evt\/devicex\/updated$/, devRefresh);
+        setSubs(newTopics);
+
+        bind(/[0-9]+\/evt\/functionx\/updated/, fnRefresh);
+        bind(/[0-9]+\/evt\/devicex\/updated/, devRefresh);
         return () => {
-            mqtt.unbind(fnRefresh);
-            mqtt.unbind(devRefresh);
+            unbind(fnRefresh);
+            unbind(devRefresh);
         };
-    }, [installations, lynxClient, mqtt]);
+    }, [installations, lynxClient, bind, unbind, setSubs]);
 
     return {
         installationMap,
