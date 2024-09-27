@@ -41,6 +41,9 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
     }, [clientIdMap]);
 
     useEffect(() => {
+        if(installations.length === 0) {
+            return;
+        }
         const newInstallationMap = new Map<number, Installation>();
         const newClientIdMap = new Map<number, Installation>();
         const newTopics = new Array<string>();
