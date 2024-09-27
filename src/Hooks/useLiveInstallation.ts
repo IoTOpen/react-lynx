@@ -17,16 +17,17 @@ export const useLiveInstallation = (installation: Installation) => {
     const mqtt = useMQTT();
     const {functions, refresh: fnRefresh} = useFunctions(installation.id);
     const {devices, refresh: devRefresh} = useDevices(installation.id);
+    const {unbind, bind, setSubs} = mqtt;
 
     useEffect(() => {
-        mqtt.setSubs([`${installation.client_id}/#`]);
-        mqtt.bind(/^[0-9]+\/evt\/functionx\/updated$/, fnRefresh);
-        mqtt.bind(/^[0-9]+\/evt\/devicex\/updated$/, devRefresh);
+        setSubs([`${installation.client_id}/#`]);
+        bind(/[0-9]+\/evt\/functionx\/updated/, fnRefresh);
+        bind(/[0-9]+\/evt\/devicex\/updated/, devRefresh);
         return () => {
-            mqtt.unbind(fnRefresh);
-            mqtt.unbind(devRefresh);
+            unbind(fnRefresh);
+            unbind(devRefresh);
         };
-    }, [devRefresh, fnRefresh, installation, mqtt]);
+    }, [bind, devRefresh, fnRefresh, installation, setSubs, unbind]);
 
     return {
         installation,
@@ -41,16 +42,16 @@ export const useLiveInstallationId = (installationId: number | string) => {
     const {installation} = useInstallation(installationId);
     const {functions, refresh: fnRefresh} = useFunctions(installationId);
     const {devices, refresh: devRefresh} = useDevices(installationId);
-
+    const {unbind, bind, setSubs} = mqtt;
     useEffect(() => {
-        mqtt.setSubs([`${installation.client_id}/#`]);
-        mqtt.bind(/^[0-9]+\/evt\/functionx\/updated$/, fnRefresh);
-        mqtt.bind(/^[0-9]+\/evt\/devicex\/updated$/, devRefresh);
+        setSubs([`${installation.client_id}/#`]);
+        bind(/[0-9]+\/evt\/functionx\/updated/, fnRefresh);
+        bind(/[0-9]+\/evt\/devicex\/updated/, devRefresh);
         return () => {
-            mqtt.unbind(fnRefresh);
-            mqtt.unbind(devRefresh);
+            unbind(fnRefresh);
+            unbind(devRefresh);
         };
-    }, [devRefresh, fnRefresh, installation, mqtt]);
+    }, [bind, devRefresh, fnRefresh, installation, setSubs, unbind]);
 
     return {
         installation,

@@ -16,6 +16,8 @@ export interface MultiLiveInstallation {
 export const useMultiLiveInstallation = (installations: Installation[]) => {
     const {lynxClient} = useGlobalLynxClient();
     const mqtt = useMQTT();
+    const {bind, unbind, setSubs} = mqtt;
+
 
     // To keep track of client id => installation
     const [clientIdMap, setClientIdMap] = useState<Map<number, Installation>>(new Map());
@@ -41,6 +43,9 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
     }, [clientIdMap]);
 
     useEffect(() => {
+        if (installations.length === 0) {
+            return;
+        }
         const newInstallationMap = new Map<number, Installation>();
         const newClientIdMap = new Map<number, Installation>();
         const newTopics = new Array<string>();
@@ -50,8 +55,6 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
             newClientIdMap.set(inst.client_id, inst);
             newTopics.push(`${inst.client_id}/#`);
         });
-        setClientIdMap(() => newClientIdMap);
-        setInstallationMap(() => newInstallationMap);
 
         // This is a flag to prevent new fetches during the initial fetch
         let done = false;
@@ -90,6 +93,8 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
             }).catch(reject);
         });
         work.finally(() => {
+            setClientIdMap(() => newClientIdMap);
+            setInstallationMap(() => newInstallationMap);
             setFunctionMap(() => newFunctionMap);
             setDeviceMap(() => newDeviceMap);
             // Now we can accept updates from mqtt
@@ -102,7 +107,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
             const inst = newClientIdMap.get(cid);
             if (inst === undefined) return;
             lynxClient.getFunctions(inst.id).then((fns) => {
-                setDeviceMap((p) => new Map([...p, [inst.id, fns]]));
+                setFunctionMap((p) => new Map([...p, [inst.id, fns]]));
             });
         };
         const devRefresh = (topic: string) => {
@@ -114,14 +119,15 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
                 setDeviceMap((p) => new Map([...p, [inst.id, devs]]));
             });
         };
-        mqtt.setSubs(newTopics);
-        mqtt.bind(/^[0-9]+\/evt\/functionx\/updated$/, fnRefresh);
-        mqtt.bind(/^[0-9]+\/evt\/devicex\/updated$/, devRefresh);
+        setSubs(newTopics);
+
+        bind(/[0-9]+\/evt\/functionx\/updated/, fnRefresh);
+        bind(/[0-9]+\/evt\/devicex\/updated/, devRefresh);
         return () => {
-            mqtt.unbind(fnRefresh);
-            mqtt.unbind(devRefresh);
+            unbind(fnRefresh);
+            unbind(devRefresh);
         };
-    }, [installations, lynxClient, mqtt]);
+    }, [installations, lynxClient, bind, unbind, setSubs]);
 
     return {
         installationMap,
