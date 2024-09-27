@@ -102,7 +102,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
             const inst = newClientIdMap.get(cid);
             if (inst === undefined) return;
             lynxClient.getFunctions(inst.id).then((fns) => {
-                setDeviceMap((p) => new Map([...p, [inst.id, fns]]));
+                setFunctionMap((p) => new Map([...p, [inst.id, fns]]));
             });
         };
         const devRefresh = (topic: string) => {
