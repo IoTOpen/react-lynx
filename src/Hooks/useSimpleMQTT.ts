@@ -4,6 +4,14 @@ import Paho, {Qos, TypedArray} from 'paho-mqtt';
 
 export type Binding = (topic: string, payload: string, qos: Qos, retained: boolean) => void;
 
+export type Binder = (topic: RegExp | string, binder: Binding) => void;
+export type Unbinder = (binder: Binding) => void;
+
+export type ExactBinder = (topic: string, binder: Binding) => void;
+export type ExactUnbinder = (topic: string, binder: Binding) => void;
+
+export type Publisher = (topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => void;
+
 function isEq<T>(a: T[], b: T[]): boolean {
     if (a.length === b.length) {
         for (let i = 0; i < a.length; i++) {
@@ -48,11 +56,11 @@ export interface SimpleMQTT {
     setSubs: (subscriptions: string[]) => void;
     error?: Paho.MQTTError;
     connected: boolean;
-    bind: (topic: RegExp | string, binder: Binding) => void;
-    unbind: (binder: Binding) => void;
-    bindExact: (topic: string, binder: Binding) => void;
-    unbindExact: (topic: string, binder: Binding) => void;
-    pub: (topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => void;
+    bind: Binder;
+    unbind: Unbinder;
+    bindExact: ExactBinder;
+    unbindExact: ExactUnbinder;
+    pub: Publisher;
 }
 
 export const useSimpleMQTT = (uri?: string, username?: string, password?: string) => {
@@ -141,6 +149,8 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         let binds = exactBindings.current.get(topic);
         if (binds === undefined) {
             binds = [binder];
+            exactBindings.current.set(topic, binds);
+            return;
         }
         if (binds.includes(binder)) {
             return;

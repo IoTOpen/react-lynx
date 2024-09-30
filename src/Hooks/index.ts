@@ -2,7 +2,15 @@ export * from './useMeta';
 export * from './useInstallationInfo';
 export * from './usePahoMQTTClient';
 export * from './useSimpleMQTT';
-export type {Binding, SimpleMQTT} from './useSimpleMQTT';
+export type {
+    Binding,
+    SimpleMQTT,
+    Binder,
+    Unbinder,
+    ExactBinder,
+    ExactUnbinder,
+    Publisher
+} from './useSimpleMQTT';
 
 export * from './useTokens';
 
