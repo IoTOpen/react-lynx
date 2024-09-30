@@ -149,6 +149,8 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         let binds = exactBindings.current.get(topic);
         if (binds === undefined) {
             binds = [binder];
+            exactBindings.current.set(topic, binds);
+            return;
         }
         if (binds.includes(binder)) {
             return;
