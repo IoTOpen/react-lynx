@@ -20,11 +20,11 @@ type Unsub = (topic: string) => void | Promise<void>;
 
 function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
     return new Promise<void>((resolve) => {
-        subs.forEach(async (s) => {
+        subs.forEach(async (topic) => {
             try {
-                await unsub(s);
+                await unsub(topic);
             } catch (e) {
-                console.log(e);
+                console.warn('failed to unsubscribe to', topic, e);
             }
         });
         resolve();
@@ -33,11 +33,11 @@ function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
 
 function subscribe(sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
     return new Promise<void>((resolve) => {
-        subs.forEach(async (s) => {
+        subs.forEach(async (topic) => {
             try {
-                await sub(s);
+                await sub(topic);
             } catch (e) {
-                console.log(e);
+                console.warn('failed to subscribe to', topic, e);
             }
         });
         resolve();
@@ -160,8 +160,8 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         }
         if (c.current) {
             unsubscribe(unsub, subs.current).then(() => {
-                subscribe(sub, s).then().catch();
-            }).catch();
+                return subscribe(sub, s);
+            });
         }
         subs.current = s;
     }, [sub, unsub]);
