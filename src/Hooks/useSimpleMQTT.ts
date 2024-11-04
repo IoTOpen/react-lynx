@@ -65,7 +65,11 @@ export interface SimpleMQTT {
 
 export const useSimpleMQTT = (uri?: string, username?: string, password?: string) => {
     if (uri === undefined) {
-        uri = location.protocol === 'http:' ? `ws://${location.host}/mqtt` : `wss://${location.host}/mqtt`;
+        if(window !== undefined) {
+            uri = window.location.protocol === 'http:' ? `ws://${window.location.host}/mqtt` : `wss://${window.location.host}/mqtt`;
+        } else {
+            uri = location.protocol === 'http:' ? `ws://${location.host}/mqtt` : `wss://${location.host}/mqtt`;
+        }
     }
     const subs = useRef<string[]>([]);
     const bindings = useRef(new Map<string, Binding[]>([]));
