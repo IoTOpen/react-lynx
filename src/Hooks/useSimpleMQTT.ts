@@ -65,7 +65,7 @@ export interface SimpleMQTT {
 
 export const useSimpleMQTT = (uri?: string, username?: string, password?: string) => {
     if (uri === undefined) {
-        if(window !== undefined) {
+        if (window !== undefined) {
             uri = window.location.protocol === 'http:' ? `ws://${window.location.host}/mqtt` : `wss://${window.location.host}/mqtt`;
         } else {
             uri = location.protocol === 'http:' ? `ws://${location.host}/mqtt` : `wss://${location.host}/mqtt`;
@@ -78,14 +78,14 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         const tmp = exactBindings.current.get(msg.destinationName);
         if (tmp) {
             tmp.forEach((cb) => {
-                cb(msg.destinationName, msg.payloadString, msg.qos, msg.retained);
+                cb(msg.destinationName, new TextDecoder().decode(msg.payloadBytes), msg.qos, msg.retained);
             });
         }
         bindings.current.forEach((binds, key) => {
             const re = new RegExp(key);
             if (re.test(msg.destinationName)) {
                 binds.forEach(cb => {
-                    cb(msg.destinationName, msg.payloadString, msg.qos, msg.retained);
+                    cb(msg.destinationName, new TextDecoder().decode(msg.payloadBytes), msg.qos, msg.retained);
                 });
             }
         });
