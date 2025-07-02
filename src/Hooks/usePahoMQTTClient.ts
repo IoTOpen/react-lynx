@@ -1,5 +1,5 @@
-import {useCallback, useLayoutEffect, useRef, useState} from 'react';
 import Paho, {MQTTError, Qos, TypedArray} from 'paho-mqtt';
+import {useCallback, useLayoutEffect, useRef, useState} from 'react';
 
 interface MQTTHandlers {
     onMessage?: Paho.OnMessageHandler;
@@ -91,7 +91,7 @@ export const usePahoMQTTClient = (uri: string,
                 console.log(e);
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, []);
 
 

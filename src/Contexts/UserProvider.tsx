@@ -1,5 +1,6 @@
-import {createContext, ReactNode, useContext, useLayoutEffect, useMemo, useState} from 'react';
 import {ErrorResponse, User} from '@iotopen/node-lynx';
+import {createContext, ReactNode, useContext, useLayoutEffect, useMemo, useState} from 'react';
+
 import {useGlobalLynxClient} from './LynxClientProvider';
 
 interface userContext {
@@ -40,7 +41,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
         }).finally(() => {
             setLoading(false);
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [lynxClient]);
     const contextValue = useMemo(() => ({user, permissions, loading, error}), [user, permissions, loading, error]);
     return (

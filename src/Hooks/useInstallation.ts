@@ -1,5 +1,6 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
 import {Installation} from '@iotopen/node-lynx';
+import {useCallback, useLayoutEffect, useState} from 'react';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 const zeroInstallation = {

@@ -1,6 +1,7 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useLayoutEffect, useState} from 'react';
 import {EdgeAppInstance, ErrorResponse} from '@iotopen/node-lynx';
+import {useCallback, useLayoutEffect, useState} from 'react';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useConfiguredEdgeApps = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;

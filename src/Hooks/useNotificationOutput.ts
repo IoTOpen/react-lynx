@@ -1,6 +1,7 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useEffect, useState} from 'react';
 import {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
+import {useCallback, useEffect, useState} from 'react';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 const zeroNotificationOutput = {
     id: 0,

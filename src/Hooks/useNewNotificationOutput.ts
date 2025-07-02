@@ -1,5 +1,6 @@
-import {useCallback, useState} from 'react';
 import {EmptyNotificationOutput} from '@iotopen/node-lynx';
+import {useCallback, useState} from 'react';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 const zeroEmptyNotificationOutput = {

@@ -1,7 +1,13 @@
 {
   "files.eol": "\n",
   "javascript.preferences.quoteStyle": "single",
-  "prettier.singleQuote": true,
-  "prettier.tabWidth": 4,
-  "prettier.printWidth": 120
+  "workbench.colorCustomizations": {
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#f3949a",
+    "titleBar.activeBackground": "#ee666f",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#ee666f99",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "#ee666f",
 }

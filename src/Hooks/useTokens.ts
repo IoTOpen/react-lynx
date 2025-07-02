@@ -1,6 +1,7 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useLayoutEffect, useState} from 'react';
 import {EmptyToken, ErrorResponse, Token} from '@iotopen/node-lynx';
+import {useCallback, useLayoutEffect, useState} from 'react';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useTokens = () => {
     const {lynxClient} = useGlobalLynxClient();

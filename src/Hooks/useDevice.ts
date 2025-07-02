@@ -1,6 +1,7 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useLayoutEffect, useState} from 'react';
-import {Devicex, ErrorResponse, MetaObject, OKResponse} from '@iotopen/node-lynx';
+import { Devicex, ErrorResponse, MetaObject, OKResponse } from '@iotopen/node-lynx';
+import { useCallback, useLayoutEffect, useState } from 'react';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroDevice = {
     updated: 0,
@@ -15,12 +16,12 @@ const zeroDevice = {
 export const useDevice = (installationId: number | string, deviceId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const id = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
-    if(isNaN(iid) || isNaN(id)) {
+    if (isNaN(iid) || isNaN(id)) {
         throw new Error('invalid installationId or deviceId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
-    const [dev, setDev] = useState<Devicex>({...zeroDevice});
+    const [dev, setDev] = useState<Devicex>({ ...zeroDevice });
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useLayoutEffect(() => {
@@ -44,7 +45,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     }, [lynxClient, dev]);
 
     const setType = useCallback((t: string) => {
-        if (dev) setDev({...dev, type: t});
+        if (dev) setDev({ ...dev, type: t });
     }, [dev, setDev]);
 
     const remove = useCallback(() => {
@@ -67,25 +68,29 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     };
 };
 
-export const useDeviceMeta = (installationId: number | string, deviceId?: number|string) => {
+export const useDeviceMeta = (installationId: number | string, deviceId?: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const devId = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
+    const defaultDevId = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
 
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
+    /**
+     * Use the provided devId if present, otherwise fall back to the defaultDevId from the hook's arguments.
+     * This ensures correct device targeting and avoids shadowing issues.
+     */
     const create = useCallback((key: string, meta: MetaObject, devId?: number, silent?: boolean) => {
-        const id = devId ? devId : devId ?? 0;
+        const id = devId ?? defaultDevId ?? 0;
         return lynxClient.createDeviceMeta(iid, id, key, meta, silent);
-    }, [lynxClient, iid, devId]);
+    }, [lynxClient, iid, defaultDevId]);
 
     const update = useCallback((key: string, meta: MetaObject, createMissing?: boolean, devId?: number, silent?: boolean) => {
-        const id = devId ? devId : devId ?? 0;
+        const id = devId ?? defaultDevId ?? 0;
         return lynxClient.updateDeviceMeta(iid, id, key, meta, silent, createMissing);
-    }, [lynxClient, iid, devId]);
+    }, [lynxClient, iid, defaultDevId]);
 
     const remove = useCallback((key: string, devId?: number, silent?: boolean) => {
-        const id = devId ? devId : devId ?? 0;
+        const id = devId ?? defaultDevId ?? 0;
         return lynxClient.deleteDeviceMeta(iid, id, key, silent);
-    }, [lynxClient, iid, devId]);
+    }, [lynxClient, iid, defaultDevId]);
 
     return {
         createMeta: create,

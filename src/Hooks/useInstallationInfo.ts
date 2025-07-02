@@ -1,6 +1,7 @@
-import {useGlobalLynxClient} from '../Contexts';
 import {ErrorResponse, InstallationInfo} from '@iotopen/node-lynx';
 import {useCallback, useLayoutEffect, useState} from 'react';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useInstallationInfo = (assignedOnly?: boolean) => {
     const {lynxClient} = useGlobalLynxClient();

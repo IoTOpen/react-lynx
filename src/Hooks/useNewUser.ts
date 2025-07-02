@@ -1,7 +1,8 @@
 import {EmptyUser} from '@iotopen/node-lynx';
-import {useCallback, useState} from 'react';
-import {useGlobalLynxClient} from '../Contexts';
 import {Address} from '@iotopen/node-lynx/src/types';
+import {useCallback, useState} from 'react';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 const zeroEmptyUser = {
     address: {

@@ -1,6 +1,7 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useLayoutEffect, useState} from 'react';
 import {ErrorResponse, Installation, Metadata} from '@iotopen/node-lynx';
+import {useCallback, useLayoutEffect, useState} from 'react';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useInstallations = (filter?: Metadata) => {
     const {lynxClient} = useGlobalLynxClient();

@@ -1,9 +1,10 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
-import {EdgeApp, ErrorResponse} from '@iotopen/node-lynx';
-import {useGlobalLynxClient} from '../Contexts';
+import { EdgeApp, ErrorResponse } from '@iotopen/node-lynx';
+import { useCallback, useLayoutEffect, useState } from 'react';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useEdgeApps = () => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [apps, setApps] = useState<EdgeApp[]>([]);
@@ -20,8 +21,10 @@ export const useEdgeApps = () => {
         });
     }, [lynxClient]);
 
+
     useLayoutEffect(() => {
         refresh();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return {

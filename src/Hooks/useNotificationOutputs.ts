@@ -1,6 +1,7 @@
-import {useCallback, useEffect, useState} from 'react';
-import {useGlobalLynxClient} from '../Contexts';
 import {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
+import {useCallback, useEffect, useState} from 'react';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useNotificationOutputs = (installationId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;

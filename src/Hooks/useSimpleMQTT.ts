@@ -1,6 +1,7 @@
-import {usePahoMQTTClient} from './usePahoMQTTClient';
-import {useCallback, useEffect, useRef} from 'react';
 import Paho, {Qos, TypedArray} from 'paho-mqtt';
+import {useCallback, useEffect, useRef} from 'react';
+
+import {usePahoMQTTClient} from './usePahoMQTTClient';
 
 export type Binding = (topic: string, payload: string, qos: Qos, retained: boolean) => void;
 

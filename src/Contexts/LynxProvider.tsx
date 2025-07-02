@@ -1,5 +1,6 @@
-import {LynxClientProvider} from './LynxClientProvider';
 import {ReactNode} from 'react';
+
+import {LynxClientProvider} from './LynxClientProvider';
 import {UserProvider} from './UserProvider';
 
 type LynxProviderProps = {

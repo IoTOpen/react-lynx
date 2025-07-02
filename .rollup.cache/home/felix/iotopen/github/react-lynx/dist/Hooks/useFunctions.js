@@ -1,0 +1,83 @@
+import { useCallback, useLayoutEffect, useState } from 'react';
+import { useGlobalLynxClient } from '../Contexts';
+export const useFunctions = (installationId, filter) => {
+    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
+    if (isNaN(iid) && iid !== undefined) {
+        throw new Error('invalid installationId');
+    }
+    const { lynxClient } = useGlobalLynxClient();
+    const [loading, setLoading] = useState(true);
+    const [functions, setFunctions] = useState([]);
+    const [error, setError] = useState();
+    const refreshCall = useCallback(() => {
+        if (iid === undefined) {
+            setLoading(false);
+            setFunctions([]);
+            return;
+        }
+        setLoading(true);
+        lynxClient.getFunctions(iid, filter).then(res => {
+            setError((err) => err !== undefined ? undefined : err);
+            setFunctions(res);
+            return res;
+        }).catch(e => {
+            setError(e);
+        }).finally(() => {
+            setLoading(false);
+        });
+    }, [lynxClient, iid, filter]);
+    function removeFn(fns) {
+        if (Array.isArray(fns)) {
+            const last = fns.pop();
+            if (!last)
+                return Promise.allSettled([]);
+            const rest = fns.map((f => {
+                return lynxClient.deleteFunction(f, true);
+            }));
+            return Promise.allSettled(rest).then(async (settled) => {
+                try {
+                    settled.push({ status: 'fulfilled', value: await lynxClient.deleteFunction(last) });
+                }
+                catch (e) {
+                    settled.push({ status: 'rejected', reason: e });
+                }
+                return settled;
+            });
+        }
+        return lynxClient.deleteFunction(fns);
+    }
+    function createFn(fns) {
+        if (Array.isArray(fns)) {
+            const last = fns.pop();
+            if (!last)
+                return Promise.allSettled([]);
+            const rest = fns.map(f => {
+                return lynxClient.createFunction(f, true);
+            });
+            return Promise.allSettled(rest).then(async (settled) => {
+                try {
+                    settled.push({ status: 'fulfilled', value: await lynxClient.createFunction(last) });
+                }
+                catch (e) {
+                    settled.push({ status: 'rejected', reason: e });
+                }
+                return settled;
+            });
+        }
+        return lynxClient.createFunction(fns);
+    }
+    const create = createFn;
+    const remove = removeFn;
+    useLayoutEffect(() => {
+        refreshCall();
+    }, [refreshCall]);
+    return {
+        loading: loading,
+        error: error,
+        create: create,
+        remove: remove,
+        functions: functions,
+        refresh: refreshCall,
+    };
+};
+//# sourceMappingURL=useFunctions.js.map

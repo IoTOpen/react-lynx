@@ -1,6 +1,8 @@
 import {useCallback, useEffect, useState} from 'react';
-import {useOAuth2Client} from './useOAuth2Client';
+
 import {useGlobalLynxClient} from '../Contexts';
+
+import {useOAuth2Client} from './useOAuth2Client';
 
 export const useOAuth2Consent = () => {
     const {lynxClient} = useGlobalLynxClient();

@@ -1,14 +1,15 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
-import {useGlobalLynxClient} from '../Contexts';
-import {EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse} from '@iotopen/node-lynx';
-import {ObjectOrArray} from '../types';
+import { EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse } from '@iotopen/node-lynx';
+import { useCallback, useLayoutEffect, useState } from 'react';
+
+import { useGlobalLynxClient } from '../Contexts';
+import { ObjectOrArray } from '../types';
 
 export const useFunctions = (installationId: number | string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    if(isNaN(iid) && iid !== undefined) {
+    if (isNaN(iid) && iid !== undefined) {
         throw new Error('invalid installationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [functions, setFunctions] = useState<Functionx[]>([]);
     const [error, setError] = useState<ErrorResponse | undefined>();
@@ -30,8 +31,8 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         });
     }, [lynxClient, iid, filter]);
 
-    function removeFn<T extends Functionx | Functionx[]>(fns: T): ObjectOrArray<OKResponse, Functionx, T>
-    function removeFn(fns: Functionx | Functionx[]) {
+    function removeFn<T extends Functionx | Functionx[]> (fns: T): ObjectOrArray<OKResponse, Functionx, T>
+    function removeFn (fns: Functionx | Functionx[]) {
         if (Array.isArray(fns)) {
             const last = fns.pop();
             if (!last) return Promise.allSettled([]);
@@ -40,9 +41,9 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
             }));
             return Promise.allSettled(rest).then(async (settled) => {
                 try {
-                    settled.push({status: 'fulfilled', value: await lynxClient.deleteFunction(last)});
+                    settled.push({ status: 'fulfilled', value: await lynxClient.deleteFunction(last) });
                 } catch (e) {
-                    settled.push({status: 'rejected', reason: e});
+                    settled.push({ status: 'rejected', reason: e });
                 }
                 return settled;
             });
@@ -50,8 +51,8 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         return lynxClient.deleteFunction(fns);
     }
 
-    function createFn<T extends EmptyFunctionx | EmptyFunctionx[]>(fns: T): ObjectOrArray<Functionx, EmptyFunctionx, T>
-    function createFn(fns: EmptyFunctionx | EmptyFunctionx[]) {
+    function createFn<T extends EmptyFunctionx | EmptyFunctionx[]> (fns: T): ObjectOrArray<Functionx, EmptyFunctionx, T>
+    function createFn (fns: EmptyFunctionx | EmptyFunctionx[]) {
         if (Array.isArray(fns)) {
             const last = fns.pop();
             if (!last) return Promise.allSettled([]);
@@ -60,9 +61,9 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
             });
             return Promise.allSettled(rest).then(async (settled) => {
                 try {
-                    settled.push({status: 'fulfilled', value: await lynxClient.createFunction(last)});
+                    settled.push({ status: 'fulfilled', value: await lynxClient.createFunction(last) });
                 } catch (e) {
-                    settled.push({status: 'rejected', reason: e});
+                    settled.push({ status: 'rejected', reason: e });
                 }
                 return settled;
             });
@@ -70,8 +71,8 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         return lynxClient.createFunction(fns);
     }
 
-    const create = useCallback(createFn, [lynxClient]);
-    const remove = useCallback(removeFn, [lynxClient]);
+    const create = createFn;
+    const remove = removeFn;
 
     useLayoutEffect(() => {
         refreshCall();
