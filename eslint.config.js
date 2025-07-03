@@ -111,6 +111,10 @@ export default tseslint.config(
             ],
             '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
             '@typescript-eslint/consistent-type-imports': 'error',
+            '@typescript-eslint/restrict-template-expressions': 'off',
+            '@typescript-eslint/restrict-plus-operands': 'off',
+            // NOTE: Enforce 'interface' for props and 'type' for unions/aliases per coding standards.
+            '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
         },
     },
 );
