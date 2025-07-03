@@ -52,7 +52,6 @@ export const useNotificationMessage = (installationId, notificationId) => {
     }, [lynxClient, message]);
     useEffect(() => {
         refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return {
         refresh,

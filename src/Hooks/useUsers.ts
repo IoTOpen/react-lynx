@@ -1,7 +1,8 @@
-import {Metadata, User} from '@iotopen/node-lynx';
-import {useCallback, useState} from 'react';
+import { useCallback, useState } from 'react';
 
-import {useGlobalLynxClient} from '../Contexts';
+import type { Metadata, User } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 
 // TODO: implement organization filter
@@ -9,17 +10,22 @@ export const useUsers = (filter?: Metadata) => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | undefined>();
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
 
     new URLSearchParams();
 
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getUsers(filter).then((users) => {
-            setError((err) => err !== undefined ? undefined : err);
+            setError(undefined);
             setUsers(users);
         }).catch((e) => {
-            setError(e);
+            // Defensive: Ensure only Error is set
+            if (e instanceof Error) {
+                setError(e);
+            } else {
+                setError(new Error('Unknown error'));
+            }
         }).finally(() => {
             setLoading(false);
         });

@@ -1,5 +1,6 @@
-import {EmptyNotificationMessage} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {EmptyNotificationMessage} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 
@@ -10,7 +11,7 @@ const zeroEmptyNotificationMessage = {
     text: '',
 };
 
-export type NotificationMessageTemplate = {
+export interface NotificationMessageTemplate {
     installation_id?: number;
     name?: string;
     text?: string;

@@ -18,7 +18,6 @@ export const useEdgeApps = () => {
     }, [lynxClient]);
     useLayoutEffect(() => {
         refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return {
         apps,

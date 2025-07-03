@@ -16,7 +16,6 @@ export const useMeta = (obj, deps) => {
             newList.sort((a, b) => a.key.localeCompare(b.key));
             setMetaList(newList);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, depList);
     const compile = useCallback(() => {
         const res = { meta: {}, protected_meta: {} };

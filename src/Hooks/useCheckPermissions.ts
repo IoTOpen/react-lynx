@@ -1,4 +1,4 @@
-import {Permissions} from '@iotopen/node-lynx';
+import type {Permissions} from '@iotopen/node-lynx';
 
 import {useGlobalPermissions} from '../Contexts';
 

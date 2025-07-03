@@ -38,7 +38,6 @@ export const useNotificationOutputExecutor = (installationId, executorId) => {
     }, [id, iid, lynxClient]);
     useEffect(() => {
         refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return {
         refresh,

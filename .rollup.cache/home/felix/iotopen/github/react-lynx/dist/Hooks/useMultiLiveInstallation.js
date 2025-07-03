@@ -30,7 +30,7 @@ export const useMultiLiveInstallation = (installations) => {
         }
         const newInstallationMap = new Map();
         const newClientIdMap = new Map();
-        const newTopics = new Array();
+        const newTopics = [];
         installations.forEach((inst) => {
             newInstallationMap.set(inst.id, inst);
             newClientIdMap.set(inst.client_id, inst);
@@ -72,7 +72,7 @@ export const useMultiLiveInstallation = (installations) => {
                     resolve();
             }).catch(reject);
         });
-        work.finally(() => {
+        void work.finally(() => {
             setClientIdMap(() => newClientIdMap);
             setInstallationMap(() => newInstallationMap);
             setFunctionMap(() => newFunctionMap);
@@ -87,7 +87,7 @@ export const useMultiLiveInstallation = (installations) => {
             const inst = newClientIdMap.get(cid);
             if (inst === undefined)
                 return;
-            lynxClient.getFunctions(inst.id).then((fns) => {
+            void lynxClient.getFunctions(inst.id).then((fns) => {
                 setFunctionMap((p) => new Map([...p, [inst.id, fns]]));
             });
         };
@@ -98,7 +98,7 @@ export const useMultiLiveInstallation = (installations) => {
             const inst = newClientIdMap.get(cid);
             if (inst === undefined)
                 return;
-            lynxClient.getDevices(inst.id).then((devs) => {
+            void lynxClient.getDevices(inst.id).then((devs) => {
                 setDeviceMap((p) => new Map([...p, [inst.id, devs]]));
             });
         };

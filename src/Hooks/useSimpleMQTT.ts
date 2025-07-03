@@ -1,7 +1,9 @@
-import Paho, {Qos, TypedArray} from 'paho-mqtt';
-import {useCallback, useEffect, useRef} from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
-import {usePahoMQTTClient} from './usePahoMQTTClient';
+import type { Qos, TypedArray } from 'paho-mqtt';
+import type Paho from 'paho-mqtt';
+
+import { usePahoMQTTClient } from './usePahoMQTTClient';
 
 export type Binding = (topic: string, payload: string, qos: Qos, retained: boolean) => void;
 
@@ -13,7 +15,7 @@ export type ExactUnbinder = (topic: string, binder: Binding) => void;
 
 export type Publisher = (topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => void;
 
-function isEq<T>(a: T[], b: T[]): boolean {
+function isEq<T> (a: T[], b: T[]): boolean {
     if (a.length === b.length) {
         for (let i = 0; i < a.length; i++) {
             if (a[i] !== b[i]) {
@@ -27,30 +29,26 @@ function isEq<T>(a: T[], b: T[]): boolean {
 
 type Unsub = (topic: string) => void | Promise<void>;
 
-function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
-    return new Promise<void>((resolve) => {
-        subs.forEach(async (topic) => {
-            try {
-                await unsub(topic);
-            } catch (e) {
-                console.warn('failed to unsubscribe to', topic, e);
-            }
-        });
-        resolve();
+async function unsubscribe (unsub: Unsub, subs: string[]): Promise<void> {
+    const promises = subs.map(async (topic) => {
+        try {
+            await unsub(topic);
+        } catch (e) {
+            console.warn('failed to unsubscribe to', topic, e);
+        }
     });
+    await Promise.all(promises);
 }
 
-function subscribe(sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
-    return new Promise<void>((resolve) => {
-        subs.forEach(async (topic) => {
-            try {
-                await sub(topic);
-            } catch (e) {
-                console.warn('failed to subscribe to', topic, e);
-            }
-        });
-        resolve();
+async function subscribe (sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
+    const promises = subs.map(async (topic) => {
+        try {
+            await sub(topic);
+        } catch (e) {
+            console.warn('failed to subscribe to', topic, e);
+        }
     });
+    await Promise.all(promises);
 }
 
 export interface SimpleMQTT {
@@ -112,8 +110,9 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         pub
     } = usePahoMQTTClient(uri, {
         onMessage: onMessage, onConnected: () => {
-            subs.current.forEach(s => {
-                sub(s).then().catch();
+            // Re-subscribe to all topics upon connection.
+            void subscribe(sub, subs.current).catch((e) => {
+                console.error('#mqtt: Failed to re-subscribe on connect', e);
             });
         },
     }, options);
@@ -174,9 +173,9 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
             return;
         }
         if (c.current) {
-            unsubscribe(unsub, subs.current).then(() => {
-                return subscribe(sub, s);
-            });
+            unsubscribe(unsub, subs.current)
+                .then(() => subscribe(sub, s))
+                .catch((e) => { console.error('#mqtt: Failed to update subscriptions', e); });
         }
         subs.current = s;
     }, [sub, unsub]);

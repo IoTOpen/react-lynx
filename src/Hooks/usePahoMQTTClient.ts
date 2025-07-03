@@ -1,5 +1,7 @@
-import Paho, {MQTTError, Qos, TypedArray} from 'paho-mqtt';
-import {useCallback, useLayoutEffect, useRef, useState} from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+
+import type { MQTTError, Qos, TypedArray } from 'paho-mqtt';
+import Paho from 'paho-mqtt';
 
 interface MQTTHandlers {
     onMessage?: Paho.OnMessageHandler;
@@ -12,9 +14,9 @@ export const usePahoMQTTClient = (uri: string,
     handlers?: MQTTHandlers, connectionOptions?: Paho.ConnectionOptions, clientId?: string) => {
     if (clientId === undefined) {
         let uuid;
-        if(window?.crypto?.randomUUID) {
+        if (window?.crypto?.randomUUID) {
             uuid = window.crypto.randomUUID();
-        } else if(typeof crypto !== 'undefined' && crypto?.randomUUID) {
+        } else if (typeof crypto !== 'undefined' && crypto?.randomUUID) {
             uuid = crypto.randomUUID();
         } else {
             uuid = Math.random().toString(36).substring(2, 15);
@@ -38,7 +40,7 @@ export const usePahoMQTTClient = (uri: string,
                 setConnected(client.current.isConnected());
                 if (rct.current === undefined) {
                     rct.current = window.setInterval(() => {
-                        if(c.current.isConnected()) {
+                        if (c.current.isConnected()) {
                             clearInterval(rct.current);
                         } else {
                             c.current.connect(o);
@@ -76,7 +78,9 @@ export const usePahoMQTTClient = (uri: string,
         }
         try {
             c.current.connect(o);
-        } catch (e) {
+        } catch (err) {
+            // Fallback connection attempt if the initial synchronous call fails.
+            console.error('# 🐛 Initial MQTT connection failed, retrying in 5s:', err);
             window.setTimeout(() => {
                 c.current.connect(o);
             }, 5000);
@@ -87,21 +91,21 @@ export const usePahoMQTTClient = (uri: string,
                 if (rct.current !== undefined) {
                     window.clearInterval(rct.current);
                 }
-            } catch (e) {
-                console.log(e);
+            } catch (err) {
+                console.log(err);
             }
         };
-         
+
     }, []);
 
 
     const sub = useCallback((topic: string, qos?: Qos) => {
-        return new Promise<Qos>((resolve) => {
+        return new Promise<Qos>((resolve, reject) => {
             client.current.subscribe(topic, {
                 qos: qos ? qos : 0,
                 timeout: 1,
                 onFailure: (e: MQTTError) => {
-                    throw e;
+                    reject(new Error(`MQTT Subscription failed: ${e.errorMessage}`));
                 },
                 onSuccess: (res) => {
                     resolve(res.grantedQos);
@@ -111,18 +115,22 @@ export const usePahoMQTTClient = (uri: string,
     }, [client]);
 
     const pub = useCallback((topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => {
-        client.current.send(topic, payload, qos, retained);
+        // The Paho client's send method expects a string or an ArrayBuffer.
+        // If the payload is a TypedArray, we must pass its underlying buffer.
+        // We must ensure we are not passing a SharedArrayBuffer.
+        const message = typeof payload === 'string' ? payload : payload.buffer instanceof ArrayBuffer ? payload.buffer : new ArrayBuffer(0);
+        client.current.send(topic, message, qos, retained);
     }, [client]);
 
     const unsub = useCallback((topic: string) => {
-        return new Promise<void>((resolve) => {
+        return new Promise<void>((resolve, reject) => {
             client.current.unsubscribe(topic, {
                 timeout: 1,
                 onSuccess: () => {
                     resolve();
                 },
                 onFailure: (e: MQTTError) => {
-                    throw e;
+                    reject(new Error(`MQTT Unsubscribe failed: ${e.errorMessage}`));
                 }
             });
         });

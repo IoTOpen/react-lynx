@@ -1,10 +1,10 @@
-import {Devicex, Functionx, Installation} from '@iotopen/node-lynx';
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import {useGlobalLynxClient} from '../Contexts';
+import type { Devicex, Functionx, Installation } from '@iotopen/node-lynx';
 
-import {useMQTT} from './useMQTT';
-import {SimpleMQTT} from './useSimpleMQTT';
+import { useGlobalLynxClient } from '../Contexts';
+import { useMQTT } from './useMQTT';
+import type { SimpleMQTT } from './useSimpleMQTT';
 
 export interface MultiLiveInstallation {
     installationMap: Map<number, Installation>;
@@ -16,9 +16,9 @@ export interface MultiLiveInstallation {
 }
 
 export const useMultiLiveInstallation = (installations: Installation[]) => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const mqtt = useMQTT();
-    const {bind, unbind, setSubs} = mqtt;
+    const { bind, unbind, setSubs } = mqtt;
 
 
     // To keep track of client id => installation
@@ -62,11 +62,11 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
         let done = false;
         const fnFetchers = installations.map(async (i) => {
             const fns = await lynxClient.getFunctions(i.id);
-            return {functions: fns, installationId: i.id};
+            return { functions: fns, installationId: i.id };
         });
         const devFetchers = installations.map(async (i) => {
             const devs = await lynxClient.getDevices(i.id);
-            return {devices: devs, installationId: i.id};
+            return { devices: devs, installationId: i.id };
         });
 
         const newDeviceMap = new Map<number, Devicex[]>();
@@ -94,7 +94,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
                 if (fnDone && devDone) resolve();
             }).catch(reject);
         });
-        work.finally(() => {
+        void work.finally(() => {
             setClientIdMap(() => newClientIdMap);
             setInstallationMap(() => newInstallationMap);
             setFunctionMap(() => newFunctionMap);
@@ -108,7 +108,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
             const cid = Number(topic.split('/')[0]);
             const inst = newClientIdMap.get(cid);
             if (inst === undefined) return;
-            lynxClient.getFunctions(inst.id).then((fns) => {
+            void lynxClient.getFunctions(inst.id).then((fns) => {
                 setFunctionMap((p) => new Map([...p, [inst.id, fns]]));
             });
         };
@@ -117,7 +117,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
             const cid = Number(topic.split('/')[0]);
             const inst = newClientIdMap.get(cid);
             if (inst === undefined) return;
-            lynxClient.getDevices(inst.id).then((devs) => {
+            void lynxClient.getDevices(inst.id).then((devs) => {
                 setDeviceMap((p) => new Map([...p, [inst.id, devs]]));
             });
         };

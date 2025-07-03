@@ -1,8 +1,16 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "declaration": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "jsx": "react-jsx",
     "module": "esnext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "sourceMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -10,26 +18,24 @@
     "strictNullChecks": true,
     "alwaysStrict": true,
     "skipLibCheck": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "incremental": true,
-    "jsx": "react-jsx",
     "outDir": "./dist",
-    "sourceMap": true,
     "typeRoots": [
+      "./node_modules/@types",
       "./types"
     ]
   },
   "include": [
     "src/"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }

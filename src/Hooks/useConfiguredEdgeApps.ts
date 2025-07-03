@@ -1,5 +1,6 @@
-import {EdgeAppInstance, ErrorResponse} from '@iotopen/node-lynx';
 import {useCallback, useLayoutEffect, useState} from 'react';
+
+import type {EdgeAppInstance, ErrorResponse} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 

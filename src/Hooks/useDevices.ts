@@ -1,8 +1,9 @@
-import { Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse } from '@iotopen/node-lynx';
 import { useCallback, useLayoutEffect, useState } from 'react';
 
+import type { Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse } from '@iotopen/node-lynx';
+
 import { useGlobalLynxClient } from '../Contexts';
-import { ObjectOrArray } from '../types';
+import type { ObjectOrArray } from '../types';
 
 export const useDevices = (installationId: number | string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;

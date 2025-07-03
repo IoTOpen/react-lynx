@@ -71,7 +71,9 @@ export const usePahoMQTTClient = (uri, handlers, connectionOptions, clientId) =>
         try {
             c.current.connect(o);
         }
-        catch (e) {
+        catch (err) {
+            // Fallback connection attempt if the initial synchronous call fails.
+            console.error('# 🐛 Initial MQTT connection failed, retrying in 5s:', err);
             window.setTimeout(() => {
                 c.current.connect(o);
             }, 5000);
@@ -83,18 +85,18 @@ export const usePahoMQTTClient = (uri, handlers, connectionOptions, clientId) =>
                     window.clearInterval(rct.current);
                 }
             }
-            catch (e) {
-                console.log(e);
+            catch (err) {
+                console.log(err);
             }
         };
     }, []);
     const sub = useCallback((topic, qos) => {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             client.current.subscribe(topic, {
                 qos: qos ? qos : 0,
                 timeout: 1,
                 onFailure: (e) => {
-                    throw e;
+                    reject(new Error(`MQTT Subscription failed: ${e.errorMessage}`));
                 },
                 onSuccess: (res) => {
                     resolve(res.grantedQos);
@@ -103,17 +105,21 @@ export const usePahoMQTTClient = (uri, handlers, connectionOptions, clientId) =>
         });
     }, [client]);
     const pub = useCallback((topic, payload, qos, retained) => {
-        client.current.send(topic, payload, qos, retained);
+        // The Paho client's send method expects a string or an ArrayBuffer.
+        // If the payload is a TypedArray, we must pass its underlying buffer.
+        // We must ensure we are not passing a SharedArrayBuffer.
+        const message = typeof payload === 'string' ? payload : payload.buffer instanceof ArrayBuffer ? payload.buffer : new ArrayBuffer(0);
+        client.current.send(topic, message, qos, retained);
     }, [client]);
     const unsub = useCallback((topic) => {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             client.current.unsubscribe(topic, {
                 timeout: 1,
                 onSuccess: () => {
                     resolve();
                 },
                 onFailure: (e) => {
-                    throw e;
+                    reject(new Error(`MQTT Unsubscribe failed: ${e.errorMessage}`));
                 }
             });
         });

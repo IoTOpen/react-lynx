@@ -1,5 +1,6 @@
-import {EmptyNotificationOutput} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {EmptyNotificationOutput} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 
@@ -11,12 +12,12 @@ const zeroEmptyNotificationOutput = {
     config: {},
 };
 
-export type NotificationOutputTemplate = {
+export interface NotificationOutputTemplate {
     installation_id?: number;
     name?: string;
     notification_message_id?: number;
     notification_output_executor_id?: number;
-    config?: { [key: string]: string };
+    config?: Record<string, string>;
 }
 
 export const useNewNotificationOutput = (installationId: number | string, template?: NotificationOutputTemplate) => {

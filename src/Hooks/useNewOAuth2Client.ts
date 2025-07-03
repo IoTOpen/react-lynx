@@ -1,9 +1,11 @@
-import {EmptyOAuth2Client, zero} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {EmptyOAuth2Client} from '@iotopen/node-lynx';
+import { zero} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 
-export type OAuth2ClientTemplate = {
+export interface OAuth2ClientTemplate {
     name?: string
     trusted?: boolean
     allowed_scopes?: string[]

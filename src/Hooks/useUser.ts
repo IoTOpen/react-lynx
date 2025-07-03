@@ -1,5 +1,6 @@
-import {User} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {User} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 

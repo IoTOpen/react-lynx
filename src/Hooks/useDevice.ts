@@ -1,5 +1,6 @@
-import { Devicex, ErrorResponse, MetaObject, OKResponse } from '@iotopen/node-lynx';
 import { useCallback, useLayoutEffect, useState } from 'react';
+
+import type { Devicex, ErrorResponse, MetaObject, OKResponse } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
 

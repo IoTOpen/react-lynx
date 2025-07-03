@@ -1,9 +1,10 @@
-import {ErrorResponse, NotificationMessage} from '@iotopen/node-lynx';
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import {useGlobalLynxClient} from '../Contexts';
+import type { ErrorResponse, NotificationMessage } from '@iotopen/node-lynx';
 
-const zeroNotificationMessage= {
+import { useGlobalLynxClient } from '../Contexts';
+
+const zeroNotificationMessage = {
     id: 0,
     installation_id: 0,
     name: '',
@@ -19,14 +20,14 @@ export const useNotificationMessage = (installationId: number | string, notifica
     if (isNaN(id)) {
         throw new Error('invalid messageId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState<NotificationMessage>({
         ...zeroNotificationMessage,
     });
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refresh = useCallback(() => {
-        if(iid === 0 || id === 0) return;
+        if (iid === 0 || id === 0) return;
         setLoading(true);
         lynxClient.getNotificationMessage(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
@@ -49,7 +50,7 @@ export const useNotificationMessage = (installationId: number | string, notifica
 
     const remove = useCallback(() => {
         lynxClient.deleteNotificationMessage(message).then(() => {
-            setMessage({...zeroNotificationMessage});
+            setMessage({ ...zeroNotificationMessage });
         }).catch(e => {
             setError(e);
         });

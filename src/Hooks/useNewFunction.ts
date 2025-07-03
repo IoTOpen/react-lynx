@@ -1,13 +1,14 @@
-import {EmptyFunctionx, Metadata} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {EmptyFunctionx, Metadata} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 
-export type FunctionTemplate = {
+export interface FunctionTemplate {
     type?: string
     meta?: Metadata
     protected_meta?: Metadata
-};
+}
 
 export const useNewFunction = (installationId: number | string, template?: FunctionTemplate) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;

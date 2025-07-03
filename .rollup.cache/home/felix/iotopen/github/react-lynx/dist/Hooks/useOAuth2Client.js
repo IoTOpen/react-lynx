@@ -20,7 +20,6 @@ export const useOAuth2Client = (id) => {
     }, [loading, lynxClient, id]);
     useEffect(() => {
         refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
     const remove = useCallback(() => {
         return lynxClient.deleteOAuth2Client(client);

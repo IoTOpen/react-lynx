@@ -1,8 +1,9 @@
-import { EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse } from '@iotopen/node-lynx';
 import { useCallback, useLayoutEffect, useState } from 'react';
 
+import type { EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse } from '@iotopen/node-lynx';
+
 import { useGlobalLynxClient } from '../Contexts';
-import { ObjectOrArray } from '../types';
+import type { ObjectOrArray } from '../types';
 
 export const useFunctions = (installationId: number | string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;

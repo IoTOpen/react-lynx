@@ -1,5 +1,7 @@
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+
 import { LynxClient } from '@iotopen/node-lynx';
-import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import type { ReactNode} from 'react';
 
 
 interface lynxClientContext {
@@ -47,7 +49,7 @@ interface LynxClientProviderProps {
 
 export const LynxClientProvider = ({ children, url, apiKey, bearer }: LynxClientProviderProps) => {
     const [client, setClient] = useState(new LynxClient(url, apiKey, bearer));
-    const newClient = useCallback((url: string, apiKey?: string, bearer?: boolean) => setClient(new LynxClient(url, apiKey, bearer)), [setClient]);
+    const newClient = useCallback((url: string, apiKey?: string, bearer?: boolean) => { setClient(new LynxClient(url, apiKey, bearer)); }, [setClient]);
     const contextValue = useMemo(() => ({ lynxClient: client, newLynxClient: newClient }), [client, newClient]);
     return (
         <LynxClientContext.Provider value={contextValue}>

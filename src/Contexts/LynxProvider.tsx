@@ -1,9 +1,9 @@
-import {ReactNode} from 'react';
+import type {ReactNode} from 'react';
 
 import {LynxClientProvider} from './LynxClientProvider';
 import {UserProvider} from './UserProvider';
 
-type LynxProviderProps = {
+interface LynxProviderProps {
     apiURL?: string;
     apiKey?: string;
     bearer?: boolean;

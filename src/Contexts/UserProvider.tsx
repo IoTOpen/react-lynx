@@ -1,11 +1,13 @@
-import {ErrorResponse, User} from '@iotopen/node-lynx';
-import {createContext, ReactNode, useContext, useLayoutEffect, useMemo, useState} from 'react';
+import {createContext, useContext, useLayoutEffect, useMemo, useState} from 'react';
+
+import type {ErrorResponse, User} from '@iotopen/node-lynx';
+import type { ReactNode} from 'react';
 
 import {useGlobalLynxClient} from './LynxClientProvider';
 
 interface userContext {
     user: User | null;
-    permissions: { [key: string]: boolean } | null;
+    permissions: Record<string, boolean> | null;
     error: ErrorResponse | undefined;
     loading: boolean;
 }
@@ -22,7 +24,7 @@ interface UserProviderProps {
 
 export const UserProvider = ({children}: UserProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
-    const [permissions, setPermissions] = useState<{ [key: string]: boolean } | null>(null);
+    const [permissions, setPermissions] = useState<Record<string, boolean> | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const {lynxClient} = useGlobalLynxClient();

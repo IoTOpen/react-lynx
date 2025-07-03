@@ -1,13 +1,14 @@
-import {EmptyDevicex, Metadata} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {EmptyDevicex, Metadata} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 
-export type DeviceTemplate = {
+export interface DeviceTemplate {
     type?: string
     meta?: Metadata
     protected_meta?: Metadata
-};
+}
 
 export const useNewDevice = (installationId: number | string, template?: DeviceTemplate) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;

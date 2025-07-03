@@ -1,9 +1,10 @@
-import {Address, EmptyOrganization, Metadata, OrganizationChild} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {Address, EmptyOrganization, Metadata, OrganizationChild} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 
-export type OrganizationTemplate = {
+export interface OrganizationTemplate {
     address?: Address
     children?: OrganizationChild[]
     email?: string

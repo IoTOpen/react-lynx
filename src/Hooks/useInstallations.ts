@@ -1,5 +1,6 @@
-import {ErrorResponse, Installation, Metadata} from '@iotopen/node-lynx';
 import {useCallback, useLayoutEffect, useState} from 'react';
+
+import type {ErrorResponse, Installation, Metadata} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 

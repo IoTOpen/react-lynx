@@ -1,5 +1,6 @@
-import {ErrorResponse, MinimalOrg, Organization} from '@iotopen/node-lynx';
 import {useCallback, useEffect, useState} from 'react';
+
+import type {ErrorResponse, MinimalOrg, Organization} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
 
@@ -13,7 +14,7 @@ export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
         setLoading(true);
         lynxClient.getOrganizations(minimal === true).then(orgs => {
             setError((err) => err !== undefined ? undefined : err);
-            setOrganizations(<MinimalOrg<T>[]>orgs);
+            setOrganizations((orgs as MinimalOrg<T>[]));
         }).catch(e => {
             setError(e);
         }).finally(() => {
