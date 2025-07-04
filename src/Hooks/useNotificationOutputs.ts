@@ -3,6 +3,7 @@ import {useCallback, useEffect, useState} from 'react';
 import type {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 export const useNotificationOutputs = (installationId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -17,8 +18,12 @@ export const useNotificationOutputs = (installationId: number | string) => {
         lynxClient.getNotificationOutputs(iid).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setNotificationOutputs(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

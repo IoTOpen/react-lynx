@@ -19,7 +19,7 @@ export const useUsers = (filter?: Metadata) => {
         lynxClient.getUsers(filter).then((users) => {
             setError(undefined);
             setUsers(users);
-        }).catch((e) => {
+        }).catch((e: unknown) => {
             // Defensive: Ensure only Error is set
             if (e instanceof Error) {
                 setError(e);

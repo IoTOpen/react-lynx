@@ -4,6 +4,7 @@ import type {ErrorResponse, OAuth2Client} from '@iotopen/node-lynx';
 import { zero} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 export const useOAuth2Client = (id: string) => {
     const {lynxClient} = useGlobalLynxClient();
@@ -15,8 +16,12 @@ export const useOAuth2Client = (id: string) => {
         lynxClient.getOAuth2Client(id).then(client => {
             setError((err) => err !== undefined ? undefined : err);
             setClient(client);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

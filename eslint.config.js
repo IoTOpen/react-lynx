@@ -9,7 +9,7 @@ import js from '@eslint/js';
 // See .github/instructions/js-ts.instructions.md for coding standards
 export default tseslint.config(
     {
-        ignores: ['dist/', 'node_modules/', 'coverage/', '*.d.ts'],
+        ignores: ['dist/', 'node_modules/', 'coverage/', '*.d.ts', '.rollup.cache/'],
     },
 
     // Base configuration for all files
@@ -67,6 +67,10 @@ export default tseslint.config(
             // React and Hooks rules
             ...reactHooksPlugin.configs.recommended.rules,
             'react/react-in-jsx-scope': 'off',
+
+            // Explicitly add react-hooks rules to ensure compatibility with flat config and plugin resolution issues.
+            'react-hooks/rules-of-hooks': 'error',
+            'react-hooks/exhaustive-deps': 'warn',
 
             // Disable unnecessary condition checking for flexibility
             '@typescript-eslint/no-unnecessary-condition': 'off',

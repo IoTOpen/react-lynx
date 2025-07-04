@@ -15,8 +15,13 @@ export const useRoles = () => {
         lynxClient.getRoles().then((roles) => {
             setError((err) => err !== undefined ? undefined : err);
             setRoles(roles);
-        }).catch((e) => {
-            setError(e);
+        }).catch((e: unknown) => {
+            // Only set Error objects; fallback to a generic error if needed
+            if (e instanceof Error) {
+                setError(e);
+            } else {
+                setError(new Error('Unknown error occurred while fetching roles.'));
+            }
         }).finally(() => {
             setLoading(false);
         });

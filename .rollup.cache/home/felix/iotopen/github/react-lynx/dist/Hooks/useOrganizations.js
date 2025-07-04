@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
+// Removed local isErrorResponse definition, now using shared utility
 export const useOrganizations = (minimal) => {
     const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
@@ -10,8 +12,13 @@ export const useOrganizations = (minimal) => {
         lynxClient.getOrganizations(minimal === true).then(orgs => {
             setError((err) => err !== undefined ? undefined : err);
             setOrganizations(orgs);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

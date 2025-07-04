@@ -38,15 +38,13 @@ export const usePahoMQTTClient = (uri: string,
             onFailure: (e: MQTTError) => {
                 setError(e);
                 setConnected(client.current.isConnected());
-                if (rct.current === undefined) {
-                    rct.current = window.setInterval(() => {
-                        if (c.current.isConnected()) {
-                            clearInterval(rct.current);
-                        } else {
-                            c.current.connect(o);
-                        }
-                    }, 5000);
-                }
+                rct.current ??= window.setInterval(() => {
+                    if (c.current.isConnected()) {
+                        clearInterval(rct.current);
+                    } else {
+                        c.current.connect(o);
+                    }
+                }, 5000);
             },
             onSuccess: () => {
                 setError(undefined);
@@ -102,7 +100,7 @@ export const usePahoMQTTClient = (uri: string,
     const sub = useCallback((topic: string, qos?: Qos) => {
         return new Promise<Qos>((resolve, reject) => {
             client.current.subscribe(topic, {
-                qos: qos ? qos : 0,
+                qos: qos ?? 0, // Use nullish coalescing to allow qos=0
                 timeout: 1,
                 onFailure: (e: MQTTError) => {
                     reject(new Error(`MQTT Subscription failed: ${e.errorMessage}`));

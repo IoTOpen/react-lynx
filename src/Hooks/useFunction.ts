@@ -3,6 +3,7 @@ import { useCallback, useLayoutEffect, useState } from 'react';
 import type { ErrorResponse, Functionx, MetaObject } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 const zeroFunction = {
     id: 0,
@@ -33,11 +34,10 @@ export const useFunction = (installationId: number | string, functionId: number 
             setError(undefined);
             setFunc(fn);
         }).catch((e: unknown) => {
-            // Defensive: Map unknown error to ErrorResponse shape if possible
-            if (typeof e === 'object' && e !== null && 'message' in e) {
-                setError(e as ErrorResponse);
+            if (isErrorResponse(e)) {
+                setError(e);
             } else {
-                setError({ message: 'Unknown error', error: e, status: 500 } as ErrorResponse);
+                setError({ status: 500, message: 'Unknown error' });
             }
         }).finally(() => {
             setLoading(false);
@@ -79,17 +79,17 @@ export const useFunctionMeta = (installationId: number | string, functionId?: nu
 
     const { lynxClient } = useGlobalLynxClient();
     const create = useCallback((key: string, meta: MetaObject, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.createFunctionMeta(iid, id, key, meta, silent);
     }, [lynxClient, iid, fnId]);
 
     const update = useCallback((key: string, meta: MetaObject, createMissing?: boolean, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.updateFunctionMeta(iid, id, key, meta, silent, createMissing);
     }, [lynxClient, iid, fnId]);
 
     const remove = useCallback((key: string, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.deleteFunctionMeta(iid, id, key, silent);
     }, [lynxClient, iid, fnId]);
 

@@ -1,8 +1,9 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type { Devicex, ErrorResponse, MetaObject, OKResponse } from '@iotopen/node-lynx';
+import type { Devicex, ErrorResponse, MetaObject } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 const zeroDevice = {
     updated: 0,
@@ -29,33 +30,33 @@ export const useDevice = (installationId: number | string, deviceId: number | st
         lynxClient.getDevice(iid, id).then(fn => {
             setError((err) => err !== undefined ? undefined : err);
             setDev(fn);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });
     }, [lynxClient, iid, id]);
 
-    const update = useCallback(() => {
-        return new Promise<Devicex>(() => {
-            if (!dev) {
-                throw new Error('update on undefined function');
-            }
-            return lynxClient.updateDevice(dev);
-        });
+    const update = useCallback(async () => {
+        if (!dev) {
+            throw new Error('update on undefined function');
+        }
+        return lynxClient.updateDevice(dev);
     }, [lynxClient, dev]);
 
     const setType = useCallback((t: string) => {
         if (dev) setDev({ ...dev, type: t });
     }, [dev, setDev]);
 
-    const remove = useCallback(() => {
-        return new Promise<OKResponse>(() => {
-            if (!dev) {
-                throw new Error('delete on undefined function');
-            }
-            return lynxClient.deleteDevice(dev);
-        });
+    const remove = useCallback(async () => {
+        if (!dev) {
+            throw new Error('delete on undefined function');
+        }
+        return lynxClient.deleteDevice(dev);
     }, [dev, lynxClient]);
 
     return {

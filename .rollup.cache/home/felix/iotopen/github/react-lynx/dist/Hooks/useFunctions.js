@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 export const useFunctions = (installationId, filter) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if (isNaN(iid) && iid !== undefined) {
@@ -20,8 +21,13 @@ export const useFunctions = (installationId, filter) => {
             setError((err) => err !== undefined ? undefined : err);
             setFunctions(res);
             return res;
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

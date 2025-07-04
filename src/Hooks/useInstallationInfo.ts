@@ -3,6 +3,7 @@ import {useCallback, useLayoutEffect, useState} from 'react';
 import type {ErrorResponse, InstallationInfo} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 export const useInstallationInfo = (assignedOnly?: boolean) => {
     const {lynxClient} = useGlobalLynxClient();
@@ -15,8 +16,12 @@ export const useInstallationInfo = (assignedOnly?: boolean) => {
         lynxClient.getInstallations(assignedOnly).then((res) => {
             setError((err) => err !== undefined ? undefined : err);
             setInstallations(res);
-        }).catch((e: ErrorResponse) => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

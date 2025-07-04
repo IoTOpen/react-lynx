@@ -4,6 +4,7 @@ import type { EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse } f
 
 import { useGlobalLynxClient } from '../Contexts';
 import type { ObjectOrArray } from '../types';
+import { isErrorResponse } from '../utils/errorHandling';
 
 export const useFunctions = (installationId: number | string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -25,8 +26,12 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
             setError((err) => err !== undefined ? undefined : err);
             setFunctions(res);
             return res;
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

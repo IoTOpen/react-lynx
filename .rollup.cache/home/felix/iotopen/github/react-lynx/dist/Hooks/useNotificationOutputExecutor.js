@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 const zeroExecutor = {
     id: 0,
     type: '',
@@ -8,6 +9,15 @@ const zeroExecutor = {
     config: {},
     secret: ''
 };
+// Type guard for ErrorResponse to ensure type safety in catch blocks.
+// const isErrorResponse = (e: unknown): e is ErrorResponse => {
+//     return (
+//         typeof e === 'object' &&
+//         e !== null &&
+//         'message' in e &&
+//         'status' in e
+//     );
+// };
 export const useNotificationOutputExecutor = (installationId, executorId) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const id = typeof executorId === 'string' ? Number.parseInt(executorId) : executorId;
@@ -30,14 +40,20 @@ export const useNotificationOutputExecutor = (installationId, executorId) => {
         lynxClient.getNotificationOutputExecutor(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setOutputExecutor(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });
     }, [id, iid, lynxClient]);
     useEffect(() => {
         refresh();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return {
         refresh,

@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 export const useEdgeAppVersions = (appId, untagged) => {
     const id = typeof appId === 'string' ? Number.parseInt(appId) : appId;
     if (isNaN(id)) {
@@ -14,8 +15,13 @@ export const useEdgeAppVersions = (appId, untagged) => {
         lynxClient.getEdgeAppVersions(id, untagged).then((versions) => {
             setError((err) => err !== undefined ? undefined : err);
             setVersions(versions);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

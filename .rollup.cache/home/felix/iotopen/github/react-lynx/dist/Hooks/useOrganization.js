@@ -28,13 +28,24 @@ export const useOrganization = (organizationId) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
     const { lynxClient } = useGlobalLynxClient();
+    // Type guard for Error to ensure type safety in catch blocks.
+    const isError = (e) => {
+        return (typeof e === 'object' &&
+            e !== null &&
+            'message' in e);
+    };
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getOrganization(oid).then(org => {
             setError((err) => err !== undefined ? undefined : err);
             setOrganization(org);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isError(e)) {
+                setError(e);
+            }
+            else {
+                setError(new Error('Unknown error'));
+            }
         }).finally(() => {
             setLoading(false);
         });

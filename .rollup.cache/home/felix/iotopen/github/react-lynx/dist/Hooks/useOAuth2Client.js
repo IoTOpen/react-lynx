@@ -1,6 +1,7 @@
-import { zero } from '@iotopen/node-lynx';
 import { useCallback, useEffect, useState } from 'react';
+import { zero } from '@iotopen/node-lynx';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 export const useOAuth2Client = (id) => {
     const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
@@ -12,14 +13,20 @@ export const useOAuth2Client = (id) => {
         lynxClient.getOAuth2Client(id).then(client => {
             setError((err) => err !== undefined ? undefined : err);
             setClient(client);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });
     }, [loading, lynxClient, id]);
     useEffect(() => {
         refresh();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
     const remove = useCallback(() => {
         return lynxClient.deleteOAuth2Client(client);

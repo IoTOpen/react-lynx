@@ -16,6 +16,15 @@ const zeroInstallation = {
     protected_meta: {}
 };
 
+// Type guard for Error to ensure type safety in catch blocks.
+const isError = (e: unknown): e is Error => {
+    return (
+        typeof e === 'object' &&
+        e !== null &&
+        'message' in e
+    );
+};
+
 export const useInstallation = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if(isNaN(id)) {
@@ -30,29 +39,29 @@ export const useInstallation = (installationId: number | string) => {
         lynxClient.getInstallationRow(id).then(inst => {
             setError((err) => err !== undefined ? undefined : err);
             setInstallation(inst);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isError(e)) {
+                setError(e);
+            } else {
+                setError(new Error('Unknown error'));
+            }
         }).finally(() => {
             setLoading(false);
         });
     }, [lynxClient, id]);
 
-    const update = useCallback(() => {
-        return new Promise<Installation>(() => {
-            if (!installation) {
-                throw new Error('update on undefined installation');
-            }
-            return lynxClient.updateInstallation(installation);
-        });
+    const update = useCallback(async () => {
+        if (!installation) {
+            throw new Error('update on undefined installation');
+        }
+        return lynxClient.updateInstallation(installation);
     }, [lynxClient, installation]);
 
-    const remove = useCallback(() => {
-        return new Promise<Installation>(() => {
-            if (!installation) {
-                throw new Error('update on undefined installation');
-            }
-            return lynxClient.deleteInstallation(installation);
-        });
+    const remove = useCallback(async () => {
+        if (!installation) {
+            throw new Error('update on undefined installation');
+        }
+        return lynxClient.deleteInstallation(installation);
     }, [lynxClient, installation]);
     return {
         installation,

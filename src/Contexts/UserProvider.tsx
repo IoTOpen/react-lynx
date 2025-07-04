@@ -22,6 +22,16 @@ interface UserProviderProps {
     children: ReactNode;
 }
 
+// Type guard for ErrorResponse to ensure type safety in catch blocks.
+const isErrorResponse = (e: unknown): e is ErrorResponse => {
+    return (
+        typeof e === 'object' &&
+        e !== null &&
+        'message' in e &&
+        'status' in e
+    );
+};
+
 export const UserProvider = ({children}: UserProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [permissions, setPermissions] = useState<Record<string, boolean> | null>(null);
@@ -36,8 +46,12 @@ export const UserProvider = ({children}: UserProviderProps) => {
             setError((err) => err !== undefined ? undefined : err);
             setUser(u);
             setPermissions(p);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
             setUser(null);
             setPermissions(null);
         }).finally(() => {

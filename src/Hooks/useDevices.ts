@@ -4,6 +4,7 @@ import type { Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse } from 
 
 import { useGlobalLynxClient } from '../Contexts';
 import type { ObjectOrArray } from '../types';
+import { isErrorResponse } from '../utils/errorHandling';
 
 export const useDevices = (installationId: number | string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -24,8 +25,12 @@ export const useDevices = (installationId: number | string, filter?: Metadata) =
         lynxClient.getDevices(iid, filter).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setDevices(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

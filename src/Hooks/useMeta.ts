@@ -9,7 +9,7 @@ export type MetaElement = MetaObject & {
 
 export const useMeta = (obj?: WithMeta, deps?: DependencyList) => {
     const [metaList, setMetaList] = useState<MetaElement[]>([]);
-    const depList = deps ? deps : obj ? [obj] : [];
+    const depList = deps ?? (obj ? [obj] : []);
 
     useLayoutEffect(() => {
         if (obj) {
@@ -41,7 +41,7 @@ export const useMeta = (obj?: WithMeta, deps?: DependencyList) => {
     }, [metaList]);
 
     const add = useCallback((e?: MetaElement) => {
-        setMetaList([...metaList, e ? e : { key: '', value: '', protected: false }]);
+        setMetaList([...metaList, e ?? { key: '', value: '', protected: false }]);
     }, [metaList, setMetaList]);
 
     const remove = useCallback((idx: number) => {
@@ -53,15 +53,15 @@ export const useMeta = (obj?: WithMeta, deps?: DependencyList) => {
     }, [metaList, setMetaList]);
 
     const setKey = useCallback((idx: number, key: string) => {
-        setMetaList(metaList.map((x, i) => i == idx ? { ...x, key: key } : x));
+        setMetaList(metaList.map((x, i) => i === idx ? { ...x, key: key } : x));
     }, [metaList, setMetaList]);
 
     const setValue = useCallback((idx: number, value: string) => {
-        setMetaList(metaList.map((x, i) => i == idx ? { ...x, value: value } : x));
+        setMetaList(metaList.map((x, i) => i === idx ? { ...x, value: value } : x));
     }, [metaList, setMetaList]);
 
     const setProtected = useCallback((idx: number, value: boolean) => {
-        setMetaList(metaList.map((x, i) => i == idx ? { ...x, protected: value } : x));
+        setMetaList(metaList.map((x, i) => i === idx ? { ...x, protected: value } : x));
     }, [metaList, setMetaList]);
 
     return {

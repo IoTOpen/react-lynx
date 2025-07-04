@@ -3,6 +3,7 @@ import {useCallback, useEffect, useState} from 'react';
 import type {ErrorResponse, NotificationOutputExecutor} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 
 const zeroExecutor = {
@@ -13,6 +14,16 @@ const zeroExecutor = {
     config: {},
     secret: ''
 };
+
+// Type guard for ErrorResponse to ensure type safety in catch blocks.
+// const isErrorResponse = (e: unknown): e is ErrorResponse => {
+//     return (
+//         typeof e === 'object' &&
+//         e !== null &&
+//         'message' in e &&
+//         'status' in e
+//     );
+// };
 
 export const useNotificationOutputExecutor = (installationId: number | string, executorId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -35,8 +46,12 @@ export const useNotificationOutputExecutor = (installationId: number | string, e
         lynxClient.getNotificationOutputExecutor(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setOutputExecutor(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

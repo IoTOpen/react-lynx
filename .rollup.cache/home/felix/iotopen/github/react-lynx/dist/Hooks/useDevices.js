@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 export const useDevices = (installationId, filter) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if (isNaN(iid) && iid !== undefined) {
@@ -19,8 +20,13 @@ export const useDevices = (installationId, filter) => {
         lynxClient.getDevices(iid, filter).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setDevices(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

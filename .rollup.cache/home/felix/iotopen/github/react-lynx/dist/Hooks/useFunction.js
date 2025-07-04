@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 const zeroFunction = {
     id: 0,
     installation_id: 0,
@@ -25,12 +26,11 @@ export const useFunction = (installationId, functionId) => {
             setError(undefined);
             setFunc(fn);
         }).catch((e) => {
-            // Defensive: Map unknown error to ErrorResponse shape if possible
-            if (typeof e === 'object' && e !== null && 'message' in e) {
+            if (isErrorResponse(e)) {
                 setError(e);
             }
             else {
-                setError({ message: 'Unknown error', error: e, status: 500 });
+                setError({ status: 500, message: 'Unknown error' });
             }
         }).finally(() => {
             setLoading(false);
@@ -67,15 +67,15 @@ export const useFunctionMeta = (installationId, functionId) => {
     const fnId = typeof functionId === 'string' ? Number.parseInt(functionId) : functionId;
     const { lynxClient } = useGlobalLynxClient();
     const create = useCallback((key, meta, funId, silent) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.createFunctionMeta(iid, id, key, meta, silent);
     }, [lynxClient, iid, fnId]);
     const update = useCallback((key, meta, createMissing, funId, silent) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.updateFunctionMeta(iid, id, key, meta, silent, createMissing);
     }, [lynxClient, iid, fnId]);
     const remove = useCallback((key, funId, silent) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.deleteFunctionMeta(iid, id, key, silent);
     }, [lynxClient, iid, fnId]);
     return {

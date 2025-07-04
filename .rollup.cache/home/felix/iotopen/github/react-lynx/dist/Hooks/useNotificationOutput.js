@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 const zeroNotificationOutput = {
     id: 0,
     installation_id: 0,
@@ -7,14 +8,6 @@ const zeroNotificationOutput = {
     notification_message_id: 0,
     notification_output_executor_id: 0,
     config: {},
-};
-// This type guard checks if the caught error is a valid ErrorResponse.
-// This is necessary because catch block errors are of type `unknown`.
-const isErrorResponse = (e) => {
-    return (typeof e === 'object' &&
-        e !== null &&
-        'message' in e &&
-        'status' in e);
 };
 export const useNotificationOutput = (installationId, notificationId) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -39,7 +32,7 @@ export const useNotificationOutput = (installationId, notificationId) => {
         lynxClient.getNotificationOutput(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setOutput(res);
-        }).catch(e => {
+        }).catch((e) => {
             if (isErrorResponse(e)) {
                 setError(e);
             }
@@ -55,7 +48,7 @@ export const useNotificationOutput = (installationId, notificationId) => {
             setError(undefined);
         lynxClient.updateNotificationOutput(output).then(res => {
             setOutput(res);
-        }).catch(e => {
+        }).catch((e) => {
             if (isErrorResponse(e)) {
                 setError(e);
             }
@@ -67,7 +60,7 @@ export const useNotificationOutput = (installationId, notificationId) => {
     const remove = useCallback(() => {
         lynxClient.deleteNotificationOutput(output).then(() => {
             setOutput({ ...zeroNotificationOutput });
-        }).catch(e => {
+        }).catch((e) => {
             if (isErrorResponse(e)) {
                 setError(e);
             }

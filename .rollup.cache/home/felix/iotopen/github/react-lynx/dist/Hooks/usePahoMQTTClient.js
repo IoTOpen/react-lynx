@@ -1,5 +1,5 @@
-import Paho from 'paho-mqtt';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import Paho from 'paho-mqtt';
 export const usePahoMQTTClient = (uri, handlers, connectionOptions, clientId) => {
     if (clientId === undefined) {
         let uuid;
@@ -29,16 +29,14 @@ export const usePahoMQTTClient = (uri, handlers, connectionOptions, clientId) =>
             onFailure: (e) => {
                 setError(e);
                 setConnected(client.current.isConnected());
-                if (rct.current === undefined) {
-                    rct.current = window.setInterval(() => {
-                        if (c.current.isConnected()) {
-                            clearInterval(rct.current);
-                        }
-                        else {
-                            c.current.connect(o);
-                        }
-                    }, 5000);
-                }
+                rct.current ??= window.setInterval(() => {
+                    if (c.current.isConnected()) {
+                        clearInterval(rct.current);
+                    }
+                    else {
+                        c.current.connect(o);
+                    }
+                }, 5000);
             },
             onSuccess: () => {
                 setError(undefined);
@@ -93,7 +91,7 @@ export const usePahoMQTTClient = (uri, handlers, connectionOptions, clientId) =>
     const sub = useCallback((topic, qos) => {
         return new Promise((resolve, reject) => {
             client.current.subscribe(topic, {
-                qos: qos ? qos : 0,
+                qos: qos ?? 0, // Use nullish coalescing to allow qos=0
                 timeout: 1,
                 onFailure: (e) => {
                     reject(new Error(`MQTT Subscription failed: ${e.errorMessage}`));

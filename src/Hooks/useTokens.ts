@@ -3,6 +3,7 @@ import {useCallback, useLayoutEffect, useState} from 'react';
 import type {EmptyToken, ErrorResponse, Token} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 export const useTokens = () => {
     const {lynxClient} = useGlobalLynxClient();
@@ -15,8 +16,12 @@ export const useTokens = () => {
         lynxClient.getTokens().then((tokens) => {
             setError((err) => err !== undefined ? undefined : err);
             setTokens(tokens);
-        }).catch((e) => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 0, message: 'Unknown error occurred while fetching tokens.' });
+            }
         }).finally(() => {
             setLoading(false);
         });

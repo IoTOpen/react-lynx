@@ -1,10 +1,9 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { type ReactNode } from 'react';
 
 import { LynxClient } from '@iotopen/node-lynx';
-import type { ReactNode} from 'react';
 
-
-interface lynxClientContext {
+interface LynxClientContext {
     lynxClient: LynxClient;
     /**
      * Re-initializes the LynxClient instance with new connection parameters.
@@ -23,7 +22,7 @@ const defaultLynxClientContext = {
     }
 };
 
-const LynxClientContext = createContext(defaultLynxClientContext as lynxClientContext);
+const LynxClientContext = createContext(defaultLynxClientContext as LynxClientContext);
 
 interface LynxClientProviderProps {
     /**

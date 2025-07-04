@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { ErrorResponse, NotificationOutput } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 const zeroNotificationOutput = {
     id: 0,
@@ -11,17 +12,6 @@ const zeroNotificationOutput = {
     notification_message_id: 0,
     notification_output_executor_id: 0,
     config: {},
-};
-
-// This type guard checks if the caught error is a valid ErrorResponse.
-// This is necessary because catch block errors are of type `unknown`.
-const isErrorResponse = (e: unknown): e is ErrorResponse => {
-    return (
-        typeof e === 'object' &&
-        e !== null &&
-        'message' in e &&
-        'status' in e
-    );
 };
 
 export const useNotificationOutput = (installationId: number | string, notificationId: number | string) => {
@@ -46,7 +36,7 @@ export const useNotificationOutput = (installationId: number | string, notificat
         lynxClient.getNotificationOutput(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setOutput(res);
-        }).catch(e => {
+        }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);
             } else {
@@ -61,7 +51,7 @@ export const useNotificationOutput = (installationId: number | string, notificat
         if (error !== undefined) setError(undefined);
         lynxClient.updateNotificationOutput(output).then(res => {
             setOutput(res);
-        }).catch(e => {
+        }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);
             } else {
@@ -73,7 +63,7 @@ export const useNotificationOutput = (installationId: number | string, notificat
     const remove = useCallback(() => {
         lynxClient.deleteNotificationOutput(output).then(() => {
             setOutput({ ...zeroNotificationOutput });
-        }).catch(e => {
+        }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);
             } else {

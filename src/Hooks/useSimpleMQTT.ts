@@ -33,19 +33,28 @@ async function unsubscribe (unsub: Unsub, subs: string[]): Promise<void> {
     const promises = subs.map(async (topic) => {
         try {
             await unsub(topic);
-        } catch (e) {
-            console.warn('failed to unsubscribe to', topic, e);
+        } catch (e: unknown) {
+            // Log only valid Error objects, fallback to string otherwise
+            if (e instanceof Error) {
+                console.warn('failed to unsubscribe to', topic, e);
+            } else {
+                console.warn('failed to unsubscribe to', topic, String(e));
+            }
         }
     });
     await Promise.all(promises);
 }
 
-async function subscribe (sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
+async function subscribe (sub: (topic: string, qos?: Qos) => Promise<Qos>, subs: string[]): Promise<void> {
     const promises = subs.map(async (topic) => {
         try {
             await sub(topic);
-        } catch (e) {
-            console.warn('failed to subscribe to', topic, e);
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                console.warn('failed to subscribe to', topic, e);
+            } else {
+                console.warn('failed to subscribe to', topic, String(e));
+            }
         }
     });
     await Promise.all(promises);
@@ -111,8 +120,12 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
     } = usePahoMQTTClient(uri, {
         onMessage: onMessage, onConnected: () => {
             // Re-subscribe to all topics upon connection.
-            void subscribe(sub, subs.current).catch((e) => {
-                console.error('#mqtt: Failed to re-subscribe on connect', e);
+            void subscribe(sub, subs.current).catch((e: unknown) => {
+                if (e instanceof Error) {
+                    console.error('#mqtt: Failed to re-subscribe on connect', e);
+                } else {
+                    console.error('#mqtt: Failed to re-subscribe on connect', String(e));
+                }
             });
         },
     }, options);
@@ -175,7 +188,13 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         if (c.current) {
             unsubscribe(unsub, subs.current)
                 .then(() => subscribe(sub, s))
-                .catch((e) => { console.error('#mqtt: Failed to update subscriptions', e); });
+                .catch((e: unknown) => {
+                    if (e instanceof Error) {
+                        console.error('#mqtt: Failed to update subscriptions', e);
+                    } else {
+                        console.error('#mqtt: Failed to update subscriptions', String(e));
+                    }
+                });
         }
         subs.current = s;
     }, [sub, unsub]);

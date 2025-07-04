@@ -6,6 +6,13 @@ const defaultUserContext = {
     permissions: null,
 };
 const UserContext = createContext(defaultUserContext);
+// Type guard for ErrorResponse to ensure type safety in catch blocks.
+const isErrorResponse = (e) => {
+    return (typeof e === 'object' &&
+        e !== null &&
+        'message' in e &&
+        'status' in e);
+};
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [permissions, setPermissions] = useState(null);
@@ -20,8 +27,13 @@ export const UserProvider = ({ children }) => {
             setError((err) => err !== undefined ? undefined : err);
             setUser(u);
             setPermissions(p);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
             setUser(null);
             setPermissions(null);
         }).finally(() => {

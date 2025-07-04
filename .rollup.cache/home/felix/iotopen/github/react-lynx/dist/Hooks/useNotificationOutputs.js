@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 export const useNotificationOutputs = (installationId) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if (isNaN(iid)) {
@@ -13,8 +14,13 @@ export const useNotificationOutputs = (installationId) => {
         lynxClient.getNotificationOutputs(iid).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setNotificationOutputs(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

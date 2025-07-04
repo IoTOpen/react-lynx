@@ -3,6 +3,7 @@ import { useCallback, useLayoutEffect, useState } from 'react';
 import type { EdgeApp, ErrorResponse } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 export const useEdgeApps = () => {
     const { lynxClient } = useGlobalLynxClient();
@@ -15,8 +16,12 @@ export const useEdgeApps = () => {
         lynxClient.getEdgeApps().then(apps => {
             setError((err) => err !== undefined ? undefined : err);
             setApps(apps);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

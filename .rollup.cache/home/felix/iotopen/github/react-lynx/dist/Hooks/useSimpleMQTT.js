@@ -17,7 +17,13 @@ async function unsubscribe(unsub, subs) {
             await unsub(topic);
         }
         catch (e) {
-            console.warn('failed to unsubscribe to', topic, e);
+            // Log only valid Error objects, fallback to string otherwise
+            if (e instanceof Error) {
+                console.warn('failed to unsubscribe to', topic, e);
+            }
+            else {
+                console.warn('failed to unsubscribe to', topic, String(e));
+            }
         }
     });
     await Promise.all(promises);
@@ -28,7 +34,12 @@ async function subscribe(sub, subs) {
             await sub(topic);
         }
         catch (e) {
-            console.warn('failed to subscribe to', topic, e);
+            if (e instanceof Error) {
+                console.warn('failed to subscribe to', topic, e);
+            }
+            else {
+                console.warn('failed to subscribe to', topic, String(e));
+            }
         }
     });
     await Promise.all(promises);
@@ -77,7 +88,12 @@ export const useSimpleMQTT = (uri, username, password) => {
         onMessage: onMessage, onConnected: () => {
             // Re-subscribe to all topics upon connection.
             void subscribe(sub, subs.current).catch((e) => {
-                console.error('#mqtt: Failed to re-subscribe on connect', e);
+                if (e instanceof Error) {
+                    console.error('#mqtt: Failed to re-subscribe on connect', e);
+                }
+                else {
+                    console.error('#mqtt: Failed to re-subscribe on connect', String(e));
+                }
             });
         },
     }, options);
@@ -135,7 +151,14 @@ export const useSimpleMQTT = (uri, username, password) => {
         if (c.current) {
             unsubscribe(unsub, subs.current)
                 .then(() => subscribe(sub, s))
-                .catch((e) => console.error('#mqtt: Failed to update subscriptions', e));
+                .catch((e) => {
+                if (e instanceof Error) {
+                    console.error('#mqtt: Failed to update subscriptions', e);
+                }
+                else {
+                    console.error('#mqtt: Failed to update subscriptions', String(e));
+                }
+            });
         }
         subs.current = s;
     }, [sub, unsub]);

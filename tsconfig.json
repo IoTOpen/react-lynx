@@ -23,7 +23,7 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
     "incremental": true,
     "outDir": "./dist",
     "typeRoots": [
@@ -32,7 +32,7 @@
     ]
   },
   "include": [
-    "src/"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

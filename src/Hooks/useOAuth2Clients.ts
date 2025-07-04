@@ -3,6 +3,9 @@ import {useCallback, useEffect, useState} from 'react';
 import type {ErrorResponse, OAuth2Client} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
+
+// Removed local isErrorResponse definition, now using shared utility
 
 export const useOAuth2Clients = () => {
     const {lynxClient} = useGlobalLynxClient();
@@ -13,8 +16,12 @@ export const useOAuth2Clients = () => {
         lynxClient.getOAuth2Clients().then(clients => {
             setError((err) => err !== undefined ? undefined : err);
             setClients(clients);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

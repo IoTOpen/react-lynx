@@ -11,13 +11,20 @@ export const useRoles = () => {
             setError((err) => err !== undefined ? undefined : err);
             setRoles(roles);
         }).catch((e) => {
-            setError(e);
+            // Only set Error objects; fallback to a generic error if needed
+            if (e instanceof Error) {
+                setError(e);
+            }
+            else {
+                setError(new Error('Unknown error occurred while fetching roles.'));
+            }
         }).finally(() => {
             setLoading(false);
         });
     }, [lynxClient]);
     useEffect(() => {
         refresh();
+        /* eslint-disable react-hooks/exhaustive-deps */
     }, []);
     return {
         loading,

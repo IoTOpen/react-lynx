@@ -42,8 +42,13 @@ export const useUser = (userId: number | string) => {
         lynxClient.getUser(id).then((user) => {
             setError((err) => err !== undefined ? undefined : err);
             setUser(user);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            // Only set Error objects; fallback to a generic error if needed
+            if (e instanceof Error) {
+                setError(e);
+            } else {
+                setError(new Error('Unknown error occurred while fetching user.'));
+            }
         }).finally(() => {
             setLoading(false);
         });

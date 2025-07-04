@@ -28,20 +28,20 @@ const zeroEmptyUser = {
 };
 
 export interface UserTemplate {
-    email?: string
-    password?: string
-    first_name?: string
-    last_name?: string
-    role?: number
-    sms_login?: boolean
-    mobile?: string
-    note?: string
-    organisations?: number[]
-    assigned_installations?: number[]
-    address?: Address
-    expire_at?: number
-    meta?: Record<string, any>,
-    protected_meta?: Record<string, any>
+    email?: string;
+    password?: string;
+    first_name?: string;
+    last_name?: string;
+    role?: number;
+    sms_login?: boolean;
+    mobile?: string;
+    note?: string;
+    organisations?: number[];
+    assigned_installations?: number[];
+    address?: Address;
+    expire_at?: number;
+    meta?: Record<string, unknown>;
+    protected_meta?: Record<string, unknown>;
 }
 
 export const useNewUser = (template?: UserTemplate) => {

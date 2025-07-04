@@ -3,6 +3,9 @@ import {useCallback, useEffect, useState} from 'react';
 import type {ErrorResponse, MinimalOrg, Organization} from '@iotopen/node-lynx';
 
 import {useGlobalLynxClient} from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
+
+// Removed local isErrorResponse definition, now using shared utility
 
 export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
     const {lynxClient} = useGlobalLynxClient();
@@ -15,8 +18,12 @@ export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
         lynxClient.getOrganizations(minimal === true).then(orgs => {
             setError((err) => err !== undefined ? undefined : err);
             setOrganizations((orgs as MinimalOrg<T>[]));
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

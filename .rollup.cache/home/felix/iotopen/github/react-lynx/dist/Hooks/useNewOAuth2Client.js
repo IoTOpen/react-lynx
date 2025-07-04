@@ -1,5 +1,5 @@
-import { zero } from '@iotopen/node-lynx';
 import { useCallback, useState } from 'react';
+import { zero } from '@iotopen/node-lynx';
 import { useGlobalLynxClient } from '../Contexts';
 export const useNewOAuth2Client = (template) => {
     const { lynxClient } = useGlobalLynxClient();

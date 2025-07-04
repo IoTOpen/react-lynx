@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 export const useEdgeApps = () => {
     const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
@@ -10,14 +11,20 @@ export const useEdgeApps = () => {
         lynxClient.getEdgeApps().then(apps => {
             setError((err) => err !== undefined ? undefined : err);
             setApps(apps);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });
     }, [lynxClient]);
     useLayoutEffect(() => {
         refresh();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return {
         apps,

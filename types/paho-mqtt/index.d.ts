@@ -61,9 +61,10 @@ declare module 'paho-mqtt' {
     export interface WithInvocationContext {
         /**
          * <code>invocationContext</code> as passed in with the corresponding field in the connectOptions or
-         * subscribeOptions.
+         * subscribeOptions. This is intentionally typed as 'unknown' because it is user-provided and may be any shape.
+         * Consumers must use type guards or casting as appropriate.
          */
-        invocationContext: any;
+        invocationContext: unknown;
     }
 
     export interface ErrorWithInvocationContext extends MQTTError, WithInvocationContext {}
@@ -141,8 +142,11 @@ declare module 'paho-mqtt' {
         cleanSession?: boolean | undefined;
         /** If present and true, use an SSL Websocket connection. */
         useSSL?: boolean | undefined;
-        /** Passed to the onSuccess callback or onFailure callback. */
-        invocationContext?: any;
+        /**
+         * Passed to the onSuccess callback or onFailure callback. This is intentionally 'unknown' to reflect that
+         * it is user-provided and may be any type. Consumers must use type guards or casting as appropriate.
+         */
+        invocationContext?: unknown;
         /**
          * Called when the connect acknowledgement has been received from the server.
          */
@@ -197,8 +201,11 @@ declare module 'paho-mqtt' {
     export interface SubscribeOptions {
         /** the maximum qos of any publications sent as a result of making this subscription. */
         qos?: Qos | undefined;
-        /** passed to the onSuccess callback or onFailure callback. */
-        invocationContext?: any;
+        /**
+         * Passed to the onSuccess callback or onFailure callback. This is intentionally 'unknown' to reflect that
+         * it is user-provided and may be any type. Consumers must use type guards or casting as appropriate.
+         */
+        invocationContext?: unknown;
         /** called when the subscribe acknowledgement has been received from the server. */
         onSuccess?: OnSubscribeSuccessCallback | undefined;
         /** called when the subscribe request has failed or timed out. */
@@ -213,7 +220,7 @@ declare module 'paho-mqtt' {
 
     export interface UnsubscribeOptions {
         /** passed to the onSuccess callback or onFailure callback.  */
-        invocationContext?: any;
+        invocationContext?: unknown;
         /** called when the unsubscribe acknowledgement has been received from the server. */
         onSuccess?: OnSuccessCallback | undefined;
         /** called when the unsubscribe request has failed or timed out. */
@@ -346,9 +353,10 @@ declare module 'paho-mqtt' {
         /**
          * Get the contents of the trace log.
          *
-         *  @return tracebuffer containing the time ordered trace records.
+         *  @return tracebuffer containing the time ordered trace records. This is intentionally 'unknown[]' because
+         *  the trace log may contain arbitrary user or library data. Consumers must use type guards or casting.
          */
-        getTraceLog(): any[];
+        getTraceLog(): unknown[];
 
         /**
          * Start tracing.

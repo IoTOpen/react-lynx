@@ -3,6 +3,7 @@ import { useCallback, useLayoutEffect, useState } from 'react';
 import type { EdgeAppVersion, ErrorResponse } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) => {
     const id = typeof appId === 'string' ? Number.parseInt(appId) : appId;
@@ -19,8 +20,12 @@ export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) =
         lynxClient.getEdgeAppVersions(id, untagged).then((versions) => {
             setError((err) => err !== undefined ? undefined : err);
             setVersions(versions);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });

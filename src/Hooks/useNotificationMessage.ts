@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { ErrorResponse, NotificationMessage } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
 
 const zeroNotificationMessage = {
     id: 0,
@@ -32,8 +33,12 @@ export const useNotificationMessage = (installationId: number | string, notifica
         lynxClient.getNotificationMessage(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setMessage(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });
@@ -43,16 +48,24 @@ export const useNotificationMessage = (installationId: number | string, notifica
         if (error !== undefined) setError(undefined);
         lynxClient.updateNotificationMessage(message).then(res => {
             setMessage(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         });
     }, [error, lynxClient, message]);
 
     const remove = useCallback(() => {
         lynxClient.deleteNotificationMessage(message).then(() => {
             setMessage({ ...zeroNotificationMessage });
-        }).catch(e => {
-            setError(e);
+        }).catch((e: unknown) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            } else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         });
     }, [lynxClient, message]);
 

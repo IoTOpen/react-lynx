@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 export const useMeta = (obj, deps) => {
     const [metaList, setMetaList] = useState([]);
-    const depList = deps ? deps : obj ? [obj] : [];
+    const depList = deps ?? (obj ? [obj] : []);
     useLayoutEffect(() => {
         if (obj) {
             const newList = [];
@@ -16,6 +16,7 @@ export const useMeta = (obj, deps) => {
             newList.sort((a, b) => a.key.localeCompare(b.key));
             setMetaList(newList);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, depList);
     const compile = useCallback(() => {
         const res = { meta: {}, protected_meta: {} };
@@ -30,7 +31,7 @@ export const useMeta = (obj, deps) => {
         return res;
     }, [metaList]);
     const add = useCallback((e) => {
-        setMetaList([...metaList, e ? e : { key: '', value: '', protected: false }]);
+        setMetaList([...metaList, e ?? { key: '', value: '', protected: false }]);
     }, [metaList, setMetaList]);
     const remove = useCallback((idx) => {
         setMetaList(metaList.filter((_, i) => i !== idx));
@@ -39,13 +40,13 @@ export const useMeta = (obj, deps) => {
         setMetaList(metaList.map((x, i) => i === idx ? e : x));
     }, [metaList, setMetaList]);
     const setKey = useCallback((idx, key) => {
-        setMetaList(metaList.map((x, i) => i == idx ? { ...x, key: key } : x));
+        setMetaList(metaList.map((x, i) => i === idx ? { ...x, key: key } : x));
     }, [metaList, setMetaList]);
     const setValue = useCallback((idx, value) => {
-        setMetaList(metaList.map((x, i) => i == idx ? { ...x, value: value } : x));
+        setMetaList(metaList.map((x, i) => i === idx ? { ...x, value: value } : x));
     }, [metaList, setMetaList]);
     const setProtected = useCallback((idx, value) => {
-        setMetaList(metaList.map((x, i) => i == idx ? { ...x, protected: value } : x));
+        setMetaList(metaList.map((x, i) => i === idx ? { ...x, protected: value } : x));
     }, [metaList, setMetaList]);
     return {
         metaList: metaList,

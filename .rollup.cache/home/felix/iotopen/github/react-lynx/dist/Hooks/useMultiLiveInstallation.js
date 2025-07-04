@@ -30,7 +30,7 @@ export const useMultiLiveInstallation = (installations) => {
         }
         const newInstallationMap = new Map();
         const newClientIdMap = new Map();
-        const newTopics = [];
+        const newTopics = new Array();
         installations.forEach((inst) => {
             newInstallationMap.set(inst.id, inst);
             newClientIdMap.set(inst.client_id, inst);

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useGlobalLynxClient } from '../Contexts';
+import { isErrorResponse } from '../utils/errorHandling';
+// Removed local isErrorResponse definition, now using shared utility
 export const useNotificationOutputExecutors = (installationId) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if (isNaN(iid)) {
@@ -13,8 +15,13 @@ export const useNotificationOutputExecutors = (installationId) => {
         lynxClient.getNotificationOutputExecutors(iid).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setNotificationExecutors(res);
-        }).catch(e => {
-            setError(e);
+        }).catch((e) => {
+            if (isErrorResponse(e)) {
+                setError(e);
+            }
+            else {
+                setError({ status: 500, message: 'Unknown error' });
+            }
         }).finally(() => {
             setLoading(false);
         });
