@@ -27,32 +27,26 @@ function isEq<T>(a: T[], b: T[]): boolean {
     return false;
 }
 
-type Unsub = (topic: string) => void | Promise<void>;
+type Unsub = (topic: string) => Promise<void>;
 
-function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
-    return new Promise<void>((resolve) => {
-        subs.forEach(async (topic) => {
-            try {
-                await unsub(topic);
-            } catch (e) {
-                console.warn('failed to unsubscribe to', topic, e);
-            }
-        });
-        resolve();
-    });
+async function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
+    for (const topic of subs) {
+        try {
+            await unsub(topic);
+        } catch (e) {
+            console.warn('failed to unsubscribe to', topic, e);
+        }
+    }
 }
 
-function subscribe(sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
-    return new Promise<void>((resolve) => {
-        subs.forEach(async (topic) => {
-            try {
-                await sub(topic);
-            } catch (e) {
-                console.warn('failed to subscribe to', topic, e);
-            }
-        });
-        resolve();
-    });
+async function subscribe(sub: (topic: string, qos?: Qos) => Promise<Qos>, subs: string[]): Promise<void> {
+    for (const topic of subs) {
+        try {
+            await sub(topic);
+        } catch (e) {
+            console.warn('failed to subscribe to', topic, e);
+        }
+    }
 }
 
 export interface SimpleMQTT {
@@ -115,7 +109,9 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
     } = usePahoMQTTClient(uri, {
         onMessage: onMessage, onConnected: () => {
             subs.current.forEach(s => {
-                sub(s).then().catch();
+                void sub(s).catch((e: unknown) => {
+                    console.warn('failed to subscribe to', s, e);
+                });
             });
         },
     }, options);
@@ -178,6 +174,8 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         if (c.current) {
             unsubscribe(unsub, subs.current).then(() => {
                 return subscribe(sub, s);
+            }).catch((e: unknown) => {
+                console.warn('failed to update subscriptions', e);
             });
         }
         subs.current = s;
