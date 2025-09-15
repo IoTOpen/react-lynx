@@ -7,8 +7,9 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "lint": "eslint . --max-warnings 0",
-    "lint:fix": "eslint . --fix",
+    "lint": "pnpm type-check && eslint src --max-warnings 0",
+    "lint:fix": "eslint src --fix",
+    "type-check": "tsc --noEmit",
     "prepare": "rm -rf dist/ && rollup -c",
     "build": "rollup -c",
     "dev": "rollup -c -w",
