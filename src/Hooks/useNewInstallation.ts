@@ -25,13 +25,11 @@ export const useNewInstallation = (organizationId: number | string, template?: I
     });
     const {lynxClient} = useGlobalLynxClient();
 
-    const create = useCallback(() => {
-        return lynxClient.createInstallation(newInstallation);
-    }, [lynxClient, newInstallation]);
+    const create = useCallback(() => lynxClient.createInstallation(newInstallation), [lynxClient, newInstallation]);
 
     return {
-        newInstallation: newInstallation,
-        setNewInstallation: setNewInstallation,
-        create: create,
+        newInstallation,
+        setNewInstallation,
+        create,
     };
 };

@@ -45,9 +45,7 @@ export const useNewOrganization = (parentId: number | string , template?: Organi
         ...template, parent: pid
     });
 
-    const create = useCallback(() => {
-        return lynxClient.createOrganization(newOrganization);
-    }, [lynxClient, newOrganization]);
+    const create = useCallback(() => lynxClient.createOrganization(newOrganization), [lynxClient, newOrganization]);
 
     return {
         newOrganization,

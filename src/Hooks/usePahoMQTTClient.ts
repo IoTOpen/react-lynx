@@ -97,20 +97,18 @@ export const usePahoMQTTClient = (uri: string,
     }, []);
 
 
-    const sub = useCallback((topic: string, qos?: Qos) => {
-        return new Promise<Qos>((resolve, reject) => {
-            client.current.subscribe(topic, {
-                qos: qos ?? 0, // Use nullish coalescing to allow qos=0
-                timeout: 1,
-                onFailure: (e: MQTTError) => {
-                    reject(new Error(`MQTT Subscription failed: ${e.errorMessage}`));
-                },
-                onSuccess: (res) => {
-                    resolve(res.grantedQos);
-                }
-            });
+    const sub = useCallback((topic: string, qos?: Qos) => new Promise<Qos>((resolve, reject) => {
+        client.current.subscribe(topic, {
+            qos: qos ?? 0, // Use nullish coalescing to allow qos=0
+            timeout: 1,
+            onFailure: (e: MQTTError) => {
+                reject(new Error(`MQTT Subscription failed: ${e.errorMessage}`));
+            },
+            onSuccess: (res) => {
+                resolve(res.grantedQos);
+            }
         });
-    }, [client]);
+    }), [client]);
 
     const pub = useCallback((topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => {
         // The Paho client's send method expects a string or an ArrayBuffer.
@@ -120,26 +118,24 @@ export const usePahoMQTTClient = (uri: string,
         client.current.send(topic, message, qos, retained);
     }, [client]);
 
-    const unsub = useCallback((topic: string) => {
-        return new Promise<void>((resolve, reject) => {
-            client.current.unsubscribe(topic, {
-                timeout: 1,
-                onSuccess: () => {
-                    resolve();
-                },
-                onFailure: (e: MQTTError) => {
-                    reject(new Error(`MQTT Unsubscribe failed: ${e.errorMessage}`));
-                }
-            });
+    const unsub = useCallback((topic: string) => new Promise<void>((resolve, reject) => {
+        client.current.unsubscribe(topic, {
+            timeout: 1,
+            onSuccess: () => {
+                resolve();
+            },
+            onFailure: (e: MQTTError) => {
+                reject(new Error(`MQTT Unsubscribe failed: ${e.errorMessage}`));
+            }
         });
-    }, [client]);
+    }), [client]);
 
     return {
-        client: client,
-        connected: connected,
-        error: error,
-        sub: sub,
-        pub: pub,
-        unsub: unsub,
+        client,
+        connected,
+        error,
+        sub,
+        pub,
+        unsub,
     };
 };

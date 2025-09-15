@@ -26,9 +26,7 @@ export const useNewNotificationMessage = (installationId: number | string, templ
         installation_id: iid,
     });
 
-    const create = useCallback(() => {
-        return lynxClient.createNotificationMessage(newNotificationMessage);
-    }, [lynxClient, newNotificationMessage]);
+    const create = useCallback(() => lynxClient.createNotificationMessage(newNotificationMessage), [lynxClient, newNotificationMessage]);
 
     return {
         newNotificationMessage,

@@ -13,9 +13,9 @@ export const useOAuth2Clients = () => {
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [clients, setClients] = useState<OAuth2Client[]>([]);
     const refresh = useCallback(() => {
-        lynxClient.getOAuth2Clients().then(clients => {
+        lynxClient.getOAuth2Clients().then(fetchedClients => {
             setError((err) => err !== undefined ? undefined : err);
-            setClients(clients);
+            setClients(fetchedClients);
         }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);

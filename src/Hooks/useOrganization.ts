@@ -34,13 +34,11 @@ export const useOrganization = (organizationId: number | string) => {
     const {lynxClient} = useGlobalLynxClient();
 
     // Type guard for Error to ensure type safety in catch blocks.
-    const isError = (e: unknown): e is Error => {
-        return (
-            typeof e === 'object' &&
+    const isError = (e: unknown): e is Error => (
+        typeof e === 'object' &&
             e !== null &&
             'message' in e
-        );
-    };
+    );
 
     const refresh = useCallback(() => {
         setLoading(true);
@@ -63,13 +61,9 @@ export const useOrganization = (organizationId: number | string) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const update = useCallback(() => {
-        return lynxClient.updateOrganization(organization);
-    }, [lynxClient, organization]);
+    const update = useCallback(() => lynxClient.updateOrganization(organization), [lynxClient, organization]);
 
-    const remove = useCallback(() => {
-        return lynxClient.deleteOrganization(organization);
-    }, [lynxClient, organization]);
+    const remove = useCallback(() => lynxClient.deleteOrganization(organization), [lynxClient, organization]);
 
     return {
         loading,

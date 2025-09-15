@@ -17,13 +17,11 @@ const zeroInstallation = {
 };
 
 // Type guard for Error to ensure type safety in catch blocks.
-const isError = (e: unknown): e is Error => {
-    return (
-        typeof e === 'object' &&
+const isError = (e: unknown): e is Error => (
+    typeof e === 'object' &&
         e !== null &&
         'message' in e
-    );
-};
+);
 
 export const useInstallation = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;

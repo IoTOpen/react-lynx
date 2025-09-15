@@ -81,7 +81,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
                     }
                 });
                 fnDone = true;
-                if (fnDone && devDone) resolve();
+                if (fnDone && devDone) {resolve();}
             }).catch(reject);
 
             Promise.allSettled(devFetchers).then((devsResult) => {
@@ -91,7 +91,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
                     }
                 });
                 devDone = true;
-                if (fnDone && devDone) resolve();
+                if (fnDone && devDone) {resolve();}
             }).catch(reject);
         });
         void work.finally(() => {
@@ -104,19 +104,19 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
         });
 
         const fnRefresh = (topic: string) => {
-            if (!done) return;
+            if (!done) {return;}
             const cid = Number(topic.split('/')[0]);
             const inst = newClientIdMap.get(cid);
-            if (inst === undefined) return;
+            if (inst === undefined) {return;}
             void lynxClient.getFunctions(inst.id).then((fns) => {
                 setFunctionMap((p) => new Map([...p, [inst.id, fns]]));
             });
         };
         const devRefresh = (topic: string) => {
-            if (!done) return;
+            if (!done) {return;}
             const cid = Number(topic.split('/')[0]);
             const inst = newClientIdMap.get(cid);
-            if (inst === undefined) return;
+            if (inst === undefined) {return;}
             void lynxClient.getDevices(inst.id).then((devs) => {
                 setDeviceMap((p) => new Map([...p, [inst.id, devs]]));
             });

@@ -51,9 +51,7 @@ export const useNewUser = (template?: UserTemplate) => {
     });
     const {lynxClient} = useGlobalLynxClient();
 
-    const create =  useCallback(() => {
-        return lynxClient.createUser(newUser);
-    }, [lynxClient, newUser]);
+    const create =  useCallback(() => lynxClient.createUser(newUser), [lynxClient, newUser]);
 
     return {
         newUser, setNewUser,

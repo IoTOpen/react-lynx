@@ -33,9 +33,9 @@ export const useInstallationInfo = (assignedOnly?: boolean) => {
     }, [refreshCall]);
 
     return {
-        installations: installations,
+        installations,
         refresh: refreshCall,
-        loading: loading,
-        error: error,
+        loading,
+        error,
     };
 };

@@ -40,10 +40,8 @@ export const useDevices = (installationId: number | string, filter?: Metadata) =
     function removeFn (devs: Devicex | Devicex[]) {
         if (Array.isArray(devs)) {
             const last = devs.pop();
-            if (!last) return Promise.allSettled([]);
-            const rest = devs.map((dev => {
-                return lynxClient.deleteDevice(dev, true);
-            }));
+            if (!last) {return Promise.allSettled([]);}
+            const rest = devs.map((dev => lynxClient.deleteDevice(dev, true)));
             return Promise.allSettled(rest).then(async (settled) => {
                 try {
                     settled.push({ status: 'fulfilled', value: await lynxClient.deleteDevice(last) });
@@ -60,10 +58,8 @@ export const useDevices = (installationId: number | string, filter?: Metadata) =
     function createFn (devs: EmptyDevicex | EmptyDevicex[]) {
         if (Array.isArray(devs)) {
             const last = devs.pop();
-            if (!last) return Promise.allSettled([]);
-            const rest = devs.map(dev => {
-                return lynxClient.createDevice(dev, true);
-            });
+            if (!last) {return Promise.allSettled([]);}
+            const rest = devs.map(dev => lynxClient.createDevice(dev, true));
             return Promise.allSettled(rest).then(async (settled) => {
                 try {
                     settled.push({ status: 'fulfilled', value: await lynxClient.createDevice(last) });
@@ -84,11 +80,11 @@ export const useDevices = (installationId: number | string, filter?: Metadata) =
     }, [refreshCall]);
 
     return {
-        loading: loading,
-        error: error,
-        create: create,
-        remove: remove,
-        devices: devices,
+        loading,
+        error,
+        create,
+        remove,
+        devices,
         refresh: refreshCall,
     };
 };

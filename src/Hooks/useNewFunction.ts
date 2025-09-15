@@ -26,14 +26,12 @@ export const useNewFunction = (installationId: number | string, template?: Funct
         setNewFunction({...newFunction, type: t});
     }, [newFunction, setNewFunction]);
 
-    const create = useCallback(() => {
-        return lynxClient.createFunction(newFunction);
-    }, [lynxClient, newFunction]);
+    const create = useCallback(() => lynxClient.createFunction(newFunction), [lynxClient, newFunction]);
 
     return {
-        newFunction: newFunction,
-        setNewFunction: setNewFunction,
-        create: create,
-        setType: setType,
+        newFunction,
+        setNewFunction,
+        create,
+        setType,
     };
 };

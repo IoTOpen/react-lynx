@@ -26,14 +26,12 @@ export const useNewDevice = (installationId: number | string, template?: DeviceT
         setNewDevice({...newDevice, type: t});
     }, [newDevice, setNewDevice]);
 
-    const create = useCallback(() => {
-        return lynxClient.createDevice(newDevice);
-    }, [lynxClient, newDevice]);
+    const create = useCallback(() => lynxClient.createDevice(newDevice), [lynxClient, newDevice]);
 
     return {
-        newDevice: newDevice,
-        setNewDevice: setNewDevice,
-        create: create,
-        setType: setType,
+        newDevice,
+        setNewDevice,
+        create,
+        setType,
     };
 };

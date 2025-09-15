@@ -10,12 +10,10 @@ interface LynxProviderProps {
     children?: ReactNode;
 }
 
-export const LynxProvider = ({ children, apiURL, apiKey, bearer }: LynxProviderProps) => {
-    return (
-        <LynxClientProvider url={apiURL} apiKey={apiKey} bearer={bearer}>
-            <UserProvider>
-                {children}
-            </UserProvider>
-        </LynxClientProvider>
-    );
-};
+export const LynxProvider = ({ children, apiURL, apiKey, bearer }: LynxProviderProps) => (
+    <LynxClientProvider url={apiURL} apiKey={apiKey} bearer={bearer}>
+        <UserProvider>
+            {children}
+        </UserProvider>
+    </LynxClientProvider>
+);

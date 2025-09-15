@@ -107,7 +107,7 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         unsub,
         pub
     } = usePahoMQTTClient(uri, {
-        onMessage: onMessage, onConnected: () => {
+        onMessage, onConnected: () => {
             subs.current.forEach(s => {
                 void sub(s).catch((e: unknown) => {
                     console.warn('failed to subscribe to', s, e);
@@ -163,7 +163,7 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
 
     const unbindExact = useCallback((topic: string, binder: Binding) => {
         const binds = exactBindings.current.get(topic);
-        if (binds === undefined) return;
+        if (binds === undefined) {return;}
         exactBindings.current.set(topic, binds.filter((b) => b !== binder));
     }, []);
 
@@ -172,9 +172,7 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
             return;
         }
         if (c.current) {
-            unsubscribe(unsub, subs.current).then(() => {
-                return subscribe(sub, s);
-            }).catch((e: unknown) => {
+            unsubscribe(unsub, subs.current).then(() => subscribe(sub, s)).catch((e: unknown) => {
                 console.warn('failed to update subscriptions', e);
             });
         }

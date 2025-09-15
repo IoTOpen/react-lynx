@@ -1,65 +1,65 @@
 {
-    "name": "@iotopen/react-lynx",
-    "version": "1.0.1",
-    "main": "dist/cjs/index.js",
-    "module": "dist/esm/index.js",
-    "source": "src/index.ts",
-    "types": "dist/index.d.ts",
-    "type": "module",
-    "scripts": {
-        "lint": "eslint . --max-warnings 0",
-        "lint:fix": "eslint . --fix",
-        "prepare": "rm -rf dist/ && rollup -c",
-        "build": "rollup -c",
-        "dev": "rollup -c -w",
-        "clean": "rm -rf dist/"
-    },
-    "peerDependencies": {
-        "@iotopen/node-lynx": "^2.5.0",
-        "paho-mqtt": "^1.1.0",
-        "react": "^18.3.1 || ^19.0.0",
-        "react-dom": "^18.3.1 || ^19.0.0"
-    },
-    "devDependencies": {
-        "@eslint/js": "^9.35.0",
-        "@rollup/plugin-commonjs": "^28.0.6",
-        "@rollup/plugin-image": "^3.0.3",
-        "@rollup/plugin-node-resolve": "^16.0.1",
-        "@rollup/plugin-terser": "^0.4.4",
-        "@rollup/plugin-typescript": "^12.1.4",
-        "@types/node": "^24.3.1",
-        "@types/react": "^18.3.24",
-        "@types/react-dom": "^18.3.7",
-        "eslint": "^9.35.0",
-        "eslint-import-resolver-typescript": "^3.10.1",
-        "eslint-plugin-react": "^7.37.5",
-        "eslint-plugin-react-hooks": "6.0.0-rc.1",
-        "eslint-plugin-simple-import-sort": "^12.1.1",
-        "globals": "^16.4.0",
-        "rollup": "^4.50.1",
-        "rollup-plugin-copy": "^3.5.0",
-        "rollup-plugin-dts": "^6.2.3",
-        "rollup-plugin-peer-deps-external": "^2.2.4",
-        "rollup-plugin-visualizer": "^6.0.3",
-        "typescript": "^5.9.2",
-        "typescript-eslint": "^8.43.0"
-    },
-    "files": [
-        "dist"
+  "name": "@iotopen/react-lynx",
+  "version": "1.0.1",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "prepare": "rm -rf dist/ && rollup -c",
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "clean": "rm -rf dist/"
+  },
+  "peerDependencies": {
+    "@iotopen/node-lynx": "^2.5.0",
+    "paho-mqtt": "^1.1.0",
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-image": "^3.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@types/node": "^24.4.0",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "eslint": "^9.35.0",
+    "eslint-import-resolver-typescript": "^3.10.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "6.0.0-rc.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^16.4.0",
+    "rollup": "^4.50.2",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-dts": "^6.2.3",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-visualizer": "^6.0.3",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": "22.x"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
     ],
-    "engines": {
-        "node": "22.x"
-    },
-    "browserslist": {
-        "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    }
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

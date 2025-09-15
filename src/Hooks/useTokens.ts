@@ -13,9 +13,9 @@ export const useTokens = () => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getTokens().then((tokens) => {
+        lynxClient.getTokens().then((fetchedTokens) => {
             setError((err) => err !== undefined ? undefined : err);
-            setTokens(tokens);
+            setTokens(fetchedTokens);
         }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);
@@ -27,24 +27,20 @@ export const useTokens = () => {
         });
     }, [lynxClient]);
 
-    const remove = useCallback((token: Token) => {
-        return lynxClient.deleteToken(token);
-    }, [lynxClient]);
+    const remove = useCallback((token: Token) => lynxClient.deleteToken(token), [lynxClient]);
 
-    const create = useCallback((token: EmptyToken) => {
-        return lynxClient.createToken(token);
-    }, [lynxClient]);
+    const create = useCallback((token: EmptyToken) => lynxClient.createToken(token), [lynxClient]);
 
     useLayoutEffect(() => {
         refresh();
     }, [refresh]);
 
     return {
-        tokens: tokens,
-        remove: remove,
-        create: create,
-        refresh: refresh,
-        loading: loading,
-        error: error
+        tokens,
+        remove,
+        create,
+        refresh,
+        loading,
+        error
     };
 };

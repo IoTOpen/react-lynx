@@ -39,9 +39,9 @@ export const useUser = (userId: number | string) => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getUser(id).then((user) => {
+        lynxClient.getUser(id).then((fetchedUser) => {
             setError((err) => err !== undefined ? undefined : err);
-            setUser(user);
+            setUser(fetchedUser);
         }).catch((e: unknown) => {
             // Only set Error objects; fallback to a generic error if needed
             if (e instanceof Error) {
@@ -54,13 +54,9 @@ export const useUser = (userId: number | string) => {
         });
     }, [lynxClient, id]);
 
-    const update = useCallback(() => {
-        return lynxClient.updateUser(user);
-    }, [lynxClient, user]);
+    const update = useCallback(() => lynxClient.updateUser(user), [lynxClient, user]);
 
-    const remove = useCallback(() => {
-        return lynxClient.deleteUser(user);
-    }, [lynxClient, user]);
+    const remove = useCallback(() => lynxClient.deleteUser(user), [lynxClient, user]);
 
     return {
         loading,

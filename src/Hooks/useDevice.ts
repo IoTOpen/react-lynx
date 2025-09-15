@@ -49,7 +49,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     }, [lynxClient, dev]);
 
     const setType = useCallback((t: string) => {
-        if (dev) setDev({ ...dev, type: t });
+        if (dev) {setDev({ ...dev, type: t });}
     }, [dev, setDev]);
 
     const remove = useCallback(async () => {
@@ -60,13 +60,13 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     }, [dev, lynxClient]);
 
     return {
-        loading: loading,
-        error: error,
+        loading,
+        error,
         Device: dev,
         setDevice: setDev,
-        update: update,
-        remove: remove,
-        setType: setType,
+        update,
+        remove,
+        setType,
     };
 };
 

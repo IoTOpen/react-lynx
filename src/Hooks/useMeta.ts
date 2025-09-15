@@ -16,11 +16,11 @@ export const useMeta = (obj?: WithMeta, deps?: DependencyList) => {
             const newList = [] as MetaElement[];
             for (const key in obj.meta) {
                 const value = obj.meta[key];
-                newList.push({ key: key, value: value, protected: false });
+                newList.push({ key, value, protected: false });
             }
             for (const key in obj.protected_meta) {
                 const value = obj.protected_meta[key];
-                newList.push({ key: key, value: value, protected: true });
+                newList.push({ key, value, protected: true });
             }
             newList.sort((a, b) => a.key.localeCompare(b.key));
             setMetaList(newList);
@@ -53,11 +53,11 @@ export const useMeta = (obj?: WithMeta, deps?: DependencyList) => {
     }, [metaList, setMetaList]);
 
     const setKey = useCallback((idx: number, key: string) => {
-        setMetaList(metaList.map((x, i) => i === idx ? { ...x, key: key } : x));
+        setMetaList(metaList.map((x, i) => i === idx ? { ...x, key } : x));
     }, [metaList, setMetaList]);
 
     const setValue = useCallback((idx: number, value: string) => {
-        setMetaList(metaList.map((x, i) => i === idx ? { ...x, value: value } : x));
+        setMetaList(metaList.map((x, i) => i === idx ? { ...x, value } : x));
     }, [metaList, setMetaList]);
 
     const setProtected = useCallback((idx: number, value: boolean) => {
@@ -65,8 +65,8 @@ export const useMeta = (obj?: WithMeta, deps?: DependencyList) => {
     }, [metaList, setMetaList]);
 
     return {
-        metaList: metaList,
-        compile: compile,
+        metaList,
+        compile,
         addMeta: add,
         removeMeta: remove,
         setMeta: update,

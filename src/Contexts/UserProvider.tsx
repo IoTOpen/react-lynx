@@ -23,14 +23,12 @@ interface UserProviderProps {
 }
 
 // Type guard for ErrorResponse to ensure type safety in catch blocks.
-const isErrorResponse = (e: unknown): e is ErrorResponse => {
-    return (
-        typeof e === 'object' &&
+const isErrorResponse = (e: unknown): e is ErrorResponse => (
+    typeof e === 'object' &&
         e !== null &&
         'message' in e &&
         'status' in e
-    );
-};
+);
 
 export const UserProvider = ({children}: UserProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
@@ -68,9 +66,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
 };
 
 
-export const useGlobalUser = () => {
-    return useContext(UserContext);
-};
+export const useGlobalUser = () => useContext(UserContext);
 
 export const useGlobalPermissions = () => {
     const {permissions} = useGlobalUser();

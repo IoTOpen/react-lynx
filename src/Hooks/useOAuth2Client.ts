@@ -12,10 +12,10 @@ export const useOAuth2Client = (id: string) => {
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [client, setClient] = useState<OAuth2Client>({...zero.getOAuth2Client()});
     const refresh = useCallback(() => {
-        if (!loading) setLoading(true);
-        lynxClient.getOAuth2Client(id).then(client => {
+        if (!loading) {setLoading(true);}
+        lynxClient.getOAuth2Client(id).then(fetchedClient => {
             setError((err) => err !== undefined ? undefined : err);
-            setClient(client);
+            setClient(fetchedClient);
         }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);
@@ -32,13 +32,9 @@ export const useOAuth2Client = (id: string) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
-    const remove = useCallback(() => {
-        return lynxClient.deleteOAuth2Client(client);
-    }, [client, lynxClient]);
+    const remove = useCallback(() => lynxClient.deleteOAuth2Client(client), [client, lynxClient]);
 
-    const update = useCallback(() => {
-        return lynxClient.updateOAuth2Client(client);
-    }, [client, lynxClient]);
+    const update = useCallback(() => lynxClient.updateOAuth2Client(client), [client, lynxClient]);
 
     return {
         refresh,

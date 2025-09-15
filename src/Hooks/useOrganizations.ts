@@ -34,13 +34,9 @@ export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const create = useCallback((org: Organization) => {
-        return lynxClient.createOrganization(org);
-    }, [lynxClient]);
+    const create = useCallback((org: Organization) => lynxClient.createOrganization(org), [lynxClient]);
 
-    const remove = useCallback((org: Organization) => {
-        return lynxClient.deleteOrganization(org);
-    }, [lynxClient]);
+    const remove = useCallback((org: Organization) => lynxClient.deleteOrganization(org), [lynxClient]);
 
     return {
         loading,

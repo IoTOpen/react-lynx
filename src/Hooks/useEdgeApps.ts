@@ -13,9 +13,9 @@ export const useEdgeApps = () => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getEdgeApps().then(apps => {
+        lynxClient.getEdgeApps().then(fetchedApps => {
             setError((err) => err !== undefined ? undefined : err);
-            setApps(apps);
+            setApps(fetchedApps);
         }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);

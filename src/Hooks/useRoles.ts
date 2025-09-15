@@ -12,9 +12,9 @@ export const useRoles = () => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getRoles().then((roles) => {
+        lynxClient.getRoles().then((fetchedRoles) => {
             setError((err) => err !== undefined ? undefined : err);
-            setRoles(roles);
+            setRoles(fetchedRoles);
         }).catch((e: unknown) => {
             // Only set Error objects; fallback to a generic error if needed
             if (e instanceof Error) {

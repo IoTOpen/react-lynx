@@ -24,7 +24,7 @@ export const useNewOAuth2Client = (template?: OAuth2ClientTemplate) => {
     });
 
     const setName = useCallback((name: string) => {
-        setClient({...client, name: name});
+        setClient({...client, name});
     }, [client]);
 
     const setScope = useCallback((scopes: string[]) => {
@@ -47,9 +47,7 @@ export const useNewOAuth2Client = (template?: OAuth2ClientTemplate) => {
         setClient({...client, redirect_uris: uris});
     }, [client]);
 
-    const create = useCallback(() => {
-        return lynxClient.createOAuth2Client(client);
-    }, [lynxClient, client]);
+    const create = useCallback(() => lynxClient.createOAuth2Client(client), [lynxClient, client]);
 
     return {
         newClient: client,

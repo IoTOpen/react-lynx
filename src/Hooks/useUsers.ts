@@ -16,9 +16,9 @@ export const useUsers = (filter?: Metadata) => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getUsers(filter).then((users) => {
+        lynxClient.getUsers(filter).then((fetchedUsers) => {
             setError(undefined);
-            setUsers(users);
+            setUsers(fetchedUsers);
         }).catch((e: unknown) => {
             // Defensive: Ensure only Error is set
             if (e instanceof Error) {

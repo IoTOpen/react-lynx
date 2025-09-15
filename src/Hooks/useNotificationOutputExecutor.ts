@@ -41,7 +41,7 @@ export const useNotificationOutputExecutor = (installationId: number | string, e
     });
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refresh = useCallback(() => {
-        if(iid === 0 || id === 0) return;
+        if(iid === 0 || id === 0) {return;}
         setLoading(true);
         lynxClient.getNotificationOutputExecutor(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);

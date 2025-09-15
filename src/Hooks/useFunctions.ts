@@ -41,10 +41,8 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
     function removeFn (fns: Functionx | Functionx[]) {
         if (Array.isArray(fns)) {
             const last = fns.pop();
-            if (!last) return Promise.allSettled([]);
-            const rest = fns.map((f => {
-                return lynxClient.deleteFunction(f, true);
-            }));
+            if (!last) {return Promise.allSettled([]);}
+            const rest = fns.map((f => lynxClient.deleteFunction(f, true)));
             return Promise.allSettled(rest).then(async (settled) => {
                 try {
                     settled.push({ status: 'fulfilled', value: await lynxClient.deleteFunction(last) });
@@ -61,10 +59,8 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
     function createFn (fns: EmptyFunctionx | EmptyFunctionx[]) {
         if (Array.isArray(fns)) {
             const last = fns.pop();
-            if (!last) return Promise.allSettled([]);
-            const rest = fns.map(f => {
-                return lynxClient.createFunction(f, true);
-            });
+            if (!last) {return Promise.allSettled([]);}
+            const rest = fns.map(f => lynxClient.createFunction(f, true));
             return Promise.allSettled(rest).then(async (settled) => {
                 try {
                     settled.push({ status: 'fulfilled', value: await lynxClient.createFunction(last) });
@@ -85,11 +81,11 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
     }, [refreshCall]);
 
     return {
-        loading: loading,
-        error: error,
-        create: create,
-        remove: remove,
-        functions: functions,
+        loading,
+        error,
+        create,
+        remove,
+        functions,
         refresh: refreshCall,
     };
 };

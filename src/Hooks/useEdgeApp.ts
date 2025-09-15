@@ -32,9 +32,9 @@ export const useEdgeApp = (appId: number | string) => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getEdgeApp(id).then(app => {
+        lynxClient.getEdgeApp(id).then(fetchedApp => {
             setError((err) => err !== undefined ? undefined : err);
-            setApp(app);
+            setApp(fetchedApp);
         }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);

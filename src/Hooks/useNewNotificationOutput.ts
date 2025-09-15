@@ -29,9 +29,7 @@ export const useNewNotificationOutput = (installationId: number | string, templa
         installation_id: iid,
     });
 
-    const create = useCallback(() => {
-        return lynxClient.createNotificationOutput(newNotificationOutput);
-    }, [lynxClient, newNotificationOutput]);
+    const create = useCallback(() => lynxClient.createNotificationOutput(newNotificationOutput), [lynxClient, newNotificationOutput]);
 
 
     return {

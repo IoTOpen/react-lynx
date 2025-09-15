@@ -17,9 +17,9 @@ export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) =
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getEdgeAppVersions(id, untagged).then((versions) => {
+        lynxClient.getEdgeAppVersions(id, untagged).then((fetchedVersions) => {
             setError((err) => err !== undefined ? undefined : err);
-            setVersions(versions);
+            setVersions(fetchedVersions);
         }).catch((e: unknown) => {
             if (isErrorResponse(e)) {
                 setError(e);
@@ -31,9 +31,7 @@ export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) =
         });
     }, [lynxClient, id, untagged]);
 
-    const nameVersion = useCallback((name: string, hash: string) => {
-        return lynxClient.nameEdgeAppVersion(id, name, hash);
-    }, [lynxClient, id]);
+    const nameVersion = useCallback((name: string, hash: string) => lynxClient.nameEdgeAppVersion(id, name, hash), [lynxClient, id]);
 
     useLayoutEffect(() => {
         refresh();

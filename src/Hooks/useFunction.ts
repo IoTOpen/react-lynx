@@ -52,7 +52,7 @@ export const useFunction = (installationId: number | string, functionId: number 
     }, [lynxClient, func]);
 
     const setType = useCallback((t: string) => {
-        if (func) setFunc({ ...func, type: t });
+        if (func) {setFunc({ ...func, type: t });}
     }, [func, setFunc]);
 
     const remove = useCallback(async () => {
@@ -63,13 +63,13 @@ export const useFunction = (installationId: number | string, functionId: number 
     }, [func, lynxClient]);
 
     return {
-        loading: loading,
-        error: error,
+        loading,
+        error,
         Function: func,
         setFunction: setFunc,
-        update: update,
-        remove: remove,
-        setType: setType,
+        update,
+        remove,
+        setType,
     };
 };
 
