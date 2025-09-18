@@ -55,7 +55,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
         installations.forEach((inst) => {
             newInstallationMap.set(inst.id, inst);
             newClientIdMap.set(inst.client_id, inst);
-            newTopics.push(`${inst.client_id}/#`);
+            newTopics.push(`${String(inst.client_id)}/#`);
         });
 
         // This is a flag to prevent new fetches during the initial fetch

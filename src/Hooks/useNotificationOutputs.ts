@@ -27,7 +27,7 @@ export const useNotificationOutputs = (installationId: number | string) => {
         }).finally(() => {
             setLoading(false);
         });
-    },[iid, lynxClient]);
+    }, [iid, lynxClient]);
 
     useEffect(() => {
         refresh();

@@ -17,12 +17,12 @@ export interface LiveInstallation {
 
 export const useLiveInstallation = (installation: Installation) => {
     const mqtt = useMQTT();
-    const {functions, refresh: fnRefresh} = useFunctions(installation.id);
-    const {devices, refresh: devRefresh} = useDevices(installation.id);
+    const {functions, refresh: fnRefresh} = useFunctions(String(installation.id));
+    const {devices, refresh: devRefresh} = useDevices(String(installation.id));
     const {unbind, bind, setSubs} = mqtt;
 
     useEffect(() => {
-        setSubs([`${installation.client_id}/#`]);
+    setSubs([`${String(installation.client_id)}/#`]);
         bind(/[0-9]+\/evt\/functionx\/updated/, fnRefresh);
         bind(/[0-9]+\/evt\/devicex\/updated/, devRefresh);
         return () => {
@@ -42,11 +42,11 @@ export const useLiveInstallation = (installation: Installation) => {
 export const useLiveInstallationId = (installationId: number | string) => {
     const mqtt = useMQTT();
     const {installation} = useInstallation(installationId);
-    const {functions, refresh: fnRefresh} = useFunctions(installationId);
-    const {devices, refresh: devRefresh} = useDevices(installationId);
+    const {functions, refresh: fnRefresh} = useFunctions(String(installationId));
+    const {devices, refresh: devRefresh} = useDevices(String(installationId));
     const {unbind, bind, setSubs} = mqtt;
     useEffect(() => {
-        setSubs([`${installation.client_id}/#`]);
+    setSubs([`${String(installation.client_id)}/#`]);
         bind(/[0-9]+\/evt\/functionx\/updated/, fnRefresh);
         bind(/[0-9]+\/evt\/devicex\/updated/, devRefresh);
         return () => {

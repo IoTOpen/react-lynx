@@ -14,7 +14,7 @@ export const useOAuth2Consent = () => {
 
         consentObject.scope = scope.join(' ');
         return lynxClient.consentOAuth2Authorization(consentObject);
-    },[lynxClient, params]);
+    }, [lynxClient, params]);
 
     useEffect(() => {
         setRequestedScopes(params.get('scope')?.split(' ') ?? []);

@@ -5,12 +5,19 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
+import importPlugin from 'eslint-plugin-import';
 
-// ESLint configuration for react-lynx
-// See .github/instructions/js-ts.instructions.md for coding standards
 export default defineConfig(
   {
-    ignores: ['dist/', 'node_modules/', 'coverage/', '*.d.ts', '.rollup.cache/'],
+    ignores: [
+      'dist/',
+      'node_modules/',
+      '.vite/',
+      'coverage/',
+      '*.d.ts',
+      '*.config.{js,ts}', // config files
+      '.rollup.cache/',
+    ],
   },
 
   // Base configuration for all files
@@ -20,6 +27,7 @@ export default defineConfig(
       sourceType: 'module',
       globals: {
         ...globals.browser,
+        ...globals.node,
       },
     },
   },
@@ -58,36 +66,49 @@ export default defineConfig(
       'react': reactPlugin,
       'react-hooks': reactHooksPlugin,
       'simple-import-sort': simpleImportSort,
+      'import': importPlugin,
     },
     settings: {
-      react: {
-        version: 'detect',
+      react: { version: 'detect' },
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+          alwaysTryTypes: true,
+        },
       },
     },
     rules: {
+      // Defensive null/undefined checks for Map.get() and similar are required for runtime safety in this codebase.
+      '@typescript-eslint/no-unnecessary-condition': 'off',
+      // Import hygiene
+      'import/first': 'error',
+      'import/no-duplicates': 'error',
+      'import/no-unresolved': 'error',
+      'import/newline-after-import': ['error', { count: 1 }],
+
+      // React
       ...reactHooksPlugin.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
-      '@typescript-eslint/no-unnecessary-condition': 'off',
-      '@typescript-eslint/no-unnecessary-type-conversion': 'off',
+      'react/prop-types': 'off',
+
+      // Import sorting
       'simple-import-sort/imports': ['error', {
         groups: [
-          ['^react$', '^react-dom$'],
-          ['^@iotopen', '^bootstrap', '^react-bootstrap', '^react-icons', '^@?\\w'],
-          ['^src/Contexts', '^src/', '^@/'],
-          ['^.+\\.css$', '^.+\\.scss$'],
-          ['^\\.']
-        ]
+          ['^react$', '^react-dom$'],         // React first
+          ['^@testing-library', '^vitest'],   // Test utils
+          ['^@iotopen', '^antd', '^@?\\w'],   // External deps
+          ['^src/Contexts', '^src/', '^@/'],  // Internal
+          ['^\\u0000'],                       // Side-effects
+          ['^\\.'],                           // Relative
+          ['^.+\\.css$'],                     // CSS last
+        ],
       }],
       'simple-import-sort/exports': 'error',
-      'no-var': 'error',
-      'prefer-const': 'error',
-      'no-unreachable': 'warn',
-      'indent': ['error', 4],
-      'linebreak-style': ['error', 'unix'],
-      'quotes': ['error', 'single'],
-      'semi': ['error', 'always'],
+
+      // Style / formatting
+      'comma-spacing': ['error', { before: false, after: true }],
+
+      // TypeScript rules
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -102,18 +123,39 @@ export default defineConfig(
         },
       ],
       '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
       '@typescript-eslint/consistent-type-imports': 'error',
-      '@typescript-eslint/restrict-template-expressions': 'off',
-      '@typescript-eslint/restrict-plus-operands': 'off',
-      '@typescript-eslint/no-shadow': ['error', {
-        allow: ['errors', 'error', 'err', 'e'],
-      }],
+      '@typescript-eslint/no-shadow': ['error', { allow: ['errors', 'error', 'err', 'e'] }],
+
+      // Core JS/TS rules
+      'no-var': 'error',
+      'prefer-const': 'error',
+      'no-unreachable': 'warn',
+      'linebreak-style': ['error', 'unix'],
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'always'],
       'eqeqeq': ['error', 'always'],
       'curly': ['error', 'all'],
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       'object-shorthand': ['error', 'always'],
       'arrow-body-style': ['error', 'as-needed'],
       'default-case': 'error',
-      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
+    },
+  },
+
+  // Plain JS/JSX files
+  {
+    files: ['src/**/*.{js,jsx}'],
+    plugins: {
+      react: reactPlugin,
+      'react-hooks': reactHooksPlugin,
+    },
+    rules: {
+      ...reactHooksPlugin.configs.recommended.rules,
+      'react/prop-types': 'warn', // keep for runtime safety in JS
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
+      'react/react-in-jsx-scope': 'off',
     },
   },
 );

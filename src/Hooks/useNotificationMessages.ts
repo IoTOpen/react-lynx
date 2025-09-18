@@ -29,7 +29,7 @@ export const useNotificationMessages = (installationId: number | string) => {
         }).finally(() => {
             setLoading(false);
         });
-    },[iid, lynxClient]);
+    }, [iid, lynxClient]);
 
     useEffect(() => {
         refresh();
