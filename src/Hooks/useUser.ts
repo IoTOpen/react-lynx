@@ -1,5 +1,7 @@
-import {User} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {User} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 const zeroUser = {
@@ -37,9 +39,9 @@ export const useUser = (userId: number | string) => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getUser(id).then((user) => {
+        lynxClient.getUser(id).then((fetchedUser) => {
             setError((err) => err !== undefined ? undefined : err);
-            setUser(user);
+            setUser(fetchedUser);
         }).catch(e => {
             setError(e);
         }).finally(() => {

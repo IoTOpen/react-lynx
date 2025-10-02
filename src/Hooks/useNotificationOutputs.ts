@@ -1,6 +1,8 @@
 import {useCallback, useEffect, useState} from 'react';
+
+import type {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
-import {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
 
 export const useNotificationOutputs = (installationId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -20,7 +22,7 @@ export const useNotificationOutputs = (installationId: number | string) => {
         }).finally(() => {
             setLoading(false);
         });
-    },[iid, lynxClient]);
+    }, [iid, lynxClient]);
 
     useEffect(() => {
         refresh();

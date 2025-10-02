@@ -1,5 +1,7 @@
 import {useCallback, useLayoutEffect, useState} from 'react';
-import {EdgeApp, ErrorResponse} from '@iotopen/node-lynx';
+
+import type {EdgeApp, ErrorResponse} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 const zeroEdgeApp = {
@@ -29,9 +31,9 @@ export const useEdgeApp = (appId: number | string) => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getEdgeApp(id).then(app => {
+        lynxClient.getEdgeApp(id).then(fetchedApp => {
             setError((err) => err !== undefined ? undefined : err);
-            setApp(app);
+            setApp(fetchedApp);
         }).catch(e => {
             setError(e);
         }).finally(() => {
@@ -41,7 +43,7 @@ export const useEdgeApp = (appId: number | string) => {
 
     useLayoutEffect(() => {
         refresh();
-    }, [id]);
+    }, [refresh]);
 
     return {
         loading,

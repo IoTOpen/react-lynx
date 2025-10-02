@@ -1,6 +1,8 @@
-import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useEffect, useState} from 'react';
-import {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
+
+import type {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 const zeroNotificationOutput = {
     id: 0,
@@ -28,7 +30,7 @@ export const useNotificationOutput = (installationId: number | string, notificat
     });
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refresh = useCallback(() => {
-        if(iid === 0 || id === 0) return;
+        if(iid === 0 || id === 0) {return;}
         setLoading(true);
         lynxClient.getNotificationOutput(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
@@ -41,7 +43,7 @@ export const useNotificationOutput = (installationId: number | string, notificat
     }, [id, iid, lynxClient]);
 
     const update = useCallback(() => {
-        if (error !== undefined) setError(undefined);
+        if (error !== undefined) {setError(undefined);}
         lynxClient.updateNotificationOutput(output).then(res => {
             setOutput(res);
         }).catch(e => {

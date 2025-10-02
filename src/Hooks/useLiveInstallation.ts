@@ -1,10 +1,12 @@
-import {SimpleMQTT} from './useSimpleMQTT';
-import {useInstallation} from './useInstallation';
-import {useFunctions} from './useFunctions';
-import {useDevices} from './useDevices';
 import {useEffect} from 'react';
-import {Devicex, Functionx, Installation} from '@iotopen/node-lynx';
+
+import type {Devicex, Functionx, Installation} from '@iotopen/node-lynx';
+
+import {useDevices} from './useDevices';
+import {useFunctions} from './useFunctions';
+import {useInstallation} from './useInstallation';
 import {useMQTT} from './useMQTT';
+import type {SimpleMQTT} from './useSimpleMQTT';
 
 export interface LiveInstallation {
     installation: Installation;

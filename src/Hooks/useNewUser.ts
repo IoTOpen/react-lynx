@@ -1,7 +1,9 @@
-import {EmptyUser} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {EmptyUser} from '@iotopen/node-lynx';
+import type {Address} from '@iotopen/node-lynx/src/types';
+
 import {useGlobalLynxClient} from '../Contexts';
-import {Address} from '@iotopen/node-lynx/src/types';
 
 const zeroEmptyUser = {
     address: {
@@ -25,7 +27,7 @@ const zeroEmptyUser = {
     meta: {},
 };
 
-export type UserTemplate = {
+export interface UserTemplate {
     email?: string
     password?: string
     first_name?: string
@@ -38,9 +40,9 @@ export type UserTemplate = {
     assigned_installations?: number[]
     address?: Address
     expire_at?: number
-    meta?: {[key: string]: any},
-    protected_meta?: {[key: string]: any}
-};
+    meta?: {[key: string]: unknown},
+    protected_meta?: {[key: string]: unknown}
+}
 
 export const useNewUser = (template?: UserTemplate) => {
     const [newUser, setNewUser] = useState<EmptyUser>({

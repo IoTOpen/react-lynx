@@ -1,9 +1,11 @@
-import {EmptyInstallation, Metadata} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {EmptyInstallation, Metadata} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 
-export type InstallationTemplate = {
+export interface InstallationTemplate {
     name?: string
     notes?: string
     meta?: Metadata
@@ -28,8 +30,8 @@ export const useNewInstallation = (organizationId: number | string, template?: I
     }, [lynxClient, newInstallation]);
 
     return {
-        newInstallation: newInstallation,
-        setNewInstallation: setNewInstallation,
-        create: create,
+        newInstallation,
+        setNewInstallation,
+        create,
     };
 };

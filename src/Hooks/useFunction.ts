@@ -1,6 +1,8 @@
-import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
-import {ErrorResponse, Functionx, MetaObject, OKResponse} from '@iotopen/node-lynx';
+
+import type {ErrorResponse, Functionx, MetaObject, OKResponse} from '@iotopen/node-lynx';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 const zeroFunction = {
     id: 0,
@@ -46,7 +48,7 @@ export const useFunction = (installationId: number | string, functionId: number 
     }, [lynxClient, func]);
 
     const setType = useCallback((t: string) => {
-        if (func) setFunc({...func, type: t});
+        if (func) {setFunc({...func, type: t});}
     }, [func, setFunc]);
 
     const remove = useCallback(() => {
@@ -59,13 +61,13 @@ export const useFunction = (installationId: number | string, functionId: number 
     }, [func, lynxClient]);
 
     return {
-        loading: loading,
-        error: error,
+        loading,
+        error,
         Function: func,
         setFunction: setFunc,
-        update: update,
-        remove: remove,
-        setType: setType,
+        update,
+        remove,
+        setType,
     };
 };
 
@@ -75,17 +77,17 @@ export const useFunctionMeta = (installationId: number | string, functionId?: nu
 
     const {lynxClient} = useGlobalLynxClient();
     const create = useCallback((key: string, meta: MetaObject, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.createFunctionMeta(iid, id, key, meta, silent);
     }, [lynxClient, iid, fnId]);
 
     const update = useCallback((key: string, meta: MetaObject, createMissing?: boolean, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.updateFunctionMeta(iid, id, key, meta, silent, createMissing);
     }, [lynxClient, iid, fnId]);
 
     const remove = useCallback((key: string, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.deleteFunctionMeta(iid, id, key, silent);
     }, [lynxClient, iid, fnId]);
 

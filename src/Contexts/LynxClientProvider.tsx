@@ -1,5 +1,7 @@
-import {createContext, ReactNode, useCallback, useContext, useMemo, useState} from 'react';
-import {LynxClient} from '@iotopen/node-lynx';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+
+import { LynxClient } from '@iotopen/node-lynx';
+import type { ReactNode } from 'react';
 
 
 interface lynxClientContext {
@@ -9,7 +11,8 @@ interface lynxClientContext {
 
 const defaultLynxClientContext = {
     lynxClient: new LynxClient(''),
-    newLynxClient: (url?: string, apiKey?: string, bearer?: boolean) => {
+    newLynxClient: (_url?: string, _apiKey?: string, _bearer?: boolean) => {
+        // intentionally unused, see interface for signature
     }
 };
 
@@ -17,15 +20,17 @@ const LynxClientContext = createContext(defaultLynxClientContext as lynxClientCo
 
 interface LynxClientProviderProps {
     children?: ReactNode;
-    url?: string;
-    apiKey?: string;
-    bearer?: boolean;
+    url?: string | undefined;
+    apiKey?: string | undefined;
+    bearer?: boolean | undefined;
 }
 
-export const LynxClientProvider = ({children, url, apiKey, bearer}: LynxClientProviderProps) => {
+export const LynxClientProvider = ({ children, url, apiKey, bearer }: LynxClientProviderProps) => {
     const [client, setClient] = useState(new LynxClient(url, apiKey, bearer));
-    const newClient = useCallback((url: string, apiKey?: string, bearer?: boolean) => setClient(new LynxClient(url, apiKey, bearer)), [setClient]);
-    const contextValue = useMemo(() => ({lynxClient: client, newLynxClient: newClient}), [client, newClient]);
+    const newClient = useCallback((newUrl: string, newApiKey?: string, newBearer?: boolean) => {
+        setClient(new LynxClient(newUrl, newApiKey, newBearer));
+    }, [setClient]);
+    const contextValue = useMemo(() => ({ lynxClient: client, newLynxClient: newClient }), [client, newClient]);
     return (
         <LynxClientContext.Provider value={contextValue}>
             {children}

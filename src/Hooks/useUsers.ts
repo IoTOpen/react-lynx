@@ -1,5 +1,7 @@
-import {Metadata, User} from '@iotopen/node-lynx';
 import {useCallback, useState} from 'react';
+
+import type {Metadata, User} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 
@@ -14,9 +16,9 @@ export const useUsers = (filter?: Metadata) => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getUsers(filter).then((users) => {
+        lynxClient.getUsers(filter).then((fetchedUsers) => {
             setError((err) => err !== undefined ? undefined : err);
-            setUsers(users);
+            setUsers(fetchedUsers);
         }).catch((e) => {
             setError(e);
         }).finally(() => {

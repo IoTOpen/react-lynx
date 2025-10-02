@@ -1,5 +1,7 @@
 import {useCallback, useLayoutEffect, useRef, useState} from 'react';
-import Paho, {MQTTError, Qos, TypedArray} from 'paho-mqtt';
+
+import type {MQTTError, Qos, TypedArray} from 'paho-mqtt';
+import Paho from 'paho-mqtt';
 
 interface MQTTHandlers {
     onMessage?: Paho.OnMessageHandler;
@@ -36,15 +38,13 @@ export const usePahoMQTTClient = (uri: string,
             onFailure: (e: MQTTError) => {
                 setError(e);
                 setConnected(client.current.isConnected());
-                if (rct.current === undefined) {
-                    rct.current = window.setInterval(() => {
-                        if(c.current.isConnected()) {
-                            clearInterval(rct.current);
-                        } else {
-                            c.current.connect(o);
-                        }
-                    }, 5000);
-                }
+                rct.current ??= window.setInterval(() => {
+                    if (c.current.isConnected()) {
+                        clearInterval(rct.current);
+                    } else {
+                        c.current.connect(o);
+                    }
+                }, 5000);
             },
             onSuccess: () => {
                 setError(undefined);
@@ -76,7 +76,7 @@ export const usePahoMQTTClient = (uri: string,
         }
         try {
             c.current.connect(o);
-        } catch (e) {
+        } catch (_e) {
             window.setTimeout(() => {
                 c.current.connect(o);
             }, 5000);
@@ -91,14 +91,14 @@ export const usePahoMQTTClient = (uri: string,
                 console.log(e);
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, []);
 
 
     const sub = useCallback((topic: string, qos?: Qos) => {
         return new Promise<Qos>((resolve) => {
             client.current.subscribe(topic, {
-                qos: qos ? qos : 0,
+                qos: qos ?? 0,
                 timeout: 1,
                 onFailure: (e: MQTTError) => {
                     throw e;
@@ -111,7 +111,16 @@ export const usePahoMQTTClient = (uri: string,
     }, [client]);
 
     const pub = useCallback((topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => {
-        client.current.send(topic, payload, qos, retained);
+        let sendPayload: string | ArrayBuffer;
+        if (typeof payload === 'string') {
+            sendPayload = payload;
+        } else if (ArrayBuffer.isView(payload)) {
+            // Always create a new ArrayBuffer to guarantee type
+            sendPayload = new Uint8Array(payload.buffer, payload.byteOffset, payload.byteLength).slice().buffer;
+        } else {
+            throw new Error('Payload must be a string or TypedArray');
+        }
+        client.current.send(topic, sendPayload, qos, retained);
     }, [client]);
 
     const unsub = useCallback((topic: string) => {
@@ -129,11 +138,11 @@ export const usePahoMQTTClient = (uri: string,
     }, [client]);
 
     return {
-        client: client,
-        connected: connected,
-        error: error,
-        sub: sub,
-        pub: pub,
-        unsub: unsub,
+        client,
+        connected,
+        error,
+        sub,
+        pub,
+        unsub,
     };
 };

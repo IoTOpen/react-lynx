@@ -1,5 +1,8 @@
 import {useCallback, useEffect, useState} from 'react';
-import {ErrorResponse, OAuth2Client, zero} from '@iotopen/node-lynx';
+
+import type {ErrorResponse, OAuth2Client} from '@iotopen/node-lynx';
+import { zero} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 export const useOAuth2Client = (id: string) => {
@@ -8,10 +11,10 @@ export const useOAuth2Client = (id: string) => {
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [client, setClient] = useState<OAuth2Client>({...zero.getOAuth2Client()});
     const refresh = useCallback(() => {
-        if (!loading) setLoading(true);
-        lynxClient.getOAuth2Client(id).then(client => {
+        if (!loading) {setLoading(true);}
+        lynxClient.getOAuth2Client(id).then(fetchedClient => {
             setError((err) => err !== undefined ? undefined : err);
-            setClient(client);
+            setClient(fetchedClient);
         }).catch(e => {
             setError(e);
         }).finally(() => {

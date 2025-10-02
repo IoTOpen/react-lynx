@@ -1,6 +1,8 @@
-import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
-import {EmptyToken, ErrorResponse, Token} from '@iotopen/node-lynx';
+
+import type {EmptyToken, ErrorResponse, Token} from '@iotopen/node-lynx';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useTokens = () => {
     const {lynxClient} = useGlobalLynxClient();
@@ -10,9 +12,9 @@ export const useTokens = () => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getTokens().then((tokens) => {
+        lynxClient.getTokens().then((fetchedTokens) => {
             setError((err) => err !== undefined ? undefined : err);
-            setTokens(tokens);
+            setTokens(fetchedTokens);
         }).catch((e) => {
             setError(e);
         }).finally(() => {
@@ -33,11 +35,11 @@ export const useTokens = () => {
     }, [refresh]);
 
     return {
-        tokens: tokens,
-        remove: remove,
-        create: create,
-        refresh: refresh,
-        loading: loading,
-        error: error
+        tokens,
+        remove,
+        create,
+        refresh,
+        loading,
+        error
     };
 };

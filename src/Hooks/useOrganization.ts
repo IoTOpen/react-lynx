@@ -1,5 +1,7 @@
-import {Organization} from '@iotopen/node-lynx';
 import {useCallback, useEffect, useState} from 'react';
+
+import type {Organization} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 const zeroOrganization = {

@@ -1,6 +1,9 @@
-import {createContext, ReactNode, useContext, useLayoutEffect, useMemo, useState} from 'react';
-import {ErrorResponse, User} from '@iotopen/node-lynx';
-import {useGlobalLynxClient} from './LynxClientProvider';
+import { createContext, useContext, useLayoutEffect, useMemo, useState } from 'react';
+
+import type { ErrorResponse, User } from '@iotopen/node-lynx';
+import type { ReactNode } from 'react';
+
+import { useGlobalLynxClient } from './LynxClientProvider';
 
 interface userContext {
     user: User | null;
@@ -19,12 +22,12 @@ interface UserProviderProps {
     children: ReactNode;
 }
 
-export const UserProvider = ({children}: UserProviderProps) => {
+export const UserProvider = ({ children }: UserProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [permissions, setPermissions] = useState<{ [key: string]: boolean } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     useLayoutEffect(() => {
         const me = lynxClient.getMe();
         const perms = lynxClient.getPermissions();
@@ -40,9 +43,8 @@ export const UserProvider = ({children}: UserProviderProps) => {
         }).finally(() => {
             setLoading(false);
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lynxClient]);
-    const contextValue = useMemo(() => ({user, permissions, loading, error}), [user, permissions, loading, error]);
+    const contextValue = useMemo(() => ({ user, permissions, loading, error }), [user, permissions, loading, error]);
     return (
         <UserContext.Provider value={contextValue}>
             {children}
@@ -56,6 +58,6 @@ export const useGlobalUser = () => {
 };
 
 export const useGlobalPermissions = () => {
-    const {permissions} = useGlobalUser();
+    const { permissions } = useGlobalUser();
     return permissions;
 };

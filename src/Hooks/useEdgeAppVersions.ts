@@ -1,6 +1,8 @@
-import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useLayoutEffect, useState} from 'react';
-import {EdgeAppVersion, ErrorResponse} from '@iotopen/node-lynx';
+
+import type {EdgeAppVersion, ErrorResponse} from '@iotopen/node-lynx';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) => {
     const id = typeof appId === 'string' ? Number.parseInt(appId) : appId;
@@ -14,15 +16,15 @@ export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) =
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getEdgeAppVersions(id, untagged).then((versions) => {
+        lynxClient.getEdgeAppVersions(id, untagged).then((fetchedVersions) => {
             setError((err) => err !== undefined ? undefined : err);
-            setVersions(versions);
+            setVersions(fetchedVersions);
         }).catch(e => {
             setError(e);
         }).finally(() => {
             setLoading(false);
         });
-    }, [lynxClient, untagged]);
+    }, [lynxClient, id, untagged]);
 
     const nameVersion = useCallback((name: string, hash: string) => {
         return lynxClient.nameEdgeAppVersion(id, name, hash);
@@ -30,7 +32,7 @@ export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) =
 
     useLayoutEffect(() => {
         refresh();
-    }, [id, untagged]);
+    }, [refresh]);
 
     return {
         loading,

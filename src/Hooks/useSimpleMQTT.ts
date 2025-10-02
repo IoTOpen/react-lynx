@@ -1,6 +1,9 @@
-import {usePahoMQTTClient} from './usePahoMQTTClient';
 import {useCallback, useEffect, useRef} from 'react';
-import Paho, {Qos, TypedArray} from 'paho-mqtt';
+
+import type {Qos, TypedArray} from 'paho-mqtt';
+import type Paho from 'paho-mqtt';
+
+import {usePahoMQTTClient} from './usePahoMQTTClient';
 
 export type Binding = (topic: string, payload: string, qos: Qos, retained: boolean) => void;
 
@@ -110,9 +113,11 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         unsub,
         pub
     } = usePahoMQTTClient(uri, {
-        onMessage: onMessage, onConnected: () => {
+        onMessage, onConnected: () => {
             subs.current.forEach(s => {
-                sub(s).then().catch();
+                sub(s).catch((e) => {
+                    console.warn('Failed to subscribe to', s, e);
+                });
             });
         },
     }, options);
@@ -164,7 +169,7 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
 
     const unbindExact = useCallback((topic: string, binder: Binding) => {
         const binds = exactBindings.current.get(topic);
-        if (binds === undefined) return;
+        if (binds === undefined) {return;}
         exactBindings.current.set(topic, binds.filter((b) => b !== binder));
     }, []);
 
@@ -173,9 +178,11 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
             return;
         }
         if (c.current) {
-            unsubscribe(unsub, subs.current).then(() => {
-                return subscribe(sub, s);
-            });
+            unsubscribe(unsub, subs.current)
+                .then(() => subscribe(sub, s))
+                .catch((e) => {
+                    console.warn('Failed to update subscriptions', e);
+                });
         }
         subs.current = s;
     }, [sub, unsub]);

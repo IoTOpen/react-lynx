@@ -1,6 +1,8 @@
-import {useGlobalLynxClient} from '../Contexts';
 import {useCallback, useEffect, useState} from 'react';
-import {Role} from '@iotopen/node-lynx';
+
+import type {Role} from '@iotopen/node-lynx';
+
+import {useGlobalLynxClient} from '../Contexts';
 
 export const useRoles = () => {
     const {lynxClient} = useGlobalLynxClient();
@@ -10,9 +12,9 @@ export const useRoles = () => {
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getRoles().then((roles) => {
+        lynxClient.getRoles().then((fetchedRoles) => {
             setError((err) => err !== undefined ? undefined : err);
-            setRoles(roles);
+            setRoles(fetchedRoles);
         }).catch((e) => {
             setError(e);
         }).finally(() => {

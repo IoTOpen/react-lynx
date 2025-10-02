@@ -1,5 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
-import {ErrorResponse} from '@iotopen/node-lynx';
+
+import type {ErrorResponse} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
 
 

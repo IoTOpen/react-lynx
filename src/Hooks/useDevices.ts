@@ -1,7 +1,9 @@
 import {useCallback, useLayoutEffect, useState} from 'react';
+
+import type {Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
-import {Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse} from '@iotopen/node-lynx';
-import {ObjectOrArray} from '../types';
+import type {ObjectOrArray} from '../types';
 
 export const useDevices = (installationId: number|string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -33,7 +35,7 @@ export const useDevices = (installationId: number|string, filter?: Metadata) => 
     function removeFn(devs: Devicex | Devicex[]) {
         if (Array.isArray(devs)) {
             const last = devs.pop();
-            if (!last) return Promise.allSettled([]);
+            if (!last) {return Promise.allSettled([]);}
             const rest = devs.map((dev => {
                 return lynxClient.deleteDevice(dev, true);
             }));
@@ -53,7 +55,7 @@ export const useDevices = (installationId: number|string, filter?: Metadata) => 
     function createFn(devs: EmptyDevicex | EmptyDevicex[]) {
         if (Array.isArray(devs)) {
             const last = devs.pop();
-            if (!last) return Promise.allSettled([]);
+            if (!last) {return Promise.allSettled([]);}
             const rest = devs.map(dev => {
                 return lynxClient.createDevice(dev, true);
             });
@@ -69,19 +71,19 @@ export const useDevices = (installationId: number|string, filter?: Metadata) => 
         return lynxClient.createDevice(devs);
     }
 
-    const create = useCallback(createFn, [lynxClient]);
-    const remove = useCallback(removeFn, [lynxClient]);
+    const create = useCallback(createFn, [lynxClient, createFn]);
+    const remove = useCallback(removeFn, [lynxClient, removeFn]);
 
     useLayoutEffect(() => {
         refreshCall();
     }, [refreshCall]);
 
     return {
-        loading: loading,
-        error: error,
-        create: create,
-        remove: remove,
-        devices: devices,
+        loading,
+        error,
+        create,
+        remove,
+        devices,
         refresh: refreshCall,
     };
 };

@@ -1,7 +1,9 @@
 import {useCallback, useLayoutEffect, useState} from 'react';
+
+import type {EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse} from '@iotopen/node-lynx';
+
 import {useGlobalLynxClient} from '../Contexts';
-import {EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse} from '@iotopen/node-lynx';
-import {ObjectOrArray} from '../types';
+import type {ObjectOrArray} from '../types';
 
 export const useFunctions = (installationId: number | string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
@@ -34,7 +36,7 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
     function removeFn(fns: Functionx | Functionx[]) {
         if (Array.isArray(fns)) {
             const last = fns.pop();
-            if (!last) return Promise.allSettled([]);
+            if (!last) {return Promise.allSettled([]);}
             const rest = fns.map((f => {
                 return lynxClient.deleteFunction(f, true);
             }));
@@ -54,7 +56,7 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
     function createFn(fns: EmptyFunctionx | EmptyFunctionx[]) {
         if (Array.isArray(fns)) {
             const last = fns.pop();
-            if (!last) return Promise.allSettled([]);
+            if (!last) {return Promise.allSettled([]);}
             const rest = fns.map(f => {
                 return lynxClient.createFunction(f, true);
             });
@@ -70,19 +72,19 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         return lynxClient.createFunction(fns);
     }
 
-    const create = useCallback(createFn, [lynxClient]);
-    const remove = useCallback(removeFn, [lynxClient]);
+    const create = useCallback(createFn, [lynxClient, createFn]);
+    const remove = useCallback(removeFn, [lynxClient, removeFn]);
 
     useLayoutEffect(() => {
         refreshCall();
     }, [refreshCall]);
 
     return {
-        loading: loading,
-        error: error,
-        create: create,
-        remove: remove,
-        functions: functions,
+        loading,
+        error,
+        create,
+        remove,
+        functions,
         refresh: refreshCall,
     };
 };
