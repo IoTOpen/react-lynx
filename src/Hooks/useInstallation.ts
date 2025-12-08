@@ -1,8 +1,8 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type {Installation} from '@iotopen/node-lynx';
+import type { Installation } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroInstallation = {
     client_id: 0,
@@ -21,10 +21,10 @@ export const useInstallation = (installationId: number | string) => {
     if(isNaN(id)) {
         throw new Error('invalid installationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | undefined>(undefined);
-    const [installation, setInstallation] = useState<Installation>({...zeroInstallation});
+    const [installation, setInstallation] = useState<Installation>({ ...zeroInstallation });
 
     useLayoutEffect(() => {
         lynxClient.getInstallationRow(id).then(inst => {

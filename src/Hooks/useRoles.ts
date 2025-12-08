@@ -1,11 +1,11 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import type {Role} from '@iotopen/node-lynx';
+import type { Role } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useRoles = () => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [roles, setRoles] = useState<Role[]>([]);
     const [error, setError] = useState<Error | undefined>();
     const [loading, setLoading] = useState(true);

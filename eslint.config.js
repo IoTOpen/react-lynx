@@ -11,16 +11,16 @@ export default [
   // Ignore patterns
   {
     ignores: [
-      '**/dist/**',
-      '**/node_modules/**',
-      '**/.vite/**',
-      '**/coverage/**',
-      '**/*.d.ts',
-      '**/build/**',
+      'dist/',
+      'node_modules/',
+      'coverage/',
+      '*.d.ts',
+      'build/',
       '*.config.{js,ts,mjs,cjs}',
-      'scripts/**',
+      'scripts/',
     ],
   },
+
   // Base language options
   {
     languageOptions: {
@@ -32,16 +32,18 @@ export default [
       },
     },
   },
+
   // Core recommended configs
   js.configs.recommended,
   ...tseslint.configs.recommended,
   reactPlugin.configs.flat.recommended,
+
   // TypeScript + React files
   {
     files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
       parserOptions: {
-        project: true,
+        project: './tsconfig.json',
         tsconfigRootDir: import.meta.dirname,
         ecmaFeatures: { jsx: true },
       },
@@ -62,33 +64,12 @@ export default [
       },
     },
     rules: {
-      // Import hygiene
-      'import/first': 'error',
-      'import/no-duplicates': 'error',
-      'import/no-cycle': 'error',
-      'import/no-unresolved': 'error',
-      'import/newline-after-import': ['error', { count: 1 }],
-      'import/no-extraneous-dependencies': [
-        'error',
-        {
-          devDependencies: [
-            '**/*.{test,spec}.{ts,tsx,js,jsx}',
-            '**/*.d.ts',
-            '**/*.stories.{ts,tsx,js,jsx}',
-            '**/setupTests.{js,ts}',
-            '**/scripts/**',
-            '*.config.{js,ts,mjs,cjs}',
-          ],
-          optionalDependencies: false,
-          peerDependencies: true,
-        },
-      ],
-      // Sorting
+      // Import hygiene and sorting
       'simple-import-sort/imports': ['error', {
         groups: [
           ['^react$', '^react-dom$'],
           ['^@?\\w'],
-          ['^(@|src|@/)(/.*|$)'],
+          ['^src/', '^@/'],
           ['^\\u0000'],
           ['^\\.\\./'],
           ['^\\./'],
@@ -96,11 +77,42 @@ export default [
         ],
       }],
       'simple-import-sort/exports': 'error',
+      'import/first': 'error',
+      'import/no-duplicates': 'error',
+      'import/no-cycle': 'error',
+      'import/no-unresolved': 'off', // TS handles this
+      'import/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: [
+            '**/*.{test,spec}.{ts,tsx,js,jsx}',
+            '**/*.d.ts',
+            '**/setupTests.{js,ts}',
+            '**/scripts/**',
+            '*.config.{js,ts,mjs,cjs}',
+          ],
+          optionalDependencies: false,
+          peerDependencies: true,
+          includeTypes: true,
+          // Component libraries import peer deps in src — this is correct behavior
+          packageDir: './',
+        },
+      ],
+
       // Style
       'comma-spacing': ['error', { before: false, after: true }],
+      'space-before-function-paren': ['error', 'never'],
       'quotes': ['error', 'single'],
       'semi': ['error', 'always'],
-      // TypeScript strictness
+      'object-curly-spacing': ['error', 'always'],
+
+      // TypeScript safety
+      '@typescript-eslint/restrict-template-expressions': ['error', {
+        allowNumber: true,
+        allowBoolean: true,
+        allowAny: false,
+        allowNullish: false,
+      }],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -120,7 +132,7 @@ export default [
       ],
       '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/no-shadow': ['error', { allow: ['err', 'error'] }],
+      '@typescript-eslint/no-shadow': ['error', { allow: ['err', 'error', 'errors', 'e'] }],
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
@@ -128,15 +140,11 @@ export default [
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/no-confusing-void-expression': 'error',
-      '@typescript-eslint/restrict-template-expressions': ['error', {
-        allowNumber: true,
-        allowBoolean: true,
-        allowAny: false,
-        allowNullish: false,
-      }],
+
       // Promise/async safety
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+
       // Core JS/TS rules
       'no-var': 'error',
       'prefer-const': 'error',
@@ -146,12 +154,14 @@ export default [
       'prefer-template': 'error',
       'no-unreachable': 'warn',
       'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+
       // React rules
       ...reactHooksPlugin.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
     },
   },
+
   // Plain JS/JSX
   {
     files: ['src/**/*.{js,jsx}'],
@@ -166,10 +176,6 @@ export default [
     },
     rules: {
       'react/prop-types': 'warn',
-      'import/first': 'error',
-      'import/no-duplicates': 'error',
-      'import/no-unresolved': 'error',
-      'import/newline-after-import': ['error', { count: 1 }],
       'simple-import-sort/imports': ['error', {
         groups: [
           ['^react$', '^react-dom$'],
@@ -186,6 +192,7 @@ export default [
       'react/prop-types': 'off',
     },
   },
+
   // Test files
   {
     files: ['**/*.{test,spec}.{ts,tsx,js,jsx}'],
@@ -193,9 +200,12 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-floating-promises': 'off',
+      // Keep rules-of-hooks enabled to catch hook misuse in tests
+      'react-hooks/rules-of-hooks': 'error',
       'no-console': 'off',
     },
   },
+
   // Node/tooling scripts
   {
     files: ['*.config.{js,ts,mjs,cjs}', 'scripts/**/*.{js,ts}'],

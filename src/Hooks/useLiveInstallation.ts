@@ -1,12 +1,12 @@
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 
-import type {Devicex, Functionx, Installation} from '@iotopen/node-lynx';
+import type { Devicex, Functionx, Installation } from '@iotopen/node-lynx';
 
-import {useDevices} from './useDevices';
-import {useFunctions} from './useFunctions';
-import {useInstallation} from './useInstallation';
-import {useMQTT} from './useMQTT';
-import type {SimpleMQTT} from './useSimpleMQTT';
+import { useDevices } from './useDevices';
+import { useFunctions } from './useFunctions';
+import { useInstallation } from './useInstallation';
+import { useMQTT } from './useMQTT';
+import type { SimpleMQTT } from './useSimpleMQTT';
 
 export interface LiveInstallation {
     installation: Installation;
@@ -17,9 +17,9 @@ export interface LiveInstallation {
 
 export const useLiveInstallation = (installation: Installation) => {
     const mqtt = useMQTT();
-    const {functions, refresh: fnRefresh} = useFunctions(installation.id);
-    const {devices, refresh: devRefresh} = useDevices(installation.id);
-    const {unbind, bind, setSubs} = mqtt;
+    const { functions, refresh: fnRefresh } = useFunctions(installation.id);
+    const { devices, refresh: devRefresh } = useDevices(installation.id);
+    const { unbind, bind, setSubs } = mqtt;
 
     useEffect(() => {
         setSubs([`${installation.client_id}/#`]);
@@ -41,10 +41,10 @@ export const useLiveInstallation = (installation: Installation) => {
 
 export const useLiveInstallationId = (installationId: number | string) => {
     const mqtt = useMQTT();
-    const {installation} = useInstallation(installationId);
-    const {functions, refresh: fnRefresh} = useFunctions(installationId);
-    const {devices, refresh: devRefresh} = useDevices(installationId);
-    const {unbind, bind, setSubs} = mqtt;
+    const { installation } = useInstallation(installationId);
+    const { functions, refresh: fnRefresh } = useFunctions(installationId);
+    const { devices, refresh: devRefresh } = useDevices(installationId);
+    const { unbind, bind, setSubs } = mqtt;
     useEffect(() => {
         setSubs([`${installation.client_id}/#`]);
         bind(/[0-9]+\/evt\/functionx\/updated/, fnRefresh);

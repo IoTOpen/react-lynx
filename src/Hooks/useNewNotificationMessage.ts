@@ -1,8 +1,8 @@
-import {useCallback, useState} from 'react';
+import { useCallback, useState } from 'react';
 
-import type {EmptyNotificationMessage} from '@iotopen/node-lynx';
+import type { EmptyNotificationMessage } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 
 const zeroEmptyNotificationMessage = {
@@ -19,7 +19,7 @@ export interface NotificationMessageTemplate {
 
 export const useNewNotificationMessage = (installationId: number | string, template?: NotificationMessageTemplate) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [newNotificationMessage, setNewNotificationMessage] = useState<EmptyNotificationMessage>({
         ...zeroEmptyNotificationMessage,
         ...template,

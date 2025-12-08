@@ -1,8 +1,8 @@
-import {useCallback, useState} from 'react';
+import { useCallback, useState } from 'react';
 
-import type {EmptyFunctionx, Metadata} from '@iotopen/node-lynx';
+import type { EmptyFunctionx, Metadata } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 export interface FunctionTemplate {
     type?: string
@@ -15,7 +15,7 @@ export const useNewFunction = (installationId: number | string, template?: Funct
     if (isNaN(id)) {
         throw new Error('invalid installationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [newFunction, setNewFunction] = useState<EmptyFunctionx>({
         meta: {},
         protected_meta: {},
@@ -23,7 +23,7 @@ export const useNewFunction = (installationId: number | string, template?: Funct
     });
 
     const setType = useCallback((t: string) => {
-        setNewFunction({...newFunction, type: t});
+        setNewFunction({ ...newFunction, type: t });
     }, [newFunction, setNewFunction]);
 
     const create = useCallback(() => {

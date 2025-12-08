@@ -1,6 +1,6 @@
-import {useCallback, useLayoutEffect, useRef, useState} from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
-import type {MQTTError, Qos, TypedArray} from 'paho-mqtt';
+import type { MQTTError, Qos, TypedArray } from 'paho-mqtt';
 import Paho from 'paho-mqtt';
 
 interface MQTTHandlers {

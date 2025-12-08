@@ -1,12 +1,12 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import type {ErrorResponse} from '@iotopen/node-lynx';
+import type { ErrorResponse } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 
 export const useIDTokenAlgorithms = () => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [algs, setAlgs] = useState<string[]>([]);

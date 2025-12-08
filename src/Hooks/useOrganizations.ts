@@ -1,11 +1,11 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import type {ErrorResponse, MinimalOrg, Organization} from '@iotopen/node-lynx';
+import type { ErrorResponse, MinimalOrg, Organization } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [organizations, setOrganizations] = useState<MinimalOrg<T>[]>([]);

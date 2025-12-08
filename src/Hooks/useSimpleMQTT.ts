@@ -1,9 +1,9 @@
-import {useCallback, useEffect, useRef} from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
-import type {Qos, TypedArray} from 'paho-mqtt';
+import type { Qos, TypedArray } from 'paho-mqtt';
 import type Paho from 'paho-mqtt';
 
-import {usePahoMQTTClient} from './usePahoMQTTClient';
+import { usePahoMQTTClient } from './usePahoMQTTClient';
 
 export type Binding = (topic: string, payload: string, qos: Qos, retained: boolean) => void;
 
@@ -31,7 +31,7 @@ type Unsub = (topic: string) => void | Promise<void>;
 
 function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
     return new Promise<void>((resolve) => {
-        subs.forEach(async (topic) => {
+        subs.forEach(async(topic) => {
             try {
                 await unsub(topic);
             } catch (e) {
@@ -44,7 +44,7 @@ function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
 
 function subscribe(sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
     return new Promise<void>((resolve) => {
-        subs.forEach(async (topic) => {
+        subs.forEach(async(topic) => {
             try {
                 await sub(topic);
             } catch (e) {

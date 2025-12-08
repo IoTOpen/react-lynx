@@ -1,7 +1,7 @@
-import type {ReactNode} from 'react';
+import type { ReactNode } from 'react';
 
-import {LynxClientProvider} from './LynxClientProvider';
-import {UserProvider} from './UserProvider';
+import { LynxClientProvider } from './LynxClientProvider';
+import { UserProvider } from './UserProvider';
 
 interface LynxProviderProps {
     apiURL?: string;
@@ -10,7 +10,7 @@ interface LynxProviderProps {
     children?: ReactNode;
 }
 
-export const LynxProvider = ({children, apiURL, apiKey, bearer}: LynxProviderProps) => {
+export const LynxProvider = ({ children, apiURL, apiKey, bearer }: LynxProviderProps) => {
     return (
         <LynxClientProvider url={apiURL} apiKey={apiKey} bearer={bearer}>
             <UserProvider>

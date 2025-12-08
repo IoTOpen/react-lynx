@@ -1,11 +1,11 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import type {Devicex, Functionx, Installation} from '@iotopen/node-lynx';
+import type { Devicex, Functionx, Installation } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
-import {useMQTT} from './useMQTT';
-import type {SimpleMQTT} from './useSimpleMQTT';
+import { useMQTT } from './useMQTT';
+import type { SimpleMQTT } from './useSimpleMQTT';
 
 export interface MultiLiveInstallation {
     installationMap: Map<number, Installation>;
@@ -17,9 +17,9 @@ export interface MultiLiveInstallation {
 }
 
 export const useMultiLiveInstallation = (installations: Installation[]) => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const mqtt = useMQTT();
-    const {bind, unbind, setSubs} = mqtt;
+    const { bind, unbind, setSubs } = mqtt;
 
 
     // To keep track of client id => installation
@@ -61,13 +61,13 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
 
         // This is a flag to prevent new fetches during the initial fetch
         let done = false;
-        const fnFetchers = installations.map(async (i) => {
+        const fnFetchers = installations.map(async(i) => {
             const fns = await lynxClient.getFunctions(i.id);
-            return {functions: fns, installationId: i.id};
+            return { functions: fns, installationId: i.id };
         });
-        const devFetchers = installations.map(async (i) => {
+        const devFetchers = installations.map(async(i) => {
             const devs = await lynxClient.getDevices(i.id);
-            return {devices: devs, installationId: i.id};
+            return { devices: devs, installationId: i.id };
         });
 
         const newDeviceMap = new Map<number, Devicex[]>();

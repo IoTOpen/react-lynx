@@ -1,15 +1,15 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type {EdgeAppVersion, ErrorResponse} from '@iotopen/node-lynx';
+import type { EdgeAppVersion, ErrorResponse } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useEdgeAppVersions = (appId: number | string, untagged?: boolean) => {
     const id = typeof appId === 'string' ? Number.parseInt(appId) : appId;
     if(isNaN(id)) {
         throw new Error('invalid appId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [versions, setVersions] = useState<EdgeAppVersion[]>([]);

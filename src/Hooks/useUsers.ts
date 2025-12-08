@@ -1,8 +1,8 @@
-import {useCallback, useState} from 'react';
+import { useCallback, useState } from 'react';
 
-import type {Metadata, User} from '@iotopen/node-lynx';
+import type { Metadata, User } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 
 // TODO: implement organization filter
@@ -10,7 +10,7 @@ export const useUsers = (filter?: Metadata) => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | undefined>();
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
 
     new URLSearchParams();
 

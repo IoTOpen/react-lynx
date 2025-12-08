@@ -1,16 +1,16 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type {EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse} from '@iotopen/node-lynx';
+import type { EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
-import type {ObjectOrArray} from '../types';
+import { useGlobalLynxClient } from '../Contexts';
+import type { ObjectOrArray } from '../types';
 
 export const useFunctions = (installationId: number | string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if(isNaN(iid) && iid !== undefined) {
         throw new Error('invalid installationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [functions, setFunctions] = useState<Functionx[]>([]);
     const [error, setError] = useState<ErrorResponse | undefined>();
@@ -40,11 +40,11 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
             const rest = fns.map((f => {
                 return lynxClient.deleteFunction(f, true);
             }));
-            return Promise.allSettled(rest).then(async (settled) => {
+            return Promise.allSettled(rest).then(async(settled) => {
                 try {
-                    settled.push({status: 'fulfilled', value: await lynxClient.deleteFunction(last)});
+                    settled.push({ status: 'fulfilled', value: await lynxClient.deleteFunction(last) });
                 } catch (e) {
-                    settled.push({status: 'rejected', reason: e});
+                    settled.push({ status: 'rejected', reason: e });
                 }
                 return settled;
             });
@@ -60,11 +60,11 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
             const rest = fns.map(f => {
                 return lynxClient.createFunction(f, true);
             });
-            return Promise.allSettled(rest).then(async (settled) => {
+            return Promise.allSettled(rest).then(async(settled) => {
                 try {
-                    settled.push({status: 'fulfilled', value: await lynxClient.createFunction(last)});
+                    settled.push({ status: 'fulfilled', value: await lynxClient.createFunction(last) });
                 } catch (e) {
-                    settled.push({status: 'rejected', reason: e});
+                    settled.push({ status: 'rejected', reason: e });
                 }
                 return settled;
             });

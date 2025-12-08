@@ -1,16 +1,16 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type {Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse} from '@iotopen/node-lynx';
+import type { Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
-import type {ObjectOrArray} from '../types';
+import { useGlobalLynxClient } from '../Contexts';
+import type { ObjectOrArray } from '../types';
 
 export const useDevices = (installationId: number|string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if(isNaN(iid) && iid !== undefined) {
         throw new Error('invalid installationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [devices, setDevices] = useState<Devicex[]>([]);
     const [error, setError] = useState<ErrorResponse | undefined>();
@@ -39,11 +39,11 @@ export const useDevices = (installationId: number|string, filter?: Metadata) => 
             const rest = devs.map((dev => {
                 return lynxClient.deleteDevice(dev, true);
             }));
-            return Promise.allSettled(rest).then(async (settled) => {
+            return Promise.allSettled(rest).then(async(settled) => {
                 try {
-                    settled.push({status: 'fulfilled', value: await lynxClient.deleteDevice(last)});
+                    settled.push({ status: 'fulfilled', value: await lynxClient.deleteDevice(last) });
                 } catch (e) {
-                    settled.push({status: 'rejected', reason: e});
+                    settled.push({ status: 'rejected', reason: e });
                 }
                 return settled;
             });
@@ -59,11 +59,11 @@ export const useDevices = (installationId: number|string, filter?: Metadata) => 
             const rest = devs.map(dev => {
                 return lynxClient.createDevice(dev, true);
             });
-            return Promise.allSettled(rest).then(async (settled) => {
+            return Promise.allSettled(rest).then(async(settled) => {
                 try {
-                    settled.push({status: 'fulfilled', value: await lynxClient.createDevice(last)});
+                    settled.push({ status: 'fulfilled', value: await lynxClient.createDevice(last) });
                 } catch (e) {
-                    settled.push({status: 'rejected', reason: e});
+                    settled.push({ status: 'rejected', reason: e });
                 }
                 return settled;
             });

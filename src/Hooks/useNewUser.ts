@@ -1,9 +1,9 @@
-import {useCallback, useState} from 'react';
+import { useCallback, useState } from 'react';
 
-import type {EmptyUser} from '@iotopen/node-lynx';
-import type {Address} from '@iotopen/node-lynx/src/types';
+import type { EmptyUser } from '@iotopen/node-lynx';
+import type { Address } from '@iotopen/node-lynx/src/types';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroEmptyUser = {
     address: {
@@ -49,7 +49,7 @@ export const useNewUser = (template?: UserTemplate) => {
         ...zeroEmptyUser,
         ...template
     });
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
 
     const create =  useCallback(() => {
         return lynxClient.createUser(newUser);

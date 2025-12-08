@@ -1,8 +1,8 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type {ErrorResponse, Functionx, MetaObject, OKResponse} from '@iotopen/node-lynx';
+import type { ErrorResponse, Functionx, MetaObject, OKResponse } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroFunction = {
     id: 0,
@@ -22,9 +22,9 @@ export const useFunction = (installationId: number | string, functionId: number 
         throw new Error('invalid installationId or functionId');
     }
 
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
-    const [func, setFunc] = useState<Functionx>({...zeroFunction});
+    const [func, setFunc] = useState<Functionx>({ ...zeroFunction });
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useLayoutEffect(() => {
@@ -48,7 +48,7 @@ export const useFunction = (installationId: number | string, functionId: number 
     }, [lynxClient, func]);
 
     const setType = useCallback((t: string) => {
-        if (func) {setFunc({...func, type: t});}
+        if (func) {setFunc({ ...func, type: t });}
     }, [func, setFunc]);
 
     const remove = useCallback(() => {
@@ -75,7 +75,7 @@ export const useFunctionMeta = (installationId: number | string, functionId?: nu
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const fnId = typeof functionId === 'string' ? Number.parseInt(functionId) : functionId;
 
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const create = useCallback((key: string, meta: MetaObject, funId?: number, silent?: boolean) => {
         const id = funId ?? fnId ?? 0;
         return lynxClient.createFunctionMeta(iid, id, key, meta, silent);

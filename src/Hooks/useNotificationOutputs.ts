@@ -1,15 +1,15 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import type {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
+import type { ErrorResponse, NotificationOutput } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useNotificationOutputs = (installationId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     if (isNaN(iid)) {
         throw new Error('invalid installationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [notificationOutputs, setNotificationOutputs] = useState<NotificationOutput[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();

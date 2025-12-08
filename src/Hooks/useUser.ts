@@ -1,8 +1,8 @@
-import {useCallback, useState} from 'react';
+import { useCallback, useState } from 'react';
 
-import type {User} from '@iotopen/node-lynx';
+import type { User } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroUser = {
     id: 0,
@@ -32,9 +32,9 @@ export const useUser = (userId: number | string) => {
     if (isNaN(id)) {
         throw new Error('invalid userId');
     }
-    const [user, setUser] = useState<User>({...zeroUser});
+    const [user, setUser] = useState<User>({ ...zeroUser });
     const [loading, setLoading] = useState<boolean>(true);
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [error, setError] = useState<Error | undefined>();
 
     const refresh = useCallback(() => {

@@ -1,11 +1,11 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type {ErrorResponse, InstallationInfo} from '@iotopen/node-lynx';
+import type { ErrorResponse, InstallationInfo } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useInstallationInfo = (assignedOnly?: boolean) => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [installations, setInstallations] = useState<InstallationInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>(undefined);

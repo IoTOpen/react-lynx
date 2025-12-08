@@ -1,8 +1,8 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type {Devicex, ErrorResponse, MetaObject, OKResponse} from '@iotopen/node-lynx';
+import type { Devicex, ErrorResponse, MetaObject, OKResponse } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroDevice = {
     updated: 0,
@@ -20,9 +20,9 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     if(isNaN(iid) || isNaN(id)) {
         throw new Error('invalid installationId or deviceId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
-    const [dev, setDev] = useState<Devicex>({...zeroDevice});
+    const [dev, setDev] = useState<Devicex>({ ...zeroDevice });
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useLayoutEffect(() => {
@@ -46,7 +46,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     }, [lynxClient, dev]);
 
     const setType = useCallback((t: string) => {
-        if (dev) {setDev({...dev, type: t});}
+        if (dev) {setDev({ ...dev, type: t });}
     }, [dev, setDev]);
 
     const remove = useCallback(() => {
@@ -73,7 +73,7 @@ export const useDeviceMeta = (installationId: number | string, deviceId?: number
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const devId = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
 
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
 
     const create = useCallback((key: string, meta: MetaObject, overrideDevId?: number, silent?: boolean) => {
     const id = overrideDevId ?? devId ?? 0;

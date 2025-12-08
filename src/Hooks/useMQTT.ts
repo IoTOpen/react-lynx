@@ -1,10 +1,10 @@
-import {useGlobalLynxClient, useGlobalUser} from '../Contexts';
+import { useGlobalLynxClient, useGlobalUser } from '../Contexts';
 
-import {useSimpleMQTT} from './useSimpleMQTT';
+import { useSimpleMQTT } from './useSimpleMQTT';
 
 export const useMQTT = () => {
     const client = useGlobalLynxClient();
-    const {user} = useGlobalUser();
+    const { user } = useGlobalUser();
     const baseURLObj = new URL(client.lynxClient.baseURL);
     const protocol = baseURLObj.protocol === 'http:' ? 'ws:' : 'wss:';
     const hostname = baseURLObj.hostname;

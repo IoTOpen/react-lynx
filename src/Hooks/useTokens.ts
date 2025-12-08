@@ -1,11 +1,11 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
-import type {EmptyToken, ErrorResponse, Token} from '@iotopen/node-lynx';
+import type { EmptyToken, ErrorResponse, Token } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useTokens = () => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [tokens, setTokens] = useState<Token[]>([]);

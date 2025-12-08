@@ -1,8 +1,8 @@
-import {useCallback, useState} from 'react';
+import { useCallback, useState } from 'react';
 
-import type {EmptyDevicex, Metadata} from '@iotopen/node-lynx';
+import type { EmptyDevicex, Metadata } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 export interface DeviceTemplate {
     type?: string
@@ -15,7 +15,7 @@ export const useNewDevice = (installationId: number | string, template?: DeviceT
     if (isNaN(id)) {
         throw new Error('invalid installationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [newDevice, setNewDevice] = useState<EmptyDevicex>({
         meta: {},
         protected_meta: {},
@@ -23,7 +23,7 @@ export const useNewDevice = (installationId: number | string, template?: DeviceT
     });
 
     const setType = useCallback((t: string) => {
-        setNewDevice({...newDevice, type: t});
+        setNewDevice({ ...newDevice, type: t });
     }, [newDevice, setNewDevice]);
 
     const create = useCallback(() => {

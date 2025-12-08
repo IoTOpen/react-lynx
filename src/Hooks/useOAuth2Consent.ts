@@ -1,15 +1,15 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
-import {useOAuth2Client} from './useOAuth2Client';
+import { useOAuth2Client } from './useOAuth2Client';
 
 export const useOAuth2Consent = () => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [requestedScopes, setRequestedScopes] = useState<string[]>([]);
     const [params] = useState(new URLSearchParams(window.location.search));
     const clientId = params.get('client_id') ?? '';
-    const {client} = useOAuth2Client(clientId);
+    const { client } = useOAuth2Client(clientId);
 
     const consent = useCallback((scope: string[]) => {
         const consentObject = Object.fromEntries(params);

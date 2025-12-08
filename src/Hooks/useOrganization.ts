@@ -1,8 +1,8 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import type {Organization} from '@iotopen/node-lynx';
+import type { Organization } from '@iotopen/node-lynx';
 
-import {useGlobalLynxClient} from '../Contexts';
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroOrganization = {
     address: {
@@ -28,10 +28,10 @@ export const useOrganization = (organizationId: number | string) => {
     if (isNaN(oid)) {
         throw new Error('invalid organizationId');
     }
-    const [organization, setOrganization] = useState<Organization>({...zeroOrganization});
+    const [organization, setOrganization] = useState<Organization>({ ...zeroOrganization });
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | undefined>();
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
 
     const refresh = useCallback(() => {
         setLoading(true);
