@@ -1,0 +1,37 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import dts from 'vite-plugin-dts'
+import { readFileSync } from 'fs'
+import { builtinModules } from 'module'
+import path from 'path'
+
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'))
+
+const deps = Object.keys(pkg.dependencies || {})
+const peers = Object.keys(pkg.peerDependencies || {})
+const builtins = new Set(builtinModules)
+
+function isExternal(id: string) {
+  if (!id) return false
+  if (builtins.has(id) || id.startsWith('node:')) return true
+  for (const d of deps) if (id === d || id.startsWith(d + '/')) return true
+  for (const p of peers) if (id === p || id.startsWith(p + '/')) return true
+  return false
+}
+
+export default defineConfig({
+  plugins: [react(), dts({ insertTypesEntry: true })],
+  build: {
+    sourcemap: true,
+    target: 'es2022',
+    outDir: 'dist',
+    lib: {
+      entry: path.resolve(__dirname, 'src/index.ts'),
+      formats: ['cjs', 'es'],
+      fileName: (format) => (format === 'cjs' ? 'cjs/index.js' : 'esm/index.js')
+    },
+    rollupOptions: {
+      external: isExternal
+    }
+  }
+})

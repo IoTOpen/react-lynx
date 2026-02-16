@@ -12,8 +12,8 @@
     "type-check": "tsc --noEmit",
     "prepare": "node scripts/prepare.cjs",
     "prepack": "node scripts/prepare.cjs",
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "build": "vite build --config ./vite.config.ts",
+    "dev": "vite",
     "clean": "rm -rf dist/"
   },
   "peerDependencies": {
@@ -22,6 +22,9 @@
     "react": "^18.3.1 || ^19.0.0",
     "react-dom": "^18.3.1 || ^19.0.0"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@iotopen/node-lynx": "github:IoTOpen/node-lynx#2.6.0-pre",
@@ -46,11 +49,11 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-visualizer": "^6.0.5",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.55.0"
+    "typescript-eslint": "^8.55.0",
+    "vite": "^7.3.1",
+    "@vitejs/plugin-react": "^5.1.4",
+    "vite-plugin-dts": "^4.1.0"
   },
-  "files": [
-    "dist"
-  ],
   "engines": {
     "node": "22 || 24"
   },
