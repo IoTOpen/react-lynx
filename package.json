@@ -10,7 +10,8 @@
     "lint": "pnpm type-check && eslint src --max-warnings 0",
     "lint:fix": "eslint src --fix",
     "type-check": "tsc --noEmit",
-    "prepack": "rm -rf dist/ && rollup -c",
+    "prepare": "node scripts/prepare.cjs",
+    "prepack": "pnpm run build",
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "clean": "rm -rf dist/"
@@ -22,15 +23,15 @@
     "react-dom": "^18.3.1 || ^19.0.0"
   },
   "devDependencies": {
-    "@iotopen/node-lynx": "github:IoTOpen/node-lynx#2.6.0-pre",
     "@eslint/js": "^9.39.2",
+    "@iotopen/node-lynx": "github:IoTOpen/node-lynx#2.6.0-pre",
     "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.3.0",
-    "@types/node": "^22.19.3",
-    "@types/react": "^19.2.7",
+    "@types/node": "^22.19.11",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@web/rollup-plugin-copy": "^0.5.1",
     "eslint": "^9.39.2",
@@ -40,12 +41,12 @@
     "eslint-plugin-react-hooks": "6.0.0-rc.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^16.5.0",
-    "rollup": "^4.55.1",
+    "rollup": "^4.57.1",
     "rollup-plugin-dts": "^6.3.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-visualizer": "^6.0.5",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.52.0"
+    "typescript-eslint": "^8.55.0"
   },
   "files": [
     "dist"
