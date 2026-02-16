@@ -11,7 +11,7 @@
     "lint:fix": "eslint src --fix",
     "type-check": "tsc --noEmit",
     "prepare": "node scripts/prepare.cjs",
-    "prepack": "pnpm run build",
+    "prepack": "node scripts/prepare.cjs",
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "clean": "rm -rf dist/"
