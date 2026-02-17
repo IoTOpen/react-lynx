@@ -14,7 +14,11 @@
     "prepack": "node scripts/prepare.cjs",
     "build": "vite build --config ./vite.config.ts",
     "dev": "vite",
-    "clean": "rm -rf dist/"
+    "clean": "rm -rf dist/",
+    "publish:prerelease": "pnpm version prerelease --preid=rc && pnpm run build && npm publish --tag rc"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "@iotopen/node-lynx": "^2.5.0",
@@ -27,17 +31,11 @@
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@iotopen/node-lynx": "github:IoTOpen/node-lynx#2.6.0-pre",
-    "@rollup/plugin-commonjs": "^28.0.9",
-    "@rollup/plugin-image": "^3.0.3",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.3.0",
+    "@iotopen/node-lynx": "https://raw.githubusercontent.com/IoTOpen/node-lynx/v2.6.0-rc.0/iotopen-node-lynx-2.6.0-rc.0.tgz",
     "@types/node": "^22.19.11",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
-    "@web/rollup-plugin-copy": "^0.5.1",
     "eslint": "^9.39.2",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
@@ -45,12 +43,8 @@
     "eslint-plugin-react-hooks": "6.0.0-rc.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^16.5.0",
-    "rollup": "^4.57.1",
-    "rollup-plugin-dts": "^6.3.0",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rollup-plugin-visualizer": "^6.0.5",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.55.0",
+    "typescript-eslint": "^8.56.0",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
