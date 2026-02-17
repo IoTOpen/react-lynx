@@ -25,8 +25,8 @@ importers:
         specifier: ^9.39.2
         version: 9.39.2
       '@iotopen/node-lynx':
-        specifier: https://github.com/IoTOpen/node-lynx/releases/download/2.6.0-pre/iotopen-node-lynx-2.6.0-rc.0.tgz
-        version: https://github.com/IoTOpen/node-lynx/releases/download/2.6.0-pre/iotopen-node-lynx-2.6.0-rc.0.tgz
+        specifier: github:IoTOpen/node-lynx#2.6.0-pre
+        version: https://codeload.github.com/IoTOpen/node-lynx/tar.gz/1b9699bbc12d795f73b791b65b4af07d2be589cc
       '@types/node':
         specifier: ^22.19.11
         version: 22.19.11
@@ -411,10 +411,10 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@iotopen/node-lynx@https://github.com/IoTOpen/node-lynx/releases/download/2.6.0-pre/iotopen-node-lynx-2.6.0-rc.0.tgz':
-    resolution: {tarball: https://github.com/IoTOpen/node-lynx/releases/download/2.6.0-pre/iotopen-node-lynx-2.6.0-rc.0.tgz}
-    version: 2.6.0-rc.0
-    engines: {node: 22 || 24}
+  '@iotopen/node-lynx@https://codeload.github.com/IoTOpen/node-lynx/tar.gz/1b9699bbc12d795f73b791b65b4af07d2be589cc':
+    resolution: {tarball: https://codeload.github.com/IoTOpen/node-lynx/tar.gz/1b9699bbc12d795f73b791b65b4af07d2be589cc}
+    version: 2.6.0-pre
+    engines: {node: 22.x}
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -2467,7 +2467,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@iotopen/node-lynx@https://github.com/IoTOpen/node-lynx/releases/download/2.6.0-pre/iotopen-node-lynx-2.6.0-rc.0.tgz':
+  '@iotopen/node-lynx@https://codeload.github.com/IoTOpen/node-lynx/tar.gz/1b9699bbc12d795f73b791b65b4af07d2be589cc':
     dependencies:
       cross-fetch: 4.1.0
       js-base64: 3.7.8

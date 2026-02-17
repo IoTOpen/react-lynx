@@ -6,6 +6,11 @@
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "type": "module",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@iotopen/node-lynx"
+    ]
+  },
   "scripts": {
     "lint": "pnpm type-check && eslint src --max-warnings 0",
     "lint:fix": "eslint src --fix",
