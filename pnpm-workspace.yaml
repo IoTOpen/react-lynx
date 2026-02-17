@@ -1,0 +1,4 @@
+onlyBuiltDependencies:
+  - '@iotopen/node-lynx'
+  - esbuild
+  - unrs-resolver

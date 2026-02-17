@@ -31,7 +31,7 @@
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@iotopen/node-lynx": "https://raw.githubusercontent.com/IoTOpen/node-lynx/v2.6.0-rc.0/iotopen-node-lynx-2.6.0-rc.0.tgz",
+    "@iotopen/node-lynx": "https://github.com/IoTOpen/node-lynx/releases/download/2.6.0-pre/iotopen-node-lynx-2.6.0-rc.0.tgz",
     "@types/node": "^22.19.11",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

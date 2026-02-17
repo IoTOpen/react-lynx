@@ -27,4 +27,6 @@ yarn-error.log*
 .github
 .rollup.cache
 .tsbuildinfo
-pnpm-workspace.yaml
+
+/.pnpm-store
+.pnpm-store/

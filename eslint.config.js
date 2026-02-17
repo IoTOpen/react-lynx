@@ -18,6 +18,9 @@ export default [
       'build/',
       '*.config.{js,ts,mjs,cjs}',
       'scripts/',
+      '.pnpm-store/',
+      '**/.pnpm-store/**',
+      '.vscode/',
     ],
   },
 
