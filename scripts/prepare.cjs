@@ -7,6 +7,7 @@ const repoRoot = path.resolve(__dirname, '..');
 const distPath = path.join(repoRoot, 'dist');
 const nodeEnv = process.env.NODE_ENV;
 const nodeModulesPath = path.join(repoRoot, 'node_modules');
+const gitDir = path.join(repoRoot, '.git');
 
 if (nodeEnv === 'production') {
   console.log('prepare: NODE_ENV=production — skipping build to avoid requiring devDependencies.');
@@ -24,6 +25,13 @@ if (fs.existsSync(distPath)) {
 // build will fail. Skip to make installs robust.
 if (!fs.existsSync(nodeModulesPath)) {
   console.log('prepare: node_modules not found — skipping build (likely running in package manager temporary dir).');
+  process.exit(0);
+}
+
+// If this is not a git repo (e.g. installed from a tarball/codeload), skip
+// the build to avoid invoking package manager actions during prepare.
+if (!fs.existsSync(gitDir)) {
+  console.log('prepare: .git not found — likely a tarball/githost install; skipping build.');
   process.exit(0);
 }
 
