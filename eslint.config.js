@@ -1,11 +1,17 @@
 // eslint.config.js
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import tseslintPlugin from '@typescript-eslint/eslint-plugin';
+import tseslintParser from '@typescript-eslint/parser';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import importPlugin from 'eslint-plugin-import';
+import importXPlugin from 'eslint-plugin-import-x';
 import js from '@eslint/js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default [
   // Ignore patterns
@@ -38,16 +44,17 @@ export default [
 
   // Core recommended configs
   js.configs.recommended,
-  ...tseslint.configs.recommended,
+  // React flat recommended config
   reactPlugin.configs.flat.recommended,
 
   // TypeScript + React files
   {
     files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
+      parser: tseslintParser,
       parserOptions: {
         project: './tsconfig.json',
-        tsconfigRootDir: import.meta.dirname,
+        tsconfigRootDir: __dirname,
         ecmaFeatures: { jsx: true },
       },
     },
@@ -55,7 +62,8 @@ export default [
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       'simple-import-sort': simpleImportSort,
-      import: importPlugin,
+      import: importXPlugin,
+      '@typescript-eslint': tseslintPlugin,
     },
     settings: {
       react: { version: 'detect' },
@@ -67,6 +75,9 @@ export default [
       },
     },
     rules: {
+        // Disable base rules in favor of TypeScript-aware ones
+        'no-unused-vars': 'off',
+        'no-redeclare': 'off',
       // Import hygiene and sorting
       'simple-import-sort/imports': ['error', {
         groups: [
@@ -171,7 +182,7 @@ export default [
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
-      import: importPlugin,
+      import: importXPlugin,
       'simple-import-sort': simpleImportSort,
     },
     settings: {
@@ -219,4 +230,4 @@ export default [
       'no-console': 'off',
     },
   },
-];
+  ];

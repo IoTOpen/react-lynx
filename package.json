@@ -8,57 +8,69 @@
   "type": "module",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@iotopen/node-lynx"
+      "esbuild",
+      "unrs-resolver"
     ]
   },
   "scripts": {
     "lint": "pnpm type-check && eslint src --max-warnings 0",
     "lint:fix": "eslint src --fix",
     "type-check": "tsc --noEmit",
+    "test": "pnpm run type-check",
     "prepare": "node scripts/prepare.cjs",
-    "prepack": "node scripts/prepare.cjs",
+    "prepack": "node scripts/prepare.cjs && node scripts/verify-dist.cjs",
     "build": "vite build --config ./vite.config.ts",
+    "prepublishOnly": "pnpm run build && node scripts/verify-dist.cjs",
     "dev": "vite",
-    "clean": "rm -rf dist/",
+    "clean": "rimraf dist",
     "publish:prerelease": "pnpm version prerelease --preid=rc && pnpm run build && npm publish --tag rc"
   },
   "publishConfig": {
     "access": "public"
   },
-    "repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/IoTOpen/react-lynx.git"
   },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@iotopen/node-lynx": "2.6.0-rc.1",
+    "@types/node": "^22.19.11",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "eslint": "^9.39.2",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import-x": "^4.16.1",
+    "eslint-plugin-react": "^7.37.5",
+      "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^16.5.0",
+    "rimraf": "^5.0.10",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
+  },
   "peerDependencies": {
-    "@iotopen/node-lynx": "^2.5.0",
+    "@iotopen/node-lynx": "2.6.0-rc.1",
     "paho-mqtt": "^1.1.0",
-    "react": "^18.3.1 || ^19.0.0",
-    "react-dom": "^18.3.1 || ^19.0.0"
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
   },
   "files": [
     "dist"
   ],
-  "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@iotopen/node-lynx": "github:IoTOpen/node-lynx#2.6.0-pre",
-    "@types/node": "^22.19.11",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.4",
-    "eslint": "^9.39.2",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "6.0.0-rc.1",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "globals": "^16.5.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.0",
-    "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.4"
-  },
+  "sideEffects": false,
   "engines": {
-    "node": "22 || 24"
+    "node": ">=18.15.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
   },
   "browserslist": {
     "production": [
