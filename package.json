@@ -1,6 +1,6 @@
 {
   "name": "@iotopen/react-lynx",
-  "version": "1.0.1",
+  "version": "1.0.2-rc.0",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "source": "src/index.ts",
@@ -45,7 +45,7 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-react": "^7.37.5",
-      "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^16.5.0",
     "rimraf": "^5.0.10",
