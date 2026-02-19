@@ -18,7 +18,7 @@ export const useNotificationOutputExecutors = (installationId: number | string) 
             setError((err) => err !== undefined ? undefined : err);
             setNotificationExecutors(res);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });

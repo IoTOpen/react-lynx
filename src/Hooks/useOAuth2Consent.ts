@@ -19,7 +19,7 @@ export const useOAuth2Consent = () => {
     }, [lynxClient, params]);
 
     useEffect(() => {
-        setRequestedScopes(params.get('scope')?.split(' ') ?? []);
+        void Promise.resolve().then(() => setRequestedScopes(params.get('scope')?.split(' ') ?? []));
     }, [params]);
 
     return {

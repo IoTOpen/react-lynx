@@ -6,7 +6,7 @@ import { useGlobalLynxClient } from '../Contexts';
 
 export const useConfiguredEdgeApps = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    if(isNaN(id)) {
+    if (isNaN(id)) {
         throw new Error('invalid installationId');
     }
     const { lynxClient } = useGlobalLynxClient();
@@ -20,14 +20,14 @@ export const useConfiguredEdgeApps = (installationId: number | string) => {
             setError((err) => err !== undefined ? undefined : err);
             setApps(fetchedApps);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
     }, [id, lynxClient]);
 
     useLayoutEffect(() => {
-        refresh();
+        void Promise.resolve().then(refresh);
     }, [refresh]);
 
     return {

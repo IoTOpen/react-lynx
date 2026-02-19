@@ -1,7 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 import { LynxClient } from '@iotopen/node-lynx';
-import type { ReactNode } from 'react';
 
 
 interface lynxClientContext {

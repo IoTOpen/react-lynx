@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import type { EmptyOAuth2Client } from '@iotopen/node-lynx';
-import { zero } from '@iotopen/node-lynx';
+import { type EmptyOAuth2Client, zero } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
 

@@ -16,7 +16,7 @@ export const useTokens = () => {
             setError((err) => err !== undefined ? undefined : err);
             setTokens(fetchedTokens);
         }).catch((e) => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
@@ -31,7 +31,7 @@ export const useTokens = () => {
     }, [lynxClient]);
 
     useLayoutEffect(() => {
-        refresh();
+        void Promise.resolve().then(refresh);
     }, [refresh]);
 
     return {

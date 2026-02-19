@@ -21,7 +21,7 @@ const zeroEdgeApp = {
 
 export const useEdgeApp = (appId: number | string) => {
     const id = typeof appId === 'string' ? Number.parseInt(appId) : appId;
-    if(isNaN(id)) {
+    if (isNaN(id)) {
         throw new Error('invalid appId');
     }
     const { lynxClient } = useGlobalLynxClient();
@@ -35,14 +35,14 @@ export const useEdgeApp = (appId: number | string) => {
             setError((err) => err !== undefined ? undefined : err);
             setApp(fetchedApp);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
     }, [id, lynxClient]);
 
     useLayoutEffect(() => {
-        refresh();
+        void Promise.resolve().then(refresh);
     }, [refresh]);
 
     return {

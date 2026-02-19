@@ -14,7 +14,7 @@ export const useOAuth2Clients = () => {
             setError((err) => err !== undefined ? undefined : err);
             setClients(fetchedClients);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });

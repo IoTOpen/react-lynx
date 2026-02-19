@@ -43,7 +43,7 @@ export const useUser = (userId: number | string) => {
             setError((err) => err !== undefined ? undefined : err);
             setUser(fetchedUser);
         }).catch(e => {
-            setError(e);
+            setError(e as Error);
         }).finally(() => {
             setLoading(false);
         });

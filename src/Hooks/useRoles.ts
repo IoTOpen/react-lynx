@@ -16,7 +16,7 @@ export const useRoles = () => {
             setError((err) => err !== undefined ? undefined : err);
             setRoles(fetchedRoles);
         }).catch((e) => {
-            setError(e);
+            setError(e as Error);
         }).finally(() => {
             setLoading(false);
         });

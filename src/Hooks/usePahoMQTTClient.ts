@@ -1,7 +1,10 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
-import type { MQTTError, Qos, TypedArray } from 'paho-mqtt';
-import Paho from 'paho-mqtt';
+import Paho, { type MQTTError, type Qos, type TypedArray } from 'paho-mqtt';
+
+function assertError(e: unknown): Error {
+    return e instanceof Error ? e : new Error(String(e));
+}
 
 interface MQTTHandlers {
     onMessage?: Paho.OnMessageHandler;
@@ -14,9 +17,9 @@ export const usePahoMQTTClient = (uri: string,
     handlers?: MQTTHandlers, connectionOptions?: Paho.ConnectionOptions, clientId?: string) => {
     if (clientId === undefined) {
         let uuid;
-        if(window?.crypto?.randomUUID) {
+        if (window?.crypto?.randomUUID) {
             uuid = window.crypto.randomUUID();
-        } else if(typeof crypto !== 'undefined' && crypto?.randomUUID) {
+        } else if (typeof crypto !== 'undefined' && crypto?.randomUUID) {
             uuid = crypto.randomUUID();
         } else {
             uuid = Math.random().toString(36).substring(2, 15);
@@ -101,7 +104,7 @@ export const usePahoMQTTClient = (uri: string,
                 qos: qos ?? 0,
                 timeout: 1,
                 onFailure: (e: MQTTError) => {
-                    throw e;
+                    throw assertError(e);
                 },
                 onSuccess: (res) => {
                     resolve(res.grantedQos);
@@ -131,7 +134,7 @@ export const usePahoMQTTClient = (uri: string,
                     resolve();
                 },
                 onFailure: (e: MQTTError) => {
-                    throw e;
+                    throw assertError(e);
                 }
             });
         });

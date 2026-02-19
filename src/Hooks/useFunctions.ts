@@ -7,7 +7,7 @@ import type { ObjectOrArray } from '../types';
 
 export const useFunctions = (installationId: number | string, filter?: Metadata) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    if(isNaN(iid) && iid !== undefined) {
+    if (isNaN(iid) && iid !== undefined) {
         throw new Error('invalid installationId');
     }
     const { lynxClient } = useGlobalLynxClient();
@@ -26,7 +26,7 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
             setFunctions(res);
             return res;
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
@@ -72,11 +72,14 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         return lynxClient.createFunction(fns);
     }
 
-    const create = useCallback(createFn, [lynxClient, createFn]);
-    const remove = useCallback(removeFn, [lynxClient, removeFn]);
+    // createFn/removeFn are overloaded; allow any args and result here.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    const create = useCallback((...args: any[]) => (createFn as any)(...args), [createFn]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    const remove = useCallback((...args: any[]) => (removeFn as any)(...args), [removeFn]);
 
     useLayoutEffect(() => {
-        refreshCall();
+        void Promise.resolve().then(refreshCall);
     }, [refreshCall]);
 
     return {

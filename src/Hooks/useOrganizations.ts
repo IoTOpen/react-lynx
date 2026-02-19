@@ -16,7 +16,7 @@ export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
             setError((err) => err !== undefined ? undefined : err);
             setOrganizations(<MinimalOrg<T>[]>orgs);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });

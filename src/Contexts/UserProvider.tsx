@@ -1,7 +1,6 @@
-import { createContext, useContext, useLayoutEffect, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useContext, useLayoutEffect, useMemo, useState } from 'react';
 
 import type { ErrorResponse, User } from '@iotopen/node-lynx';
-import type { ReactNode } from 'react';
 
 import { useGlobalLynxClient } from './LynxClientProvider';
 
@@ -29,19 +28,21 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     const [error, setError] = useState<ErrorResponse | undefined>();
     const { lynxClient } = useGlobalLynxClient();
     useLayoutEffect(() => {
-        const me = lynxClient.getMe();
-        const perms = lynxClient.getPermissions();
-        setLoading(true);
-        Promise.all([me, perms]).then(([u, p]) => {
-            setError((err) => err !== undefined ? undefined : err);
-            setUser(u);
-            setPermissions(p);
-        }).catch(e => {
-            setError(e);
-            setUser(null);
-            setPermissions(null);
-        }).finally(() => {
-            setLoading(false);
+        void Promise.resolve().then(() => {
+            const me = lynxClient.getMe();
+            const perms = lynxClient.getPermissions();
+            setLoading(true);
+            Promise.all([me, perms]).then(([u, p]) => {
+                setError((err) => err !== undefined ? undefined : err);
+                setUser(u);
+                setPermissions(p);
+            }).catch(e => {
+                setError(e as ErrorResponse);
+                setUser(null);
+                setPermissions(null);
+            }).finally(() => {
+                setLoading(false);
+            });
         });
     }, [lynxClient]);
     const contextValue = useMemo(() => ({ user, permissions, loading, error }), [user, permissions, loading, error]);

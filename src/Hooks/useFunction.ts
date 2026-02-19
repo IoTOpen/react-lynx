@@ -32,7 +32,7 @@ export const useFunction = (installationId: number | string, functionId: number 
             setError((err) => err !== undefined ? undefined : err);
             setFunc(fn);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });

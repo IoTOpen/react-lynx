@@ -17,7 +17,7 @@ const zeroDevice = {
 export const useDevice = (installationId: number | string, deviceId: number | string) => {
     const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
     const id = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
-    if(isNaN(iid) || isNaN(id)) {
+    if (isNaN(iid) || isNaN(id)) {
         throw new Error('invalid installationId or deviceId');
     }
     const { lynxClient } = useGlobalLynxClient();
@@ -30,7 +30,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
             setError((err) => err !== undefined ? undefined : err);
             setDev(fn);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });

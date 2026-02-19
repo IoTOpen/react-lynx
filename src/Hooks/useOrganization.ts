@@ -39,7 +39,7 @@ export const useOrganization = (organizationId: number | string) => {
             setError((err) => err !== undefined ? undefined : err);
             setOrganization(org);
         }).catch(e => {
-            setError(e);
+            setError(e as Error);
         }).finally(() => {
             setLoading(false);
         });

@@ -12,15 +12,13 @@ export const useUsers = (filter?: Metadata) => {
     const [error, setError] = useState<Error | undefined>();
     const { lynxClient } = useGlobalLynxClient();
 
-    new URLSearchParams();
-
     const refresh = useCallback(() => {
         setLoading(true);
         lynxClient.getUsers(filter).then((fetchedUsers) => {
             setError((err) => err !== undefined ? undefined : err);
             setUsers(fetchedUsers);
         }).catch((e) => {
-            setError(e);
+            setError(e as Error);
         }).finally(() => {
             setLoading(false);
         });

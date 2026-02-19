@@ -16,14 +16,14 @@ export const useEdgeApps = () => {
             setError((err) => err !== undefined ? undefined : err);
             setApps(fetchedApps);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
     }, [lynxClient]);
 
     useLayoutEffect(() => {
-        refresh();
+        void Promise.resolve().then(refresh);
     }, [refresh]);
 
     return {

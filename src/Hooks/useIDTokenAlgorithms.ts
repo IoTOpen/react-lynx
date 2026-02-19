@@ -16,7 +16,7 @@ export const useIDTokenAlgorithms = () => {
             setError((err) => err !== undefined ? undefined : err);
             setAlgs(res);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });

@@ -1,12 +1,11 @@
 // eslint.config.js
+import js from '@eslint/js';
 import globals from 'globals';
-import tseslintPlugin from '@typescript-eslint/eslint-plugin';
-import tseslintParser from '@typescript-eslint/parser';
+import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import importXPlugin from 'eslint-plugin-import-x';
-import js from '@eslint/js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -14,14 +13,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default [
-  // Ignore patterns
+  // --------------------------------------------------
+  // Ignore
+  // --------------------------------------------------
   {
     ignores: [
       'dist/',
-      'node_modules/',
-      'coverage/',
-      '*.d.ts',
       'build/',
+      'coverage/',
+      'node_modules/',
+      '*.d.ts',
       '*.config.{js,ts,mjs,cjs}',
       'scripts/',
       '.pnpm-store/',
@@ -30,7 +31,9 @@ export default [
     ],
   },
 
-  // Base language options
+  // --------------------------------------------------
+  // Base language setup
+  // --------------------------------------------------
   {
     languageOptions: {
       ecmaVersion: 'latest',
@@ -42,92 +45,61 @@ export default [
     },
   },
 
-  // Core recommended configs
+  // --------------------------------------------------
+  // Core JS recommended
+  // --------------------------------------------------
   js.configs.recommended,
-  // React flat recommended config
-  reactPlugin.configs.flat.recommended,
 
-  // TypeScript + React files
-  {
-    files: ['src/**/*.{ts,tsx}'],
+  // --------------------------------------------------
+  // TypeScript (v8 flat, type-aware)
+  // --------------------------------------------------
+  ...tseslint.configs.recommendedTypeChecked.map((config) => ({
+    ...config,
     languageOptions: {
-      parser: tseslintParser,
+      ...config.languageOptions,
       parserOptions: {
-        project: './tsconfig.json',
+        ...config.languageOptions?.parserOptions,
+        project: true,
         tsconfigRootDir: __dirname,
-        ecmaFeatures: { jsx: true },
       },
     },
+  })),
+
+  // --------------------------------------------------
+  // React (flat config)
+  // --------------------------------------------------
+  reactPlugin.configs.flat.recommended,
+
+  // --------------------------------------------------
+  // Project Rules
+  // --------------------------------------------------
+  {
+    files: ['src/**/*.{ts,tsx,js,jsx}'],
+
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
-      'simple-import-sort': simpleImportSort,
       import: importXPlugin,
-      '@typescript-eslint': tseslintPlugin,
+      'simple-import-sort': simpleImportSort,
     },
+
     settings: {
       react: { version: 'detect' },
       'import/resolver': {
-        typescript: {
-          project: './tsconfig.json',
-          alwaysTryTypes: true,
-        },
+        typescript: true,
       },
     },
+
     rules: {
-        // Disable base rules in favor of TypeScript-aware ones
-        'no-unused-vars': 'off',
-        'no-redeclare': 'off',
-      // Import hygiene and sorting
-      'simple-import-sort/imports': ['error', {
-        groups: [
-          ['^react$', '^react-dom$'],
-          ['^@?\\w'],
-          ['^src/', '^@/'],
-          ['^\\u0000'],
-          ['^\\.\\./'],
-          ['^\\./'],
-          ['^.+\\.css$'],
-        ],
-      }],
-      'simple-import-sort/exports': 'error',
-      'import/first': 'error',
-      'import/no-duplicates': 'error',
-      'import/no-cycle': 'error',
-      'import/no-unresolved': 'off', // TS handles this
-      'import/no-extraneous-dependencies': [
-        'error',
-        {
-          devDependencies: [
-            '**/*.{test,spec}.{ts,tsx,js,jsx}',
-            '**/*.d.ts',
-            '**/setupTests.{js,ts}',
-            '**/scripts/**',
-            '*.config.{js,ts,mjs,cjs}',
-          ],
-          optionalDependencies: false,
-          peerDependencies: true,
-          includeTypes: true,
-          // Component libraries import peer deps in src — this is correct behavior
-          packageDir: './',
-        },
-      ],
+      // --------------------------
+      // Disable base JS rules
+      // --------------------------
+      'no-unused-vars': 'off',
+      'no-redeclare': 'off',
 
-      // Style
-      'comma-spacing': ['error', { before: false, after: true }],
-      'space-before-function-paren': ['error', 'never'],
-      'quotes': ['error', 'single'],
-      'semi': ['error', 'always'],
-      'object-curly-spacing': ['error', 'always'],
-
-      // TypeScript safety
-      '@typescript-eslint/restrict-template-expressions': ['error', {
-        allowNumber: true,
-        allowBoolean: true,
-        allowAny: false,
-        allowNullish: false,
-      }],
-      '@typescript-eslint/no-explicit-any': 'error',
+      // --------------------------
+      // TypeScript rules
+      // --------------------------
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
@@ -140,87 +112,109 @@ export default [
           ignoreRestSiblings: true,
         },
       ],
-      '@typescript-eslint/no-empty-function': [
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/consistent-type-imports': [
         'error',
-        { allow: ['arrowFunctions', 'methods'] },
+        { prefer: 'type-imports' },
       ],
-      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
-      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/no-shadow': ['error', { allow: ['err', 'error', 'errors', 'e'] }],
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
-      '@typescript-eslint/prefer-nullish-coalescing': 'error',
-      '@typescript-eslint/prefer-optional-chain': 'error',
-      '@typescript-eslint/prefer-as-const': 'error',
-      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-      '@typescript-eslint/require-await': 'error',
-      '@typescript-eslint/no-confusing-void-expression': 'error',
-
-      // Promise/async safety
       '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        { checksVoidReturn: false },
+      ],
+      '@typescript-eslint/no-redeclare': 'error',
 
-      // Core JS/TS rules
+      // --------------------------
+      // Import hygiene
+      // --------------------------
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            ['^react$', '^react-dom$'],
+            ['^@?\\w'],
+            ['^(@|src|@/)(/.*|$)'],
+            ['^\\u0000'],
+            ['^\\.\\./'],
+            ['^\\./'],
+            ['^.+\\.css$'],
+          ],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
+      'import/first': 'error',
+      'import/no-duplicates': 'error',
+      'import/no-cycle': 'error',
+      'import/no-unresolved': 'off',
+      'import/no-self-import': 'error',
+      'import/no-useless-path-segments': 'error',
+
+      'import/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: [
+            '**/*.{test,spec}.{ts,tsx,js,jsx}',
+            '**/*.d.ts',
+            '**/setupTests.{js,ts}',
+            '**/scripts/**',
+            '*.config.{js,ts,mjs,cjs}',
+          ],
+          peerDependencies: true,
+          includeTypes: true,
+        },
+      ],
+
+      // --------------------------
+      // Code style
+      // --------------------------
+      quotes: ['error', 'single'],
+      semi: ['error', 'always'],
+      'object-curly-spacing': ['error', 'always'],
+      'comma-spacing': ['error', { before: false, after: true }],
+      'space-before-function-paren': ['error', 'never'],
+      'arrow-spacing': ['error', { before: true, after: true }],
+      'keyword-spacing': ['error', { before: true, after: true }],
+
+      // --------------------------
+      // Core correctness
+      // --------------------------
       'no-var': 'error',
       'prefer-const': 'error',
-      'eqeqeq': ['error', 'always', { null: 'ignore' }],
-      'curly': ['error', 'all'],
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+      curly: ['error', 'all'],
       'object-shorthand': 'error',
       'prefer-template': 'error',
       'no-unreachable': 'warn',
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-duplicate-imports': 'error',
+      'no-console':
+        process.env.NODE_ENV === 'production' ? 'warn' : 'off',
 
-      // React rules
+      // --------------------------
+      // React
+      // --------------------------
       ...reactHooksPlugin.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
     },
   },
 
-  // Plain JS/JSX
-  {
-    files: ['src/**/*.{js,jsx}'],
-    plugins: {
-      react: reactPlugin,
-      'react-hooks': reactHooksPlugin,
-      import: importXPlugin,
-      'simple-import-sort': simpleImportSort,
-    },
-    settings: {
-      react: { version: 'detect' },
-    },
-    rules: {
-      'react/prop-types': 'warn',
-      'simple-import-sort/imports': ['error', {
-        groups: [
-          ['^react$', '^react-dom$'],
-          ['^@?\\w'],
-          ['^(@|src|@/)(/.*|$)'],
-          ['^\\u0000'],
-          ['^\\.'],
-          ['^.+\\.css$'],
-        ],
-      }],
-      'simple-import-sort/exports': 'error',
-      ...reactHooksPlugin.configs.recommended.rules,
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
-    },
-  },
-
-  // Test files
+  // --------------------------------------------------
+  // Tests
+  // --------------------------------------------------
   {
     files: ['**/*.{test,spec}.{ts,tsx,js,jsx}'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-floating-promises': 'off',
-      // Keep rules-of-hooks enabled to catch hook misuse in tests
-      'react-hooks/rules-of-hooks': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'off',
       'no-console': 'off',
     },
   },
 
-  // Node/tooling scripts
+  // --------------------------------------------------
+  // Tooling / Node
+  // --------------------------------------------------
   {
     files: ['*.config.{js,ts,mjs,cjs}', 'scripts/**/*.{js,ts}'],
     languageOptions: {
@@ -230,4 +224,4 @@ export default [
       'no-console': 'off',
     },
   },
-  ];
+];

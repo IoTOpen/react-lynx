@@ -27,13 +27,13 @@ export const useNotificationMessage = (installationId: number | string, notifica
     });
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refresh = useCallback(() => {
-        if(iid === 0 || id === 0) {return;}
+        if (iid === 0 || id === 0) {return;}
         setLoading(true);
         lynxClient.getNotificationMessage(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setMessage(res);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
@@ -44,7 +44,7 @@ export const useNotificationMessage = (installationId: number | string, notifica
         lynxClient.updateNotificationMessage(message).then(res => {
             setMessage(res);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         });
     }, [error, lynxClient, message]);
 
@@ -52,7 +52,7 @@ export const useNotificationMessage = (installationId: number | string, notifica
         lynxClient.deleteNotificationMessage(message).then(() => {
             setMessage({ ...zeroNotificationMessage });
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         });
     }, [lynxClient, message]);
 

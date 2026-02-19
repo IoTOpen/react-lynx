@@ -18,7 +18,7 @@ export const useNotificationMessages = (installationId: number | string) => {
             setError((err) => err !== undefined ? undefined : err);
             setNotificationMessages(res);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });

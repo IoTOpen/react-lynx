@@ -18,7 +18,7 @@ const zeroInstallation = {
 
 export const useInstallation = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    if(isNaN(id)) {
+    if (isNaN(id)) {
         throw new Error('invalid installationId');
     }
     const { lynxClient } = useGlobalLynxClient();
@@ -31,7 +31,7 @@ export const useInstallation = (installationId: number | string) => {
             setError((err) => err !== undefined ? undefined : err);
             setInstallation(inst);
         }).catch(e => {
-            setError(e);
+            setError(e as Error);
         }).finally(() => {
             setLoading(false);
         });

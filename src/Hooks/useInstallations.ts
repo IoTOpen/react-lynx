@@ -16,14 +16,14 @@ export const useInstallations = (filter?: Metadata) => {
             setError((err) => err !== undefined ? undefined : err);
             setInstallations(res);
         }).catch(e => {
-            setError(() => e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
     }, [lynxClient, filter]);
 
     useLayoutEffect(() => {
-        refresh();
+        void Promise.resolve().then(refresh);
     }, [refresh]);
 
     return {
