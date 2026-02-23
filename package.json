@@ -57,7 +57,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "@iotopen/node-lynx": "2.6.0-rc.1",
+    "@iotopen/node-lynx": "^2.6.0-rc.2",
     "paho-mqtt": "^1.1.0",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
