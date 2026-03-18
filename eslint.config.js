@@ -1,4 +1,3 @@
-// eslint.config.js
 import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -23,8 +22,6 @@ export default [
       'coverage/',
       'node_modules/',
       '*.d.ts',
-      '*.config.{js,ts,mjs,cjs}',
-      'scripts/',
       '.pnpm-store/',
       '**/.pnpm-store/**',
       '.vscode/',
@@ -51,15 +48,16 @@ export default [
   js.configs.recommended,
 
   // --------------------------------------------------
-  // TypeScript (v8 flat, type-aware)
+  // TypeScript (v8 flat,
   // --------------------------------------------------
   ...tseslint.configs.recommendedTypeChecked.map((config) => ({
     ...config,
+    files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
       ...config.languageOptions,
       parserOptions: {
         ...config.languageOptions?.parserOptions,
-        project: true,
+        project: ['./tsconfig.json'],
         tsconfigRootDir: __dirname,
       },
     },
@@ -96,6 +94,7 @@ export default [
       // --------------------------
       'no-unused-vars': 'off',
       'no-redeclare': 'off',
+      'no-undef': 'off',
 
       // --------------------------
       // TypeScript rules
@@ -112,7 +111,8 @@ export default [
           ignoreRestSiblings: true,
         },
       ],
-      '@typescript-eslint/no-explicit-any': 'error',
+      // allow `any` but warn — library authors can opt-in where necessary
+      '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-imports': [
         'error',
         { prefer: 'type-imports' },
@@ -145,8 +145,10 @@ export default [
       'simple-import-sort/exports': 'error',
       'import/first': 'error',
       'import/no-duplicates': 'error',
+      'import/newline-after-import': ['error', { count: 1 }],
       'import/no-cycle': 'error',
       'import/no-unresolved': 'off',
+
       'import/no-self-import': 'error',
       'import/no-useless-path-segments': 'error',
 
@@ -194,6 +196,8 @@ export default [
       // React
       // --------------------------
       ...reactHooksPlugin.configs.recommended.rules,
+      // enforce exhaustive-deps explicitly for this hooks-heavy library
+      'react-hooks/exhaustive-deps': ['error'],
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
     },
@@ -216,11 +220,21 @@ export default [
   // Tooling / Node
   // --------------------------------------------------
   {
-    files: ['*.config.{js,ts,mjs,cjs}', 'scripts/**/*.{js,ts}'],
+    files: ['*.config.{js,ts,mjs,cjs}', 'scripts/**/*.{js,ts,mjs,cjs}'],
     languageOptions: {
       globals: globals.node,
+      // Use the TypeScript parser for config TS files so syntax like
+      // `function foo(id: string): boolean {}` parses correctly.
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
     },
     rules: {
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
       'no-console': 'off',
     },
   },
