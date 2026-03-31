@@ -1,37 +1,21 @@
 {
   "compilerOptions": {
-    // Language & environment
-    "target": "ES2022", // Modern baseline
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2023"
-    ],
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "jsx": "react-jsx",
     "useDefineForClassFields": true,
-    // Modules & resolution
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
+    "paths": { "@/*": ["./src/*"], "paho-mqtt": ["./types/paho-mqtt/index.d.ts"] },
     "resolveJsonModule": true,
     "allowArbitraryExtensions": true,
-    // JS interop
     "allowJs": false,
     "checkJs": false,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
-    // Emit
     "noEmit": true,
     "isolatedModules": true,
-    // Type checking (strict + safe defaults)
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -41,23 +25,11 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    // Performance
     "skipLibCheck": true,
     "incremental": true,
     "tsBuildInfoFile": "./.tsbuildinfo",
-    // Tooling types
-    "typeRoots": [
-      "./types"
-    ]
+
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    "coverage",
-    ".tsbuildinfo"
-  ]
+  "include": ["src", "types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "build", "coverage", ".tsbuildinfo"]
 }

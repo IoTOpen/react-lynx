@@ -475,4 +475,11 @@ declare module 'paho-mqtt' {
          */
         constructor(payload: string | ArrayBuffer | TypedArray);
     }
+
+        declare const Paho: {
+            Client: typeof Client;
+            Message: typeof Message;
+        };
+
+        export default Paho;
 }

@@ -1,20 +1,30 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
-import Paho, { type MQTTError, type Qos, type TypedArray } from 'paho-mqtt';
+import Paho, {
+    type Client as PahoClient,
+    type ConnectionOptions,
+    type MQTTError,
+    type OnConnectHandler,
+    type OnConnectionLostHandler,
+    type OnMessageHandler,
+    type OnSubscribeSuccessParams,
+    type Qos,
+    type TypedArray,
+} from 'paho-mqtt';
 
 function assertError(e: unknown): Error {
     return e instanceof Error ? e : new Error(String(e));
 }
 
 interface MQTTHandlers {
-    onMessage?: Paho.OnMessageHandler;
-    onDelivery?: Paho.OnMessageHandler;
-    onConnected?: Paho.OnConnectHandler;
-    onDisconnect?: Paho.OnConnectionLostHandler;
+    onMessage?: OnMessageHandler;
+    onDelivery?: OnMessageHandler;
+    onConnected?: OnConnectHandler;
+    onDisconnect?: OnConnectionLostHandler;
 }
 
 export const usePahoMQTTClient = (uri: string,
-    handlers?: MQTTHandlers, connectionOptions?: Paho.ConnectionOptions, clientId?: string) => {
+    handlers?: MQTTHandlers, connectionOptions?: ConnectionOptions, clientId?: string) => {
     if (clientId === undefined) {
         let uuid;
         if (window?.crypto?.randomUUID) {
@@ -26,12 +36,12 @@ export const usePahoMQTTClient = (uri: string,
         }
         clientId = `paho-ws-mqtt-${uuid}`;
     }
-    const client = useRef<Paho.Client>(new Paho.Client(uri, clientId));
+    const client = useRef<PahoClient>(new Paho.Client(uri, clientId));
     const opts = useRef(connectionOptions);
     const callbacks = useRef(handlers);
     const reconnectTimer = useRef<number | undefined>(undefined);
     const [connected, setConnected] = useState(false);
-    const [error, setError] = useState<Paho.MQTTError | undefined>(undefined);
+    const [error, setError] = useState<MQTTError | undefined>(undefined);
     useLayoutEffect(() => {
         const c = client;
         const rct = reconnectTimer;
@@ -57,7 +67,7 @@ export const usePahoMQTTClient = (uri: string,
                     rct.current = undefined;
                 }
             },
-        } as Paho.ConnectionOptions;
+        } as ConnectionOptions;
         const cbs = callbacks.current;
         c.current.onConnectionLost = (e: MQTTError) => {
             setError(e);
@@ -106,7 +116,7 @@ export const usePahoMQTTClient = (uri: string,
                 onFailure: (e: MQTTError) => {
                     throw assertError(e);
                 },
-                onSuccess: (res) => {
+                onSuccess: (res: OnSubscribeSuccessParams) => {
                     resolve(res.grantedQos);
                 }
             });

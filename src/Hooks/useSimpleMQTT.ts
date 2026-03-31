@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import type { Qos, TypedArray } from 'paho-mqtt';
-import type Paho from 'paho-mqtt';
+import type { ConnectionOptions, Message, MQTTError, Qos, TypedArray } from 'paho-mqtt';
 
 import { usePahoMQTTClient } from './usePahoMQTTClient';
 
@@ -57,7 +56,7 @@ function subscribe(sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs:
 
 export interface SimpleMQTT {
     setSubs: (subscriptions: string[]) => void;
-    error?: Paho.MQTTError;
+    error?: MQTTError;
     connected: boolean;
     bind: Binder;
     unbind: Unbinder;
@@ -77,7 +76,7 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
     const subs = useRef<string[]>([]);
     const bindings = useRef(new Map<string, Binding[]>([]));
     const exactBindings = useRef(new Map<string, Binding[]>([]));
-    const onMessage = useCallback((msg: Paho.Message) => {
+    const onMessage = useCallback((msg: Message) => {
         const tmp = exactBindings.current.get(msg.destinationName);
         if (tmp) {
             tmp.forEach((cb) => {
@@ -99,7 +98,7 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         cleanSession: true,
         reconnect: true,
         keepAliveInterval: 5,
-    } as Paho.ConnectionOptions;
+    } as ConnectionOptions;
     if (username) {
         options.userName = username;
     }

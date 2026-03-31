@@ -1,7 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import importXPlugin from 'eslint-plugin-import-x';
@@ -48,7 +47,7 @@ export default [
   js.configs.recommended,
 
   // --------------------------------------------------
-  // TypeScript (v8 flat,
+  // TypeScript (v8 flat)
   // --------------------------------------------------
   ...tseslint.configs.recommendedTypeChecked.map((config) => ({
     ...config,
@@ -64,25 +63,18 @@ export default [
   })),
 
   // --------------------------------------------------
-  // React (flat config)
-  // --------------------------------------------------
-  reactPlugin.configs.flat.recommended,
-
-  // --------------------------------------------------
   // Project Rules
   // --------------------------------------------------
   {
     files: ['src/**/*.{ts,tsx,js,jsx}'],
 
     plugins: {
-      react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       import: importXPlugin,
       'simple-import-sort': simpleImportSort,
     },
 
     settings: {
-      react: { version: 'detect' },
       'import/resolver': {
         typescript: true,
       },
@@ -111,7 +103,6 @@ export default [
           ignoreRestSiblings: true,
         },
       ],
-      // allow `any` but warn — library authors can opt-in where necessary
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-imports': [
         'error',
@@ -148,7 +139,6 @@ export default [
       'import/newline-after-import': ['error', { count: 1 }],
       'import/no-cycle': 'error',
       'import/no-unresolved': 'off',
-
       'import/no-self-import': 'error',
       'import/no-useless-path-segments': 'error',
 
@@ -189,17 +179,13 @@ export default [
       'prefer-template': 'error',
       'no-unreachable': 'warn',
       'no-duplicate-imports': 'error',
-      'no-console':
-        process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
 
       // --------------------------
-      // React
+      // React hooks — spread first, explicit overrides after
       // --------------------------
       ...reactHooksPlugin.configs.recommended.rules,
-      // enforce exhaustive-deps explicitly for this hooks-heavy library
-      'react-hooks/exhaustive-deps': ['error'],
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
+      'react-hooks/exhaustive-deps': 'error',
     },
   },
 
@@ -223,8 +209,6 @@ export default [
     files: ['*.config.{js,ts,mjs,cjs}', 'scripts/**/*.{js,ts,mjs,cjs}'],
     languageOptions: {
       globals: globals.node,
-      // Use the TypeScript parser for config TS files so syntax like
-      // `function foo(id: string): boolean {}` parses correctly.
       parser: tseslint.parser,
       parserOptions: {
         ecmaVersion: 'latest',

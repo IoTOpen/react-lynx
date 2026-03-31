@@ -32,7 +32,7 @@ export default defineConfig({
       formats: ['cjs', 'es'],
       fileName: (format) => (format === 'cjs' ? 'cjs/index.js' : 'esm/index.js'),
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: isExternal,
     },
   },
