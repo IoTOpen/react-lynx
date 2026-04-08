@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { Installation } from '@iotopen/node-lynx';
 
@@ -26,7 +26,7 @@ export const useInstallation = (installationId: number | string) => {
     const [error, setError] = useState<Error | undefined>(undefined);
     const [installation, setInstallation] = useState<Installation>({ ...zeroInstallation });
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         lynxClient.getInstallationRow(id).then(inst => {
             setError((err) => err !== undefined ? undefined : err);
             setInstallation(inst);
@@ -38,21 +38,11 @@ export const useInstallation = (installationId: number | string) => {
     }, [lynxClient, id]);
 
     const update = useCallback(() => {
-        return new Promise<Installation>(() => {
-            if (!installation) {
-                throw new Error('update on undefined installation');
-            }
-            return lynxClient.updateInstallation(installation);
-        });
+        return lynxClient.updateInstallation(installation);
     }, [lynxClient, installation]);
 
     const remove = useCallback(() => {
-        return new Promise<Installation>(() => {
-            if (!installation) {
-                throw new Error('update on undefined installation');
-            }
-            return lynxClient.deleteInstallation(installation);
-        });
+        return lynxClient.deleteInstallation(installation);
     }, [lynxClient, installation]);
     return {
         installation,

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { Metadata, User } from '@iotopen/node-lynx';
 
@@ -23,6 +23,10 @@ export const useUsers = (filter?: Metadata) => {
             setLoading(false);
         });
     }, [lynxClient, filter]);
+
+    useEffect(() => {
+        queueMicrotask(refresh);
+    }, [refresh]);
 
     return {
         users,

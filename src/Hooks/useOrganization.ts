@@ -46,9 +46,8 @@ export const useOrganization = (organizationId: number | string) => {
     }, [lynxClient, oid]);
 
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        queueMicrotask(refresh);
+    }, [refresh]);
 
     const update = useCallback(() => {
         return lynxClient.updateOrganization(organization);

@@ -10,7 +10,7 @@ export const useOAuth2Client = (id: string) => {
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [client, setClient] = useState<OAuth2Client>({ ...zero.getOAuth2Client() });
     const refresh = useCallback(() => {
-        if (!loading) {setLoading(true);}
+        setLoading(true);
         lynxClient.getOAuth2Client(id).then(fetchedClient => {
             setError((err) => err !== undefined ? undefined : err);
             setClient(fetchedClient);
@@ -19,12 +19,11 @@ export const useOAuth2Client = (id: string) => {
         }).finally(() => {
             setLoading(false);
         });
-    }, [loading, lynxClient, id]);
+    }, [lynxClient, id]);
 
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+        queueMicrotask(refresh);
+    }, [refresh]);
 
     const remove = useCallback(() => {
         return lynxClient.deleteOAuth2Client(client);

@@ -25,10 +25,17 @@ interface LynxClientProviderProps {
 }
 
 export const LynxClientProvider = ({ children, url, apiKey, bearer }: LynxClientProviderProps) => {
-    const [client, setClient] = useState(new LynxClient(url, apiKey, bearer));
+    const key = `${url ?? ''}|${apiKey ?? ''}|${bearer ? '1' : '0'}`;
+
+    return <LynxClientProviderState key={key} url={url} apiKey={apiKey} bearer={bearer}>{children}</LynxClientProviderState>;
+};
+
+const LynxClientProviderState = ({ children, url, apiKey, bearer }: LynxClientProviderProps) => {
+    const [client, setClient] = useState(() => new LynxClient(url, apiKey, bearer));
+
     const newClient = useCallback((newUrl: string, newApiKey?: string, newBearer?: boolean) => {
         setClient(new LynxClient(newUrl, newApiKey, newBearer));
-    }, [setClient]);
+    }, []);
     const contextValue = useMemo(() => ({ lynxClient: client, newLynxClient: newClient }), [client, newClient]);
     return (
         <LynxClientContext.Provider value={contextValue}>

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { User } from '@iotopen/node-lynx';
 
@@ -48,6 +48,10 @@ export const useUser = (userId: number | string) => {
             setLoading(false);
         });
     }, [lynxClient, id]);
+
+    useEffect(() => {
+        queueMicrotask(refresh);
+    }, [refresh]);
 
     const update = useCallback(() => {
         return lynxClient.updateUser(user);

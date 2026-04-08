@@ -1,6 +1,6 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import type { Devicex, ErrorResponse, MetaObject, OKResponse } from '@iotopen/node-lynx';
+import type { Devicex, ErrorResponse, MetaObject } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
 
@@ -25,7 +25,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     const [dev, setDev] = useState<Devicex>({ ...zeroDevice });
     const [error, setError] = useState<ErrorResponse | undefined>();
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         lynxClient.getDevice(iid, id).then(fn => {
             setError((err) => err !== undefined ? undefined : err);
             setDev(fn);
@@ -37,12 +37,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     }, [lynxClient, iid, id]);
 
     const update = useCallback(() => {
-        return new Promise<Devicex>(() => {
-            if (!dev) {
-                throw new Error('update on undefined function');
-            }
-            return lynxClient.updateDevice(dev);
-        });
+        return lynxClient.updateDevice(dev);
     }, [lynxClient, dev]);
 
     const setType = useCallback((t: string) => {
@@ -50,12 +45,7 @@ export const useDevice = (installationId: number | string, deviceId: number | st
     }, [dev, setDev]);
 
     const remove = useCallback(() => {
-        return new Promise<OKResponse>(() => {
-            if (!dev) {
-                throw new Error('delete on undefined function');
-            }
-            return lynxClient.deleteDevice(dev);
-        });
+        return lynxClient.deleteDevice(dev);
     }, [dev, lynxClient]);
 
     return {

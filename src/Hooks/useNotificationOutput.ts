@@ -44,25 +44,26 @@ export const useNotificationOutput = (installationId: number | string, notificat
 
     const update = useCallback(() => {
         if (error !== undefined) {setError(undefined);}
-        lynxClient.updateNotificationOutput(output).then(res => {
+        return lynxClient.updateNotificationOutput(output).then(res => {
             setOutput(res);
+            return res;
         }).catch(e => {
             setError(e as ErrorResponse);
         });
     }, [error, lynxClient, output]);
 
     const remove = useCallback(() => {
-        lynxClient.deleteNotificationOutput(output).then(() => {
+        return lynxClient.deleteNotificationOutput(output).then((res) => {
             setOutput({ ...zeroNotificationOutput });
+            return res;
         }).catch(e => {
             setError(e as ErrorResponse);
         });
     }, [lynxClient, output]);
 
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        queueMicrotask(refresh);
+    }, [refresh]);
 
     return {
         refresh,

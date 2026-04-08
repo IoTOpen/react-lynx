@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { ErrorResponse, InstallationInfo } from '@iotopen/node-lynx';
 
@@ -20,11 +20,10 @@ export const useInstallationInfo = (assignedOnly?: boolean) => {
         }).finally(() => {
             setLoading(false);
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lynxClient]);
+    }, [assignedOnly, lynxClient]);
 
-    useLayoutEffect(() => {
-        refreshCall();
+    useEffect(() => {
+        queueMicrotask(refreshCall);
     }, [refreshCall]);
 
     return {
