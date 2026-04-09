@@ -25,7 +25,7 @@ export default defineConfig({
   plugins: [react(), dts({ insertTypesEntry: true })],
   build: {
     sourcemap: true,
-    target: 'es2022',
+    target: 'es2023',
     outDir: 'dist',
     lib: {
       entry: srcEntry,
