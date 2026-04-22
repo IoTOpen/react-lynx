@@ -21,13 +21,15 @@ export const useMeta = (obj?: WithMeta, deps: DependencyList = []) => {
                 newList.push({ key, value: value ?? '', protected: true });
             }
             newList.sort((a, b) => a.key.localeCompare(b.key));
-            setMetaList(newList);
+            void Promise.resolve().then(() => {
+                setMetaList(newList);
+            });
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [obj, ...deps]);
 
     const compile = useCallback(() => {
-        const res = { meta: {}, protected_meta: {} } as WithMeta;
+        const res: WithMeta = { meta: {}, protected_meta: {} };
         metaList.forEach((e) => {
             if (e.protected) {
                 res.protected_meta[e.key] = e.value;

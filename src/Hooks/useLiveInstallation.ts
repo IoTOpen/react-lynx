@@ -15,7 +15,7 @@ export interface LiveInstallation {
     mqtt: SimpleMQTT;
 }
 
-export const useLiveInstallation = (installation: Installation) => {
+export const useLiveInstallation = (installation: Installation): LiveInstallation => {
     const mqtt = useMQTT();
     const { functions, refresh: fnRefresh } = useFunctions(installation.id);
     const { devices, refresh: devRefresh } = useDevices(installation.id);
@@ -36,10 +36,10 @@ export const useLiveInstallation = (installation: Installation) => {
         functions,
         devices,
         mqtt,
-    } as LiveInstallation;
+    };
 };
 
-export const useLiveInstallationId = (installationId: number | string) => {
+export const useLiveInstallationId = (installationId: number | string): LiveInstallation => {
     const mqtt = useMQTT();
     const { installation } = useInstallation(installationId);
     const { functions, refresh: fnRefresh } = useFunctions(installationId);
@@ -59,6 +59,6 @@ export const useLiveInstallationId = (installationId: number | string) => {
         installation,
         functions,
         devices,
-        mqtt
-    } as LiveInstallation;
+        mqtt,
+    };
 };

@@ -23,9 +23,8 @@ export const useRoles = () => {
     }, [lynxClient]);
 
     useEffect(() => {
-        refresh();
-        /* eslint-disable react-hooks/exhaustive-deps */
-    }, []);
+        void Promise.resolve().then(refresh);
+    }, [refresh]);
 
     return {
         loading,

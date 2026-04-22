@@ -23,9 +23,8 @@ export const useIDTokenAlgorithms = () => {
     }, [lynxClient]);
 
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        void Promise.resolve().then(refresh);
+    }, [refresh]);
 
     return {
         loading,

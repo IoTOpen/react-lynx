@@ -16,7 +16,7 @@ export interface MultiLiveInstallation {
     toInstallationId: (cid: number) => number;
 }
 
-export const useMultiLiveInstallation = (installations: Installation[]) => {
+export const useMultiLiveInstallation = (installations: Installation[]): MultiLiveInstallation => {
     const { lynxClient } = useGlobalLynxClient();
     const mqtt = useMQTT();
     const { bind, unbind, setSubs } = mqtt;
@@ -148,6 +148,6 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
         deviceMap,
         mqtt,
         toClientId,
-        toInstallationId
-    } as MultiLiveInstallation;
+        toInstallationId,
+    };
 };
