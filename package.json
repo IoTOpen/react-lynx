@@ -1,6 +1,6 @@
 {
   "name": "@iotopen/react-lynx",
-  "version": "1.0.2-rc.10",
+  "version": "1.0.2-rc.11",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
   "source": "src/index.ts",
