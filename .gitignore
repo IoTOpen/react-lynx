@@ -31,3 +31,4 @@ yarn-error.log*
 /.pnpm-store
 .pnpm-store/
 .vscode/
+scripts/
