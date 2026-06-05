@@ -1,35 +1,51 @@
+// tsconfig.json (for development and type-checking)
 {
   "compilerOptions": {
-    "target": "es2023",
+    "target": "ES2023",
     "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "jsx": "react-jsx",
-    "useDefineForClassFields": true,
+
     "module": "ESNext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "paths": { "@/*": ["./src/*"], "paho-mqtt": ["./types/paho-mqtt/index.d.ts"] },
+
     "resolveJsonModule": true,
     "allowArbitraryExtensions": true,
+
     "allowJs": false,
     "checkJs": false,
-    "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
-    "isolatedModules": true,
+
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+
     "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
+
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "incremental": true,
+
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    "noEmit": true,            // Do not emit JS; Vite handles bundling
+
+    "incremental": true,       // Optional: enable incremental builds
     "tsBuildInfoFile": "./.tsbuildinfo",
 
+    // Path aliases (baseUrl is deprecated in TS 7; keep it with ignoreDeprecations or remove it)
+    "baseUrl": ".",            // (see note above on TS6 deprecation)
+    "paths": {
+      "@/*": ["./src/*"],
+      "paho-mqtt": ["./types/paho-mqtt/index.d.ts"]
+    },
+
+    "ignoreDeprecations": "6.0"  // silence TS6 baseUrl deprecation warning
   },
-  "include": ["src", "types/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "build", "coverage", ".tsbuildinfo"]
+  "include": ["src"],         // Only include source files
+  "exclude": ["node_modules", "dist", "build", "coverage"]
 }
