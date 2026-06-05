@@ -47,7 +47,7 @@ export default [
   js.configs.recommended,
 
   // --------------------------------------------------
-  // TypeScript (v8 flat)
+  // TypeScript
   // --------------------------------------------------
   ...tseslint.configs.recommendedTypeChecked.map((config) => ({
     ...config,

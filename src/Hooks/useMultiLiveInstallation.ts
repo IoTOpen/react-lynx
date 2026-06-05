@@ -100,7 +100,6 @@ export const useMultiLiveInstallation = (installations: Installation[]): MultiLi
             setInstallationMap(() => newInstallationMap);
             setFunctionMap(() => newFunctionMap);
             setDeviceMap(() => newDeviceMap);
-            // Now we can accept updates from mqtt
             done = true;
     }).catch((e) => {
         console.warn('Error in work.finally:', e);

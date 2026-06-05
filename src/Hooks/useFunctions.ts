@@ -81,7 +81,6 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         if (Array.isArray(fns)) {
             if (fns.length === 0) {return Promise.allSettled([]);}
 
-            // Replaced .pop() mutation with strict index lookup (!) to clear noUncheckedIndexedAccess rules
             const last = fns[fns.length - 1]!;
             const rest = fns.slice(0, -1).map(f => lynxClient.deleteFunction(f, true));
 
@@ -102,7 +101,6 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         if (Array.isArray(fns)) {
             if (fns.length === 0) {return Promise.allSettled([]);}
 
-            // Replaced .pop() mutation with strict index lookup (!) to clear noUncheckedIndexedAccess rules
             const last = fns[fns.length - 1]!;
             const rest = fns.slice(0, -1).map(f => lynxClient.createFunction(f, true));
 

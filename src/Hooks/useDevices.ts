@@ -72,7 +72,6 @@ export const useDevices = (installationId: number | string, filter?: Metadata) =
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lynxClient, iid, filterKey]);
 
-    // Removed ': any' and applied 'as unknown as RemoveDeviceFn' externally to satisfy the React Compiler
     const remove = useCallback((devs: Devicex | Devicex[]) => {
         if (Array.isArray(devs)) {
             if (devs.length === 0) {return Promise.allSettled([]);}
@@ -92,7 +91,6 @@ export const useDevices = (installationId: number | string, filter?: Metadata) =
         return lynxClient.deleteDevice(devs);
     }, [lynxClient]) as unknown as RemoveDeviceFn;
 
-    // Removed ': any' and applied 'as unknown as CreateDeviceFn' externally to satisfy the React Compiler
     const create = useCallback((devs: EmptyDevicex | EmptyDevicex[]) => {
         if (Array.isArray(devs)) {
             if (devs.length === 0) {return Promise.allSettled([]);}
