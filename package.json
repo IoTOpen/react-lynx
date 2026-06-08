@@ -1,17 +1,15 @@
 {
   "name": "@iotopen/react-lynx",
-  "version": "1.0.2-rc.14",
+  "version": "1.0.2-rc.15",
   "description": "IoT Open React hooks wrapper for the node-lynx",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.js",
   "types": "./dist/src/index.d.ts",
   "type": "module",
-
-    "files": [
+  "files": [
     "dist"
   ],
   "sideEffects": false,
-
   "engines": {
     "node": ">=20.19.0 <25"
   },
@@ -36,7 +34,6 @@
     "type": "git",
     "url": "https://github.com/IoTOpen/react-lynx.git"
   },
-
   "keywords": [
     "lynx",
     "iot",
@@ -44,7 +41,6 @@
   ],
   "author": "IoT Open",
   "license": "Apache 2.0",
-
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
@@ -80,7 +76,6 @@
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
   },
-
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
