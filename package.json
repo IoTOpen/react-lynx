@@ -1,6 +1,6 @@
 {
   "name": "@iotopen/react-lynx",
-  "version": "1.0.2-rc.15",
+  "version": "1.0.2-rc.16",
   "description": "IoT Open React hooks wrapper for the node-lynx",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.js",
