@@ -1,10 +1,10 @@
 {
   "name": "@iotopen/react-lynx",
-  "version": "1.0.2-rc.17",
+  "version": "1.0.2-rc.15",
   "description": "IoT Open React hooks wrapper for the node-lynx",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.js",
-  "types": "./dist/src/index.d.ts",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "files": [
     "dist"
@@ -72,7 +72,7 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.cjs"
     }
