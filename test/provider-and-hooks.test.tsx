@@ -10,6 +10,8 @@ const mocks = vi.hoisted(() => ({
   deleteInstallation: vi.fn(),
   getUser: vi.fn(),
   getUsers: vi.fn(),
+  getMe: vi.fn(),
+  getPermissions: vi.fn(),
   getNotificationOutput: vi.fn(),
   updateNotificationOutput: vi.fn(),
   deleteNotificationOutput: vi.fn(),
@@ -26,6 +28,8 @@ vi.mock('@iotopen/node-lynx', () => {
     deleteInstallation = mocks.deleteInstallation;
     getUser = mocks.getUser;
     getUsers = mocks.getUsers;
+    getMe = mocks.getMe;
+    getPermissions = mocks.getPermissions;
     getNotificationOutput = mocks.getNotificationOutput;
     updateNotificationOutput = mocks.updateNotificationOutput;
     deleteNotificationOutput = mocks.deleteNotificationOutput;
@@ -42,6 +46,7 @@ vi.mock('@iotopen/node-lynx', () => {
 });
 
 import { LynxClientProvider, useGlobalLynxClient } from '../src/Contexts/LynxClientProvider';
+import { UserProvider, useGlobalUser } from '../src/Contexts/UserProvider';
 import { useInstallation } from '../src/Hooks/useInstallation';
 import { useNotificationOutput } from '../src/Hooks/useNotificationOutput';
 import { useUser } from '../src/Hooks/useUser';
@@ -54,6 +59,8 @@ describe('LynxProvider and hooks', () => {
     mocks.deleteInstallation.mockReset();
     mocks.getUser.mockReset();
     mocks.getUsers.mockReset();
+    mocks.getMe.mockReset();
+    mocks.getPermissions.mockReset();
     mocks.getNotificationOutput.mockReset();
     mocks.updateNotificationOutput.mockReset();
     mocks.deleteNotificationOutput.mockReset();
@@ -98,6 +105,112 @@ describe('LynxProvider and hooks', () => {
 
     expect(seenClients[seenClients.length - 1]).not.toBe(firstClient);
     expect(mocks.instances).toHaveLength(2);
+  });
+
+  it('loads the current user and permissions', async () => {
+    mocks.getMe.mockResolvedValue({ id: 1, email: 'user@example.com' });
+    mocks.getPermissions.mockResolvedValue({ installations_read: true });
+
+    const { result } = renderHook(() => useGlobalUser(), {
+      wrapper: ({ children }) => (
+        <LynxClientProvider url="https://api.example" apiKey="token">
+          <UserProvider>{children}</UserProvider>
+        </LynxClientProvider>
+      ),
+    });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.user).toMatchObject({ id: 1, email: 'user@example.com' });
+    expect(result.current.permissions).toEqual({ installations_read: true });
+    expect(mocks.getMe).toHaveBeenCalledOnce();
+    expect(mocks.getPermissions).toHaveBeenCalledOnce();
+  });
+
+  it('does not load identity data without an API key', () => {
+    const { result } = renderHook(() => useGlobalUser(), {
+      wrapper: ({ children }) => (
+        <LynxClientProvider url="https://api.example">
+          <UserProvider>{children}</UserProvider>
+        </LynxClientProvider>
+      ),
+    });
+
+    expect(result.current).toMatchObject({ user: null, permissions: null, loading: false });
+    expect(mocks.getMe).not.toHaveBeenCalled();
+    expect(mocks.getPermissions).not.toHaveBeenCalled();
+  });
+
+  it('clears identity data when loading fails', async () => {
+    const error = { status: 401, message: 'Unauthorized' };
+    mocks.getMe.mockRejectedValue(error);
+    mocks.getPermissions.mockResolvedValue({ installations_read: true });
+
+    const { result } = renderHook(() => useGlobalUser(), {
+      wrapper: ({ children }) => (
+        <LynxClientProvider url="https://api.example" apiKey="token">
+          <UserProvider>{children}</UserProvider>
+        </LynxClientProvider>
+      ),
+    });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.user).toBeNull();
+    expect(result.current.permissions).toBeNull();
+    expect(result.current.error).toBe(error);
+  });
+
+  it('ignores responses from a replaced client', async () => {
+    let resolveFirstUser!: (user: unknown) => void;
+    let resolveFirstPermissions!: (permissions: unknown) => void;
+    const firstUser = new Promise(resolve => { resolveFirstUser = resolve; });
+    const firstPermissions = new Promise(resolve => { resolveFirstPermissions = resolve; });
+    mocks.getMe
+      .mockImplementationOnce(() => firstUser)
+      .mockResolvedValueOnce({ id: 2, email: 'second@example.com' });
+    mocks.getPermissions
+      .mockImplementationOnce(() => firstPermissions)
+      .mockResolvedValueOnce({ installations_read: false });
+
+    let latestUser: unknown;
+    function CaptureUser() {
+      latestUser = useGlobalUser().user;
+      return null;
+    }
+
+    function Harness({ apiKey }: { apiKey: string }) {
+      return (
+        <LynxClientProvider url="https://api.example" apiKey={apiKey}>
+          <UserProvider>
+            <CaptureUser />
+          </UserProvider>
+        </LynxClientProvider>
+      );
+    }
+
+    const { rerender } = render(<Harness apiKey="first-token" />);
+
+    await waitFor(() => {
+      expect(mocks.getMe).toHaveBeenCalledOnce();
+      expect(mocks.getPermissions).toHaveBeenCalledOnce();
+    });
+
+    rerender(<Harness apiKey="second-token" />);
+
+    await waitFor(() => {
+      expect(latestUser).toMatchObject({ id: 2, email: 'second@example.com' });
+    });
+
+    resolveFirstUser({ id: 1, email: 'first@example.com' });
+    resolveFirstPermissions({ installations_read: true });
+
+    await Promise.resolve();
+    expect(latestUser).toMatchObject({ id: 2, email: 'second@example.com' });
   });
 
   it('resolves installation update and delete operations', async () => {

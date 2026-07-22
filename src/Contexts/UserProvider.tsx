@@ -1,6 +1,6 @@
-import { createContext, type ReactNode, useContext, useLayoutEffect, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 
-import type { ErrorResponse, User } from '@iotopen/node-lynx';
+import type { ErrorResponse, LynxClient, User } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from './LynxClientProvider';
 
@@ -21,31 +21,47 @@ interface UserProviderProps {
     children: ReactNode;
 }
 
+interface UserState {
+    client: LynxClient;
+    user: User | null;
+    permissions: { [key: string]: boolean } | null;
+    error: ErrorResponse | undefined;
+    loading: boolean;
+}
+
 export const UserProvider = ({ children }: UserProviderProps) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [permissions, setPermissions] = useState<{ [key: string]: boolean } | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<ErrorResponse | undefined>();
     const { lynxClient } = useGlobalLynxClient();
-    useLayoutEffect(() => {
-        void Promise.resolve().then(() => {
-            const me = lynxClient.getMe();
-            const perms = lynxClient.getPermissions();
-            setLoading(true);
-            Promise.all([me, perms]).then(([u, p]) => {
-                setError((err) => err !== undefined ? undefined : err);
-                setUser(u);
-                setPermissions(p);
-            }).catch(e => {
-                setError(e as ErrorResponse);
-                setUser(null);
-                setPermissions(null);
-            }).finally(() => {
-                setLoading(false);
-            });
+    const [state, setState] = useState<UserState>(() => ({
+        client: lynxClient,
+        user: null,
+        permissions: null,
+        error: undefined,
+        loading: Boolean(lynxClient.apiKey),
+    }));
+    useEffect(() => {
+        let active = true;
+
+        if (!lynxClient.apiKey) {
+            return () => { active = false; };
+        }
+
+        void Promise.all([lynxClient.getMe(), lynxClient.getPermissions()]).then(([u, p]) => {
+            if (!active) { return; }
+            setState({ client: lynxClient, user: u, permissions: p, error: undefined, loading: false });
+        }).catch((e: unknown) => {
+            if (!active) { return; }
+            setState({ client: lynxClient, user: null, permissions: null, error: e as ErrorResponse, loading: false });
         });
+
+        return () => { active = false; };
     }, [lynxClient]);
-    const contextValue = useMemo(() => ({ user, permissions, loading, error }), [user, permissions, loading, error]);
+    const contextValue = useMemo(() => {
+        if (state.client === lynxClient) {
+            return state;
+        }
+
+        return { user: null, permissions: null, error: undefined, loading: Boolean(lynxClient.apiKey) };
+    }, [state, lynxClient]);
     return (
         <UserContext.Provider value={contextValue}>
             {children}
