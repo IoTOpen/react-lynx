@@ -26,7 +26,7 @@ function isEq<T>(a: T[], b: T[]): boolean {
     return false;
 }
 
-type Unsub = (topic: string) => void | Promise<void>;
+type Unsub = (topic: string) => Promise<void>;
 
 async function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
     await Promise.all(subs.map(async(topic) => {
@@ -38,7 +38,7 @@ async function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
     }));
 }
 
-async function subscribe(sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
+async function subscribe(sub: (topic: string, qos?: Qos) => Promise<Qos>, subs: string[]): Promise<void> {
     await Promise.all(subs.map(async(topic) => {
         try {
             await sub(topic);
@@ -68,6 +68,8 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         }
     }
     const subs = useRef<string[]>([]);
+    const activeSubs = useRef<string[]>([]);
+    const pendingSubscriptionUpdates = useRef(Promise.resolve());
     const bindings = useRef(new Map<string, Binding[]>([]));
     const exactBindings = useRef(new Map<string, Binding[]>([]));
     const onMessage = useCallback((msg: Message) => {
@@ -107,11 +109,16 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         pub
     } = usePahoMQTTClient(uri, {
         onMessage, onConnected: () => {
-            subs.current.forEach(s => {
-                sub(s).catch((e) => {
-                    console.warn('Failed to subscribe to', s, e);
-                });
+            c.current = true;
+            const nextSubs = [...subs.current];
+            const update = pendingSubscriptionUpdates.current.then(async() => {
+                activeSubs.current = [];
+                await subscribe(sub, nextSubs);
+                activeSubs.current = nextSubs;
+            }).catch((e) => {
+                console.warn('Failed to restore subscriptions', e);
             });
+            pendingSubscriptionUpdates.current = update;
         },
     }, options);
 
@@ -166,22 +173,38 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         exactBindings.current.set(topic, binds.filter((b) => b !== binder));
     }, []);
 
-    const updateSubs = useCallback((s: string[]) => {
-        if (isEq(subs.current, s)) {
-            return;
+    const updateSubs = useCallback((s: string[]): Promise<void> => {
+        const nextSubs = [...s];
+        if (isEq(subs.current, nextSubs)) {
+            return pendingSubscriptionUpdates.current;
         }
-        if (c.current) {
-            unsubscribe(unsub, subs.current)
-                .then(() => subscribe(sub, s))
-                .catch((e) => {
-                    console.warn('Failed to update subscriptions', e);
-                });
-        }
-        subs.current = s;
+        subs.current = nextSubs;
+
+        const update = pendingSubscriptionUpdates.current.then(async() => {
+            if (!c.current) {
+                return;
+            }
+            await unsubscribe(unsub, activeSubs.current);
+            activeSubs.current = [];
+            if (!isEq(subs.current, nextSubs)) {
+                return;
+            }
+            await subscribe(sub, nextSubs);
+            activeSubs.current = nextSubs;
+        })
+            .catch((e) => {
+                console.warn('Failed to update subscriptions', e);
+            });
+        pendingSubscriptionUpdates.current = update;
+        return update;
     }, [sub, unsub]);
 
+    const setSubs = useCallback((s: string[]): void => {
+        void updateSubs(s);
+    }, [updateSubs]);
+
     return {
-        setSubs: updateSubs,
+        setSubs,
         error,
         connected,
         bind,

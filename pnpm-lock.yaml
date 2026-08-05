@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@types/paho-mqtt':
+        specifier: 1.0.10
+        version: 1.0.10
       react:
         specifier: ^18 || ^19
         version: 19.2.8
@@ -500,6 +503,9 @@ packages:
 
   '@types/node@22.20.1':
     resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
+
+  '@types/paho-mqtt@1.0.10':
+    resolution: {integrity: sha512-xOEii1m7jw7mIKjufDkolpz7VlyqptUmm/YFPtLJCybrPCuLhN+WYgNpulQ/CXo7wtEW7x4uGon2v89+6g/pcA==}
 
   '@types/react-dom@19.2.4':
     resolution: {integrity: sha512-Bsc+QHgp+P/F02XDzNCY9jnZNCUuLki36KT7VKrTXXLdHf+vHMNZnW1rVu5DNW/rCK+fya3DATySbLM4yhtKUw==}
@@ -2187,6 +2193,8 @@ snapshots:
   '@types/node@22.20.1':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/paho-mqtt@1.0.10': {}
 
   '@types/react-dom@19.2.4(@types/react@19.2.18)':
     dependencies:

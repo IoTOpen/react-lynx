@@ -39,8 +39,7 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "paho-mqtt": ["./types/paho-mqtt/index.d.ts"]
+      "@/*": ["./src/*"]
     },
 
     "ignoreDeprecations": "6.0"

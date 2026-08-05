@@ -6,6 +6,7 @@ const { pathToFileURL } = require('url');
 const ts = require('typescript');
 
 const repoRoot = path.resolve(__dirname, '..');
+const distPath = path.join(repoRoot, 'dist');
 const packageFile = path.join(repoRoot, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageFile, 'utf8'));
 
@@ -28,6 +29,30 @@ if (missingFiles.length > 0) {
   console.error('verify-dist: missing or empty build artifacts:');
   missingFiles.forEach((file) => console.error('  -', file));
   console.error('\nHint: run `pnpm run build` before publishing.');
+  process.exit(1);
+}
+
+const declarationFiles = [];
+const collectDeclarations = (directory) => {
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const entryPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) collectDeclarations(entryPath);
+    else if (entry.name.endsWith('.d.ts')) declarationFiles.push(entryPath);
+  }
+};
+collectDeclarations(distPath);
+
+const escapedDeclarationImports = declarationFiles.flatMap((file) => {
+  const content = fs.readFileSync(file, 'utf8');
+  return [...content.matchAll(/from\s+['"](\.\.?\/[^'"]+)['"]/g)]
+    .map(([, specifier]) => path.resolve(path.dirname(file), specifier))
+    .filter((resolved) => resolved !== distPath && !resolved.startsWith(`${distPath}${path.sep}`))
+    .map((resolved) => `${path.relative(repoRoot, file)} -> ${path.relative(repoRoot, resolved)}`);
+});
+
+if (escapedDeclarationImports.length > 0) {
+  console.error('verify-dist: declarations reference files outside the published dist directory:');
+  escapedDeclarationImports.forEach((reference) => console.error('  -', reference));
   process.exit(1);
 }
 

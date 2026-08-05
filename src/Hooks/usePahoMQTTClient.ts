@@ -4,13 +4,18 @@ import Paho, {
     type Client as PahoClient,
     type ConnectionOptions,
     type MQTTError,
-    type OnConnectHandler,
     type OnConnectionLostHandler,
     type OnMessageHandler,
     type OnSubscribeSuccessParams,
     type Qos,
     type TypedArray,
 } from 'paho-mqtt';
+
+type OnConnectHandler = (reconnect: boolean, host: string) => void;
+
+interface ReconnectAwareClient extends PahoClient {
+    onConnected?: OnConnectHandler;
+}
 
 function assertError(e: unknown): Error {
     return e instanceof Error ? e : new Error(String(e));
@@ -53,12 +58,21 @@ interface MQTTHandlers {
     onDisconnect?: OnConnectionLostHandler;
 }
 
+interface PahoMQTTClientResult {
+    client: RefObject<PahoClient>;
+    connected: boolean;
+    error: MQTTError | undefined;
+    sub: (topic: string, qos?: Qos) => Promise<Qos>;
+    pub: (topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => void;
+    unsub: (topic: string) => Promise<void>;
+}
+
 export const usePahoMQTTClient = (uri: string,
-    handlers?: MQTTHandlers, connectionOptions?: ConnectionOptions, clientId?: string) => {
+    handlers?: MQTTHandlers, connectionOptions?: ConnectionOptions, clientId?: string): PahoMQTTClientResult => {
     const reactId = useId();
     const [generatedClientId] = useState(() => generateClientId(reactId));
     const resolvedClientId = clientId ?? generatedClientId;
-    const client = useRef<PahoClient | null>(null);
+    const client = useRef<ReconnectAwareClient | null>(null);
 
     if (client.current === null) {
         client.current = new Paho.Client(uri, resolvedClientId);
