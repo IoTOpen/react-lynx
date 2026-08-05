@@ -115,12 +115,16 @@ export const useDevices = (installationId: number | string, filter?: Metadata) =
         return cancel;
     }, [refreshCall]);
 
+    const refresh = useCallback(() => {
+        void refreshCall();
+    }, [refreshCall]);
+
     return {
         loading,
         error,
         create,
         remove,
         devices,
-        refresh: refreshCall,
+        refresh,
     };
 };

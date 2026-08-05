@@ -66,19 +66,19 @@ export const useDeviceMeta = (installationId: number | string, deviceId?: number
     const { lynxClient } = useGlobalLynxClient();
 
     const create = useCallback((key: string, meta: MetaObject, overrideDevId?: number, silent?: boolean) => {
-    const id = overrideDevId ?? devId ?? 0;
+        const id = overrideDevId ?? devId ?? 0;
         return lynxClient.createDeviceMeta(iid, id, key, meta, silent);
     }, [lynxClient, iid, devId]);
 
 
     const update = useCallback((key: string, meta: MetaObject, createMissing?: boolean, overrideDevId?: number, silent?: boolean) => {
-    const id = overrideDevId ?? devId ?? 0;
+        const id = overrideDevId ?? devId ?? 0;
         return lynxClient.updateDeviceMeta(iid, id, key, meta, silent, createMissing);
     }, [lynxClient, iid, devId]);
 
 
     const remove = useCallback((key: string, overrideDevId?: number, silent?: boolean) => {
-    const id = overrideDevId ?? devId ?? 0;
+        const id = overrideDevId ?? devId ?? 0;
         return lynxClient.deleteDeviceMeta(iid, id, key, silent);
     }, [lynxClient, iid, devId]);
 

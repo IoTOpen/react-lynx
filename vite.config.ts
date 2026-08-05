@@ -24,7 +24,7 @@ function isExternal(id: string): boolean {
 }
 
 export default defineConfig({
-  plugins: [react(), dts({ bundleTypes: false , entryRoot: 'src',})],
+  plugins: [react(), dts({ bundleTypes: false, entryRoot: 'src' })],
   build: {
     sourcemap: true,
     target: 'es2023',

@@ -14,7 +14,7 @@ export const useOAuth2Consent = () => {
     const consent = useCallback((scope: string[]) => {
         const consentObject = Object.fromEntries(params);
 
-    consentObject['scope'] = scope.join(' ');
+        consentObject['scope'] = scope.join(' ');
         return lynxClient.consentOAuth2Authorization(consentObject);
     }, [lynxClient, params]);
 

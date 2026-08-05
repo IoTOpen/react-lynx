@@ -121,12 +121,16 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
         return cancel;
     }, [refreshCall]);
 
+    const refresh = useCallback(() => {
+        void refreshCall();
+    }, [refreshCall]);
+
     return {
         loading,
         error,
         create,
         remove,
         functions,
-        refresh: refreshCall,
+        refresh,
     };
 };

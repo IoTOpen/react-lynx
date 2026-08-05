@@ -56,6 +56,36 @@ describe('usePahoMQTTClient', () => {
     expect(mocks.instances[0]?.disconnect).toHaveBeenCalledTimes(1);
   });
 
+  it('rejects subscription failures', async () => {
+    const { result } = renderHook(() => usePahoMQTTClient('wss://example.com/mqtt'));
+    const failure = new Error('subscription failed');
+    const mqttClient = mocks.instances.at(-1);
+    if (mqttClient === undefined) {
+      throw new Error('Expected Paho client instance');
+    }
+
+    mqttClient.subscribe.mockImplementation((_topic, options) => {
+      options.onFailure?.(failure);
+    });
+
+    await expect(result.current.sub('devices/example')).rejects.toThrow('subscription failed');
+  });
+
+  it('rejects unsubscription failures', async () => {
+    const { result } = renderHook(() => usePahoMQTTClient('wss://example.com/mqtt'));
+    const failure = new Error('unsubscription failed');
+    const mqttClient = mocks.instances.at(-1);
+    if (mqttClient === undefined) {
+      throw new Error('Expected Paho client instance');
+    }
+
+    mqttClient.unsubscribe.mockImplementation((_topic, options) => {
+      options.onFailure?.(failure);
+    });
+
+    await expect(result.current.unsub('devices/example')).rejects.toThrow('unsubscription failed');
+  });
+
   it('respects an explicit client id', () => {
     renderHook(() => usePahoMQTTClient('wss://example.com/mqtt', undefined, undefined, 'custom-client'));
 

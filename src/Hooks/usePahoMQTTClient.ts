@@ -142,7 +142,7 @@ export const usePahoMQTTClient = (uri: string,
 
 
     const sub = useCallback((topic: string, qos?: Qos) => {
-        return new Promise<Qos>((resolve) => {
+        return new Promise<Qos>((resolve, reject) => {
             if (client.current === null) {
                 throw new Error('MQTT client is not initialized');
             }
@@ -150,7 +150,7 @@ export const usePahoMQTTClient = (uri: string,
                 qos: qos ?? 0,
                 timeout: 1,
                 onFailure: (e: MQTTError) => {
-                    throw assertError(e);
+                    reject(assertError(e));
                 },
                 onSuccess: (res: OnSubscribeSuccessParams) => {
                     resolve(res.grantedQos);
@@ -176,7 +176,7 @@ export const usePahoMQTTClient = (uri: string,
     }, [client]);
 
     const unsub = useCallback((topic: string) => {
-        return new Promise<void>((resolve) => {
+        return new Promise<void>((resolve, reject) => {
             if (client.current === null) {
                 throw new Error('MQTT client is not initialized');
             }
@@ -186,7 +186,7 @@ export const usePahoMQTTClient = (uri: string,
                     resolve();
                 },
                 onFailure: (e: MQTTError) => {
-                    throw assertError(e);
+                    reject(assertError(e));
                 }
             });
         });
