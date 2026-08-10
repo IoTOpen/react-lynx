@@ -25,7 +25,9 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run lint && pnpm run test",
     "dev": "vite",
-    "publish:prerelease": "pnpm version prerelease --preid=rc && npm publish --tag rc"
+    "release:check": "pnpm test --run && pnpm lint && pnpm run build && node scripts/verify-dist.cjs",
+    "publish:prerelease": "pnpm version prerelease --preid=rc && npm publish --tag rc",
+    "publish:release": "pnpm run release:check && npm version patch && npm publish --tag latest && git push --follow-tags"
   },
   "publishConfig": {
     "access": "public"
