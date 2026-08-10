@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ErrorResponse, MinimalOrg, Organization } from '@iotopen/node-lynx';
 
@@ -9,23 +9,41 @@ export const useOrganizations = <T extends boolean = false>(minimal?: T) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [organizations, setOrganizations] = useState<MinimalOrg<T>[]>([]);
+    const latestRequest = useRef(0);
 
-    const refresh = useCallback(() => {
-        setLoading(true);
-        lynxClient.getOrganizations(minimal === true).then(orgs => {
-            setError((err) => err !== undefined ? undefined : err);
-            setOrganizations(<MinimalOrg<T>[]>orgs);
-        }).catch(e => {
-            setError(e as ErrorResponse);
-        }).finally(() => {
-            setLoading(false);
+    const refreshCall = useCallback((resetData = false) => {
+        const request = ++latestRequest.current;
+
+        void Promise.resolve().then(() => {
+            if (request !== latestRequest.current) {return;}
+
+            setLoading(true);
+            setError(undefined);
+            if (resetData) {
+                setOrganizations([]);
+            }
+
+            void lynxClient.getOrganizations(minimal === true).then(orgs => {
+                if (request === latestRequest.current) {
+                    setOrganizations(<MinimalOrg<T>[]>orgs);
+                }
+            }).catch((e: unknown) => {
+                if (request === latestRequest.current) {
+                    setError(e as ErrorResponse);
+                }
+            }).finally(() => {
+                if (request === latestRequest.current) {
+                    setLoading(false);
+                }
+            });
         });
+
+        return () => {latestRequest.current += 1;};
     }, [lynxClient, minimal]);
 
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        return refreshCall(true);
+    }, [refreshCall]);
 
     const create = useCallback((org: Organization) => {
         return lynxClient.createOrganization(org);

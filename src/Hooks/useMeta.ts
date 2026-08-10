@@ -1,4 +1,4 @@
-import { type DependencyList, useCallback, useLayoutEffect, useState } from 'react';
+import { type DependencyList, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import type { MetaObject, WithMeta } from '@iotopen/node-lynx';
 
@@ -6,10 +6,30 @@ export type MetaElement = MetaObject & {
     key: string
 }
 
+const dependenciesChanged = (previous: DependencyList, current: DependencyList) => {
+    return previous.length !== current.length || previous.some((value, index) => !Object.is(value, current[index]));
+};
+
 export const useMeta = (obj?: WithMeta, deps: DependencyList = []) => {
     const [metaList, setMetaList] = useState<MetaElement[]>([]);
+    const previousInputs = useRef<{ obj: WithMeta | undefined; deps: DependencyList } | undefined>(undefined);
+    const updateVersion = useRef(0);
+    const mounted = useRef(true);
+
+    useEffect(() => {
+        mounted.current = true;
+        return () => {mounted.current = false;};
+    }, []);
 
     useLayoutEffect(() => {
+        const previous = previousInputs.current;
+        if (previous !== undefined && previous.obj === obj && !dependenciesChanged(previous.deps, deps)) {
+            return;
+        }
+
+        previousInputs.current = { obj, deps: [...deps] };
+        const version = ++updateVersion.current;
+
         if (obj) {
             const newList = [] as MetaElement[];
             for (const key in obj.meta) {
@@ -22,11 +42,12 @@ export const useMeta = (obj?: WithMeta, deps: DependencyList = []) => {
             }
             newList.sort((a, b) => a.key.localeCompare(b.key));
             void Promise.resolve().then(() => {
-                setMetaList(newList);
+                if (mounted.current && version === updateVersion.current) {
+                    setMetaList(newList);
+                }
             });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [obj, ...deps]);
+    });
 
     const compile = useCallback(() => {
         const res: WithMeta = { meta: {}, protected_meta: {} };

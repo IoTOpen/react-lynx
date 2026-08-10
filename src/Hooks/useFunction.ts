@@ -4,6 +4,8 @@ import type { ErrorResponse, Functionx, MetaObject } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
 
+import { parseResourceId } from './resourceId';
+
 const zeroFunction = {
     id: 0,
     installation_id: 0,
@@ -15,12 +17,8 @@ const zeroFunction = {
 };
 
 export const useFunction = (installationId: number | string, functionId: number | string) => {
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const id = typeof functionId === 'string' ? Number.parseInt(functionId) : functionId;
-
-    if (isNaN(iid) || isNaN(id)) {
-        throw new Error('invalid installationId or functionId');
-    }
+    const iid = parseResourceId(installationId, 'installationId');
+    const id = parseResourceId(functionId, 'functionId');
 
     const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
@@ -28,14 +26,31 @@ export const useFunction = (installationId: number | string, functionId: number 
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useEffect(() => {
-        lynxClient.getFunction(iid, id).then(fn => {
-            setError((err) => err !== undefined ? undefined : err);
-            setFunc(fn);
-        }).catch(e => {
-            setError(e as ErrorResponse);
-        }).finally(() => {
-            setLoading(false);
+        let cancelled = false;
+
+        void Promise.resolve().then(() => {
+            if (cancelled) {return;}
+
+            setLoading(true);
+            setError(undefined);
+            setFunc({ ...zeroFunction });
+
+            void lynxClient.getFunction(iid, id).then(fn => {
+                if (!cancelled) {
+                    setFunc(fn);
+                }
+            }).catch((e: unknown) => {
+                if (!cancelled) {
+                    setError(e as ErrorResponse);
+                }
+            }).finally(() => {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            });
         });
+
+        return () => {cancelled = true;};
     }, [lynxClient, iid, id]);
 
     const update = useCallback(() => {
@@ -62,8 +77,8 @@ export const useFunction = (installationId: number | string, functionId: number 
 };
 
 export const useFunctionMeta = (installationId: number | string, functionId?: number | string) => {
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const fnId = typeof functionId === 'string' ? Number.parseInt(functionId) : functionId;
+    const iid = parseResourceId(installationId, 'installationId');
+    const fnId = functionId === undefined ? undefined : parseResourceId(functionId, 'functionId');
 
     const { lynxClient } = useGlobalLynxClient();
     const create = useCallback((key: string, meta: MetaObject, funId?: number, silent?: boolean) => {

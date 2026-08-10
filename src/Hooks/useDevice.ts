@@ -4,6 +4,8 @@ import type { Devicex, ErrorResponse, MetaObject } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
 
+import { parseResourceId } from './resourceId';
+
 const zeroDevice = {
     updated: 0,
     created: 0,
@@ -15,25 +17,39 @@ const zeroDevice = {
 };
 
 export const useDevice = (installationId: number | string, deviceId: number | string) => {
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const id = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
-    if (isNaN(iid) || isNaN(id)) {
-        throw new Error('invalid installationId or deviceId');
-    }
+    const iid = parseResourceId(installationId, 'installationId');
+    const id = parseResourceId(deviceId, 'deviceId');
     const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [dev, setDev] = useState<Devicex>({ ...zeroDevice });
     const [error, setError] = useState<ErrorResponse | undefined>();
 
     useEffect(() => {
-        lynxClient.getDevice(iid, id).then(fn => {
-            setError((err) => err !== undefined ? undefined : err);
-            setDev(fn);
-        }).catch(e => {
-            setError(e as ErrorResponse);
-        }).finally(() => {
-            setLoading(false);
+        let cancelled = false;
+
+        void Promise.resolve().then(() => {
+            if (cancelled) {return;}
+
+            setLoading(true);
+            setError(undefined);
+            setDev({ ...zeroDevice });
+
+            void lynxClient.getDevice(iid, id).then(fn => {
+                if (!cancelled) {
+                    setDev(fn);
+                }
+            }).catch((e: unknown) => {
+                if (!cancelled) {
+                    setError(e as ErrorResponse);
+                }
+            }).finally(() => {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            });
         });
+
+        return () => {cancelled = true;};
     }, [lynxClient, iid, id]);
 
     const update = useCallback(() => {
@@ -60,8 +76,8 @@ export const useDevice = (installationId: number | string, deviceId: number | st
 };
 
 export const useDeviceMeta = (installationId: number | string, deviceId?: number|string) => {
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const devId = typeof deviceId === 'string' ? Number.parseInt(deviceId) : deviceId;
+    const iid = parseResourceId(installationId, 'installationId');
+    const devId = deviceId === undefined ? undefined : parseResourceId(deviceId, 'deviceId');
 
     const { lynxClient } = useGlobalLynxClient();
 

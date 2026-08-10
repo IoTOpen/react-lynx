@@ -1,33 +1,56 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ErrorResponse, NotificationOutput } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
 
+import { parseResourceId } from './resourceId';
+
 export const useNotificationOutputs = (installationId: number | string) => {
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    if (isNaN(iid)) {
-        throw new Error('invalid installationId');
-    }
+    const iid = parseResourceId(installationId, 'installationId');
     const { lynxClient } = useGlobalLynxClient();
     const [notificationOutputs, setNotificationOutputs] = useState<NotificationOutput[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
-    const refresh = useCallback(() => {
-        lynxClient.getNotificationOutputs(iid).then(res => {
-            setError((err) => err !== undefined ? undefined : err);
-            setNotificationOutputs(res);
-        }).catch(e => {
-            setError(e as ErrorResponse);
-        }).finally(() => {
-            setLoading(false);
+    const latestRequest = useRef(0);
+
+    const refreshCall = useCallback((resetData = false) => {
+        const request = ++latestRequest.current;
+
+        void Promise.resolve().then(() => {
+            if (request !== latestRequest.current) {return;}
+
+            setLoading(true);
+            setError(undefined);
+            if (resetData) {
+                setNotificationOutputs([]);
+            }
+
+            void lynxClient.getNotificationOutputs(iid).then(res => {
+                if (request === latestRequest.current) {
+                    setNotificationOutputs(res);
+                }
+            }).catch((e: unknown) => {
+                if (request === latestRequest.current) {
+                    setError(e as ErrorResponse);
+                }
+            }).finally(() => {
+                if (request === latestRequest.current) {
+                    setLoading(false);
+                }
+            });
         });
+
+        return () => {latestRequest.current += 1;};
     }, [iid, lynxClient]);
 
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        return refreshCall(true);
+    }, [refreshCall]);
+
+    const refresh = useCallback(() => {
+        void refreshCall();
+    }, [refreshCall]);
 
     return {
         refresh,

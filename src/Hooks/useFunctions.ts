@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { EmptyFunctionx, ErrorResponse, Functionx, Metadata, OKResponse } from '@iotopen/node-lynx';
 
 import { useGlobalLynxClient } from '../Contexts';
 import type { ObjectOrArray } from '../types';
+
+import { parseResourceId } from './resourceId';
 
 interface RemoveFunctionFn {
     <T extends Functionx | Functionx[]>(fns: T): ObjectOrArray<OKResponse, Functionx, T>;
@@ -18,63 +20,59 @@ interface CreateFunctionFn {
  * @param filter Optional metadata filter. Note: Consumers should memoize this object or rely on its JSON representation being stable.
  */
 export const useFunctions = (installationId: number | string, filter?: Metadata) => {
-    // Supplied radix 10 to prevent unexpected parsing behaviors
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId, 10) : installationId;
-
-    // Strict number checking and consolidated undefined evaluation
-    if (installationId !== undefined && Number.isNaN(iid)) {
-        throw new Error('invalid installationId');
-    }
+    const iid = installationId === undefined ? undefined : parseResourceId(installationId, 'installationId');
 
     const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [functions, setFunctions] = useState<Functionx[]>([]);
     const [error, setError] = useState<ErrorResponse | undefined>();
+    const latestRequest = useRef(0);
 
     // Stable string primitive to prevent infinite re-renders on object literal inputs
     const filterKey = filter ? JSON.stringify(filter) : undefined;
+    const stableFilter = useMemo(
+        () => filterKey === undefined ? undefined : JSON.parse(filterKey) as Metadata,
+        [filterKey],
+    );
 
-    const refreshCall = useCallback(() => {
-        let cancelled = false;
+    const refreshCall = useCallback((resetData = false) => {
+        const request = ++latestRequest.current;
 
-        if (iid === undefined) {
-            // Defer execution to a microtask to avoid synchronous cascading renders, marking the promise void
-            void Promise.resolve().then(() => {
-                if (!cancelled) {
-                    setLoading(false);
-                    setFunctions([]);
-                }
-            });
-            return () => { cancelled = true; };
-        }
-
-        // Push state mutations out of the synchronous render phase to support the React Compiler
         void Promise.resolve().then(() => {
-            if (cancelled) {return;}
-            setLoading(true);
+            if (request !== latestRequest.current) {return;}
 
-            void lynxClient.getFunctions(iid, filter)
+            setLoading(true);
+            setError(undefined);
+            if (resetData) {
+                setFunctions([]);
+            }
+
+            if (iid === undefined) {
+                setLoading(false);
+                setFunctions([]);
+                return;
+            }
+
+            void lynxClient.getFunctions(iid, stableFilter)
                 .then(res => {
-                    if (!cancelled) {
-                        setError(prev => (prev !== undefined ? undefined : prev));
+                    if (request === latestRequest.current) {
                         setFunctions(res);
                     }
                 })
                 .catch((e: unknown) => {
-                    if (!cancelled) {
+                    if (request === latestRequest.current) {
                         setError(e as ErrorResponse);
                     }
                 })
                 .finally(() => {
-                    if (!cancelled) {
+                    if (request === latestRequest.current) {
                         setLoading(false);
                     }
                 });
         });
 
-        return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lynxClient, iid, filterKey]);
+        return () => {latestRequest.current += 1;};
+    }, [lynxClient, iid, stableFilter]);
 
     // Typed via 'as unknown as' to support the inline function expression requirement of the React Compiler with zero 'any' types
     const remove = useCallback((fns: Functionx | Functionx[]) => {
@@ -117,7 +115,7 @@ export const useFunctions = (installationId: number | string, filter?: Metadata)
     }, [lynxClient]) as unknown as CreateFunctionFn;
 
     useEffect(() => {
-        const cancel = refreshCall();
+        const cancel = refreshCall(true);
         return cancel;
     }, [refreshCall]);
 
