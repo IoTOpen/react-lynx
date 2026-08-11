@@ -1,3 +1,3 @@
+export { useGlobalLynxClient } from './LynxClientProvider';
 export * from './LynxProvider';
-export {useGlobalUser, useGlobalPermissions} from './UserProvider';
-export {useGlobalLynxClient} from './LynxClientProvider';
+export { useGlobalPermissions, useGlobalUser } from './UserProvider';

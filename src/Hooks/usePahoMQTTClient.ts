@@ -1,89 +1,149 @@
-import {useCallback, useLayoutEffect, useRef, useState} from 'react';
-import Paho, {MQTTError, Qos, TypedArray} from 'paho-mqtt';
+import { type RefObject, useCallback, useEffect, useId, useRef, useState } from 'react';
+
+import Paho, {
+    type Client as PahoClient,
+    type ConnectionOptions,
+    type MQTTError,
+    type OnConnectionLostHandler,
+    type OnMessageHandler,
+    type OnSubscribeSuccessParams,
+    type Qos,
+    type TypedArray,
+} from 'paho-mqtt';
+
+type OnConnectHandler = (reconnect: boolean, host: string) => void;
+
+interface ReconnectAwareClient extends PahoClient {
+    onConnected?: OnConnectHandler;
+}
+
+function assertError(e: unknown): Error {
+    return e instanceof Error ? e : new Error(String(e));
+}
+
+function getFallbackClientId(reactId: string): string {
+    const normalizedId = reactId.replace(/[^A-Za-z0-9_-]/g, '');
+
+    return `paho-ws-mqtt-${normalizedId || 'client'}`;
+}
+
+function formatUUID(bytes: Uint8Array): string {
+    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function generateClientId(reactId: string): string {
+    if (typeof globalThis.crypto?.randomUUID === 'function') {
+        return `paho-ws-mqtt-${globalThis.crypto.randomUUID()}`;
+    }
+
+    if (typeof globalThis.crypto?.getRandomValues === 'function') {
+        const bytes = new Uint8Array(16);
+
+        globalThis.crypto.getRandomValues(bytes);
+        bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x40;
+        bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
+
+        return `paho-ws-mqtt-${formatUUID(bytes)}`;
+    }
+
+    return getFallbackClientId(reactId);
+}
 
 interface MQTTHandlers {
-    onMessage?: Paho.OnMessageHandler;
-    onDelivery?: Paho.OnMessageHandler;
-    onConnected?: Paho.OnConnectHandler;
-    onDisconnect?: Paho.OnConnectionLostHandler;
+    onMessage?: OnMessageHandler;
+    onDelivery?: OnMessageHandler;
+    onConnected?: OnConnectHandler;
+    onDisconnect?: OnConnectionLostHandler;
+}
+
+interface PahoMQTTClientResult {
+    client: RefObject<PahoClient>;
+    connected: boolean;
+    error: MQTTError | undefined;
+    sub: (topic: string, qos?: Qos) => Promise<Qos>;
+    pub: (topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => void;
+    unsub: (topic: string) => Promise<void>;
 }
 
 export const usePahoMQTTClient = (uri: string,
-    handlers?: MQTTHandlers, connectionOptions?: Paho.ConnectionOptions, clientId?: string) => {
-    if (clientId === undefined) {
-        let uuid;
-        if(window?.crypto?.randomUUID) {
-            uuid = window.crypto.randomUUID();
-        } else if(typeof crypto !== 'undefined' && crypto?.randomUUID) {
-            uuid = crypto.randomUUID();
-        } else {
-            uuid = Math.random().toString(36).substring(2, 15);
-        }
-        clientId = `paho-ws-mqtt-${uuid}`;
+    handlers?: MQTTHandlers, connectionOptions?: ConnectionOptions, clientId?: string): PahoMQTTClientResult => {
+    const reactId = useId();
+    const [generatedClientId] = useState(() => generateClientId(reactId));
+    const resolvedClientId = clientId ?? generatedClientId;
+    const client = useRef<ReconnectAwareClient | null>(null);
+
+    if (client.current === null) {
+        client.current = new Paho.Client(uri, resolvedClientId);
     }
-    const client = useRef<Paho.Client>(new Paho.Client(uri, clientId));
+
     const opts = useRef(connectionOptions);
     const callbacks = useRef(handlers);
     const reconnectTimer = useRef<number | undefined>(undefined);
     const [connected, setConnected] = useState(false);
-    const [error, setError] = useState<Paho.MQTTError | undefined>(undefined);
-    useLayoutEffect(() => {
+    const [error, setError] = useState<MQTTError | undefined>(undefined);
+    useEffect(() => {
         const c = client;
+        const currentClient = c.current;
         const rct = reconnectTimer;
+
+        if (currentClient === null) {
+            return;
+        }
+
         const o = {
             timeout: 5,
             ...opts.current,
             onFailure: (e: MQTTError) => {
                 setError(e);
-                setConnected(client.current.isConnected());
-                if (rct.current === undefined) {
-                    rct.current = window.setInterval(() => {
-                        if(c.current.isConnected()) {
-                            clearInterval(rct.current);
-                        } else {
-                            c.current.connect(o);
-                        }
-                    }, 5000);
-                }
+                setConnected(currentClient.isConnected());
+                rct.current ??= window.setInterval(() => {
+                    if (currentClient.isConnected()) {
+                        clearInterval(rct.current);
+                    } else {
+                        currentClient.connect(o);
+                    }
+                }, 5000);
             },
             onSuccess: () => {
                 setError(undefined);
-                setConnected(client.current.isConnected());
+                setConnected(currentClient.isConnected());
                 if (rct.current !== undefined) {
                     window.clearInterval(rct.current);
                     rct.current = undefined;
                 }
             },
-        } as Paho.ConnectionOptions;
+        } as ConnectionOptions;
         const cbs = callbacks.current;
-        c.current.onConnectionLost = (e: MQTTError) => {
+        currentClient.onConnectionLost = (e: MQTTError) => {
             setError(e);
-            setConnected(client.current.isConnected());
+            setConnected(currentClient.isConnected());
             cbs?.onDisconnect?.(e);
         };
-        c.current.onConnected = (reconnect: boolean, host: string) => {
-            setConnected(client.current.isConnected());
+        currentClient.onConnected = (reconnect: boolean, host: string) => {
+            setConnected(currentClient.isConnected());
             setError(undefined);
             cbs?.onConnected?.(reconnect, host);
         };
         if (cbs) {
             if (cbs.onMessage) {
-                c.current.onMessageArrived = cbs.onMessage;
+                currentClient.onMessageArrived = cbs.onMessage;
             }
             if (cbs.onDelivery) {
-                c.current.onMessageDelivered = cbs.onDelivery;
+                currentClient.onMessageDelivered = cbs.onDelivery;
             }
         }
         try {
-            c.current.connect(o);
-        } catch (e) {
+            currentClient.connect(o);
+        } catch (_e) {
             window.setTimeout(() => {
-                c.current.connect(o);
+                currentClient.connect(o);
             }, 5000);
         }
         return () => {
             try {
-                c.current.disconnect();
+                currentClient.disconnect();
                 if (rct.current !== undefined) {
                     window.clearInterval(rct.current);
                 }
@@ -91,19 +151,22 @@ export const usePahoMQTTClient = (uri: string,
                 console.log(e);
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, []);
 
 
     const sub = useCallback((topic: string, qos?: Qos) => {
-        return new Promise<Qos>((resolve) => {
+        return new Promise<Qos>((resolve, reject) => {
+            if (client.current === null) {
+                throw new Error('MQTT client is not initialized');
+            }
             client.current.subscribe(topic, {
-                qos: qos ? qos : 0,
+                qos: qos ?? 0,
                 timeout: 1,
                 onFailure: (e: MQTTError) => {
-                    throw e;
+                    reject(assertError(e));
                 },
-                onSuccess: (res) => {
+                onSuccess: (res: OnSubscribeSuccessParams) => {
                     resolve(res.grantedQos);
                 }
             });
@@ -111,29 +174,44 @@ export const usePahoMQTTClient = (uri: string,
     }, [client]);
 
     const pub = useCallback((topic: string, payload: string | TypedArray, qos?: Qos, retained?: boolean) => {
-        client.current.send(topic, payload, qos, retained);
+        if (client.current === null) {
+            throw new Error('MQTT client is not initialized');
+        }
+        let sendPayload: string | ArrayBuffer;
+        if (typeof payload === 'string') {
+            sendPayload = payload;
+        } else if (ArrayBuffer.isView(payload)) {
+            // Always create a new ArrayBuffer to guarantee type
+            sendPayload = new Uint8Array(payload.buffer, payload.byteOffset, payload.byteLength).slice().buffer;
+        } else {
+            throw new Error('Payload must be a string or TypedArray');
+        }
+        client.current.send(topic, sendPayload, qos, retained);
     }, [client]);
 
     const unsub = useCallback((topic: string) => {
-        return new Promise<void>((resolve) => {
+        return new Promise<void>((resolve, reject) => {
+            if (client.current === null) {
+                throw new Error('MQTT client is not initialized');
+            }
             client.current.unsubscribe(topic, {
                 timeout: 1,
                 onSuccess: () => {
                     resolve();
                 },
                 onFailure: (e: MQTTError) => {
-                    throw e;
+                    reject(assertError(e));
                 }
             });
         });
     }, [client]);
 
     return {
-        client: client,
-        connected: connected,
-        error: error,
-        sub: sub,
-        pub: pub,
-        unsub: unsub,
+        client: client as RefObject<PahoClient>,
+        connected,
+        error,
+        sub,
+        pub,
+        unsub,
     };
 };

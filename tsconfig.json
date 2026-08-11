@@ -1,32 +1,52 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "declaration": true,
-    "module": "esnext",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    "target": "ES2023",
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "jsx": "react-jsx",
-    "outDir": "./dist",
-    "sourceMap": true,
-    "typeRoots": [
-      "./types",
-    ]
+
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+
+    "resolveJsonModule": true,
+    "allowArbitraryExtensions": true,
+
+    "allowJs": false,
+    "checkJs": false,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    "declaration": true,
+    "declarationDir": "./dist",
+    "rootDir": "./src",
+    "noEmit": true,
+
+    "incremental": true,
+    "tsBuildInfoFile": "./.tsbuildinfo",
+
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    "ignoreDeprecations": "6.0"
   },
-  "include": [
-    "src/"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "build", "coverage"]
 }

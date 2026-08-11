@@ -1,8 +1,10 @@
-import {useCallback, useState} from 'react';
-import {Address, EmptyOrganization, Metadata, OrganizationChild} from '@iotopen/node-lynx';
-import {useGlobalLynxClient} from '../Contexts';
+import { useCallback, useState } from 'react';
 
-export type OrganizationTemplate = {
+import type { Address, EmptyOrganization, Metadata, OrganizationChild } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
+
+export interface OrganizationTemplate {
     address?: Address
     children?: OrganizationChild[]
     email?: string
@@ -32,12 +34,12 @@ const zeroEmptyOrganization = {
     phone: '',
     protected_meta: {},
 };
-export const useNewOrganization = (parentId: number | string , template?: OrganizationTemplate) => {
+export const useNewOrganization = (parentId: number | string, template?: OrganizationTemplate) => {
     const pid = typeof parentId === 'string' ? Number.parseInt(parentId) : parentId;
     if (isNaN(pid)) {
         throw new Error('invalid parentId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [newOrganization, setNewOrganization] = useState<EmptyOrganization>({
         ...zeroEmptyOrganization,
         ...template, parent: pid

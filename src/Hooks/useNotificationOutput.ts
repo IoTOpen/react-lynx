@@ -1,6 +1,8 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useEffect, useState} from 'react';
-import {ErrorResponse, NotificationOutput} from '@iotopen/node-lynx';
+import { useCallback, useEffect, useState } from 'react';
+
+import type { ErrorResponse, NotificationOutput } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroNotificationOutput = {
     id: 0,
@@ -20,47 +22,48 @@ export const useNotificationOutput = (installationId: number | string, notificat
     if (isNaN(id)) {
         throw new Error('invalid notificationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [output, setOutput] = useState<NotificationOutput>({
         ...zeroNotificationOutput,
-        config: {...zeroNotificationOutput.config}
+        config: { ...zeroNotificationOutput.config }
     });
     const [error, setError] = useState<ErrorResponse | undefined>();
     const refresh = useCallback(() => {
-        if(iid === 0 || id === 0) return;
+        if (iid === 0 || id === 0) {return;}
         setLoading(true);
         lynxClient.getNotificationOutput(iid, id).then(res => {
             setError((err) => err !== undefined ? undefined : err);
             setOutput(res);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
     }, [id, iid, lynxClient]);
 
     const update = useCallback(() => {
-        if (error !== undefined) setError(undefined);
-        lynxClient.updateNotificationOutput(output).then(res => {
+        if (error !== undefined) {setError(undefined);}
+        return lynxClient.updateNotificationOutput(output).then(res => {
             setOutput(res);
+            return res;
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         });
     }, [error, lynxClient, output]);
 
     const remove = useCallback(() => {
-        lynxClient.deleteNotificationOutput(output).then(() => {
-            setOutput({...zeroNotificationOutput});
+        return lynxClient.deleteNotificationOutput(output).then((res) => {
+            setOutput({ ...zeroNotificationOutput });
+            return res;
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         });
     }, [lynxClient, output]);
 
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        queueMicrotask(refresh);
+    }, [refresh]);
 
     return {
         refresh,

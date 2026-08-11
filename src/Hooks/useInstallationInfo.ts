@@ -1,9 +1,11 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {ErrorResponse, InstallationInfo} from '@iotopen/node-lynx';
-import {useCallback, useLayoutEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import type { ErrorResponse, InstallationInfo } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useInstallationInfo = (assignedOnly?: boolean) => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [installations, setInstallations] = useState<InstallationInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>(undefined);
@@ -18,17 +20,16 @@ export const useInstallationInfo = (assignedOnly?: boolean) => {
         }).finally(() => {
             setLoading(false);
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lynxClient]);
+    }, [assignedOnly, lynxClient]);
 
-    useLayoutEffect(() => {
-        refreshCall();
+    useEffect(() => {
+        queueMicrotask(refreshCall);
     }, [refreshCall]);
 
     return {
-        installations: installations,
+        installations,
         refresh: refreshCall,
-        loading: loading,
-        error: error,
+        loading,
+        error,
     };
 };

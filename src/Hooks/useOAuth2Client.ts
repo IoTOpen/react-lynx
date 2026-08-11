@@ -1,28 +1,29 @@
-import {useCallback, useEffect, useState} from 'react';
-import {ErrorResponse, OAuth2Client, zero} from '@iotopen/node-lynx';
-import {useGlobalLynxClient} from '../Contexts';
+import { useCallback, useEffect, useState } from 'react';
+
+import { type ErrorResponse, type OAuth2Client, zero } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useOAuth2Client = (id: string) => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
-    const [client, setClient] = useState<OAuth2Client>({...zero.getOAuth2Client()});
+    const [client, setClient] = useState<OAuth2Client>({ ...zero.getOAuth2Client() });
     const refresh = useCallback(() => {
-        if (!loading) setLoading(true);
-        lynxClient.getOAuth2Client(id).then(client => {
+        setLoading(true);
+        lynxClient.getOAuth2Client(id).then(fetchedClient => {
             setError((err) => err !== undefined ? undefined : err);
-            setClient(client);
+            setClient(fetchedClient);
         }).catch(e => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
-    }, [loading, lynxClient, id]);
+    }, [lynxClient, id]);
 
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+        queueMicrotask(refresh);
+    }, [refresh]);
 
     const remove = useCallback(() => {
         return lynxClient.deleteOAuth2Client(client);

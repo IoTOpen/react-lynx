@@ -1,6 +1,8 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
-import {Installation} from '@iotopen/node-lynx';
-import {useGlobalLynxClient} from '../Contexts';
+import { useCallback, useEffect, useState } from 'react';
+
+import type { Installation } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroInstallation = {
     client_id: 0,
@@ -16,41 +18,31 @@ const zeroInstallation = {
 
 export const useInstallation = (installationId: number | string) => {
     const id = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    if(isNaN(id)) {
+    if (isNaN(id)) {
         throw new Error('invalid installationId');
     }
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | undefined>(undefined);
-    const [installation, setInstallation] = useState<Installation>({...zeroInstallation});
+    const [installation, setInstallation] = useState<Installation>({ ...zeroInstallation });
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         lynxClient.getInstallationRow(id).then(inst => {
             setError((err) => err !== undefined ? undefined : err);
             setInstallation(inst);
         }).catch(e => {
-            setError(e);
+            setError(e as Error);
         }).finally(() => {
             setLoading(false);
         });
     }, [lynxClient, id]);
 
     const update = useCallback(() => {
-        return new Promise<Installation>(() => {
-            if (!installation) {
-                throw new Error('update on undefined installation');
-            }
-            return lynxClient.updateInstallation(installation);
-        });
+        return lynxClient.updateInstallation(installation);
     }, [lynxClient, installation]);
 
     const remove = useCallback(() => {
-        return new Promise<Installation>(() => {
-            if (!installation) {
-                throw new Error('update on undefined installation');
-            }
-            return lynxClient.deleteInstallation(installation);
-        });
+        return lynxClient.deleteInstallation(installation);
     }, [lynxClient, installation]);
     return {
         installation,

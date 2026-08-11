@@ -1,87 +1,131 @@
-import {useCallback, useLayoutEffect, useState} from 'react';
-import {useGlobalLynxClient} from '../Contexts';
-import {Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse} from '@iotopen/node-lynx';
-import {ObjectOrArray} from '../types';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-export const useDevices = (installationId: number|string, filter?: Metadata) => {
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    if(isNaN(iid) && iid !== undefined) {
-        throw new Error('invalid installationId');
-    }
-    const {lynxClient} = useGlobalLynxClient();
+import type { Devicex, EmptyDevicex, ErrorResponse, Metadata, OKResponse } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
+import type { ObjectOrArray } from '../types';
+
+import { parseResourceId } from './resourceId';
+
+interface RemoveDeviceFn {
+    <T extends Devicex | Devicex[]>(devs: T): ObjectOrArray<OKResponse, Devicex, T>;
+}
+
+interface CreateDeviceFn {
+    <T extends EmptyDevicex | EmptyDevicex[]>(devs: T): ObjectOrArray<Devicex, EmptyDevicex, T>;
+}
+
+/**
+ * @param installationId The installation ID.
+ * @param filter Optional metadata filter. Note: Consumers should memoize this object or rely on its JSON representation being stable.
+ */
+export const useDevices = (installationId: number | string, filter?: Metadata) => {
+    const iid = installationId === undefined ? undefined : parseResourceId(installationId, 'installationId');
+
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [devices, setDevices] = useState<Devicex[]>([]);
     const [error, setError] = useState<ErrorResponse | undefined>();
-    const refreshCall = useCallback(() => {
-        if(iid === undefined) {
-            setLoading(false);
-            setDevices([]);
-            return;
-        }
-        setLoading(true);
-        lynxClient.getDevices(iid, filter).then(res => {
-            setError((err) => err !== undefined ? undefined : err);
-            setDevices(res);
-        }).catch(e => {
-            setError(e);
-        }).finally(() => {
-            setLoading(false);
-        });
-    }, [lynxClient, iid, filter]);
+    const latestRequest = useRef(0);
 
-    function removeFn<T extends Devicex | Devicex[]>(devs: T): ObjectOrArray<OKResponse, Devicex, T>
-    function removeFn(devs: Devicex | Devicex[]) {
+    const filterKey = filter ? JSON.stringify(filter) : undefined;
+    const stableFilter = useMemo(
+        () => filterKey === undefined ? undefined : JSON.parse(filterKey) as Metadata,
+        [filterKey],
+    );
+
+    const refreshCall = useCallback((resetData = false) => {
+        const request = ++latestRequest.current;
+
+        void Promise.resolve().then(() => {
+            if (request !== latestRequest.current) {return;}
+
+            setLoading(true);
+            setError(undefined);
+            if (resetData) {
+                setDevices([]);
+            }
+
+            if (iid === undefined) {
+                setLoading(false);
+                setDevices([]);
+                return;
+            }
+
+            void lynxClient.getDevices(iid, stableFilter)
+                .then(res => {
+                    if (request === latestRequest.current) {
+                        setDevices(res);
+                    }
+                })
+                .catch((e: unknown) => {
+                    if (request === latestRequest.current) {
+                        setError(e as ErrorResponse);
+                    }
+                })
+                .finally(() => {
+                    if (request === latestRequest.current) {
+                        setLoading(false);
+                    }
+                });
+        });
+
+        return () => {latestRequest.current += 1;};
+    }, [lynxClient, iid, stableFilter]);
+
+    const remove = useCallback((devs: Devicex | Devicex[]) => {
         if (Array.isArray(devs)) {
-            const last = devs.pop();
-            if (!last) return Promise.allSettled([]);
-            const rest = devs.map((dev => {
-                return lynxClient.deleteDevice(dev, true);
-            }));
-            return Promise.allSettled(rest).then(async (settled) => {
+            if (devs.length === 0) {return Promise.allSettled([]);}
+
+            const last = devs[devs.length - 1]!;
+            const rest = devs.slice(0, -1).map((dev => lynxClient.deleteDevice(dev, true)));
+
+            return Promise.allSettled(rest).then(async(settled) => {
                 try {
-                    settled.push({status: 'fulfilled', value: await lynxClient.deleteDevice(last)});
+                    settled.push({ status: 'fulfilled', value: await lynxClient.deleteDevice(last) });
                 } catch (e) {
-                    settled.push({status: 'rejected', reason: e});
+                    settled.push({ status: 'rejected', reason: e });
                 }
                 return settled;
             });
         }
         return lynxClient.deleteDevice(devs);
-    }
+    }, [lynxClient]) as unknown as RemoveDeviceFn;
 
-    function createFn<T extends EmptyDevicex | EmptyDevicex[]>(devs: T): ObjectOrArray<Devicex, EmptyDevicex, T>
-    function createFn(devs: EmptyDevicex | EmptyDevicex[]) {
+    const create = useCallback((devs: EmptyDevicex | EmptyDevicex[]) => {
         if (Array.isArray(devs)) {
-            const last = devs.pop();
-            if (!last) return Promise.allSettled([]);
-            const rest = devs.map(dev => {
-                return lynxClient.createDevice(dev, true);
-            });
-            return Promise.allSettled(rest).then(async (settled) => {
+            if (devs.length === 0) {return Promise.allSettled([]);}
+
+            const last = devs[devs.length - 1]!;
+            const rest = devs.slice(0, -1).map(dev => lynxClient.createDevice(dev, true));
+
+            return Promise.allSettled(rest).then(async(settled) => {
                 try {
-                    settled.push({status: 'fulfilled', value: await lynxClient.createDevice(last)});
+                    settled.push({ status: 'fulfilled', value: await lynxClient.createDevice(last) });
                 } catch (e) {
-                    settled.push({status: 'rejected', reason: e});
+                    settled.push({ status: 'rejected', reason: e });
                 }
                 return settled;
             });
         }
         return lynxClient.createDevice(devs);
-    }
+    }, [lynxClient]) as unknown as CreateDeviceFn;
 
-    const create = useCallback(createFn, [lynxClient]);
-    const remove = useCallback(removeFn, [lynxClient]);
+    useEffect(() => {
+        const cancel = refreshCall(true);
+        return cancel;
+    }, [refreshCall]);
 
-    useLayoutEffect(() => {
-        refreshCall();
+    const refresh = useCallback(() => {
+        void refreshCall();
     }, [refreshCall]);
 
     return {
-        loading: loading,
-        error: error,
-        create: create,
-        remove: remove,
-        devices: devices,
-        refresh: refreshCall,
+        loading,
+        error,
+        create,
+        remove,
+        devices,
+        refresh,
     };
 };

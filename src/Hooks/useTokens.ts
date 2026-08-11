@@ -1,20 +1,22 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useLayoutEffect, useState} from 'react';
-import {EmptyToken, ErrorResponse, Token} from '@iotopen/node-lynx';
+import { useCallback, useLayoutEffect, useState } from 'react';
+
+import type { EmptyToken, ErrorResponse, Token } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 export const useTokens = () => {
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<ErrorResponse | undefined>();
     const [tokens, setTokens] = useState<Token[]>([]);
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getTokens().then((tokens) => {
+        lynxClient.getTokens().then((fetchedTokens) => {
             setError((err) => err !== undefined ? undefined : err);
-            setTokens(tokens);
+            setTokens(fetchedTokens);
         }).catch((e) => {
-            setError(e);
+            setError(e as ErrorResponse);
         }).finally(() => {
             setLoading(false);
         });
@@ -29,15 +31,15 @@ export const useTokens = () => {
     }, [lynxClient]);
 
     useLayoutEffect(() => {
-        refresh();
+        void Promise.resolve().then(refresh);
     }, [refresh]);
 
     return {
-        tokens: tokens,
-        remove: remove,
-        create: create,
-        refresh: refresh,
-        loading: loading,
-        error: error
+        tokens,
+        remove,
+        create,
+        refresh,
+        loading,
+        error
     };
 };

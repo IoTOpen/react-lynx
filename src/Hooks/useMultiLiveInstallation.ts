@@ -1,8 +1,11 @@
-import {Devicex, Functionx, Installation} from '@iotopen/node-lynx';
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useEffect, useState} from 'react';
-import {useMQTT} from './useMQTT';
-import {SimpleMQTT} from './useSimpleMQTT';
+import { useCallback, useEffect, useState } from 'react';
+
+import type { Devicex, Functionx, Installation } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
+
+import { useMQTT } from './useMQTT';
+import type { SimpleMQTT } from './useSimpleMQTT';
 
 export interface MultiLiveInstallation {
     installationMap: Map<number, Installation>;
@@ -13,10 +16,10 @@ export interface MultiLiveInstallation {
     toInstallationId: (cid: number) => number;
 }
 
-export const useMultiLiveInstallation = (installations: Installation[]) => {
-    const {lynxClient} = useGlobalLynxClient();
+export const useMultiLiveInstallation = (installations: Installation[]): MultiLiveInstallation => {
+    const { lynxClient } = useGlobalLynxClient();
     const mqtt = useMQTT();
-    const {bind, unbind, setSubs} = mqtt;
+    const { bind, unbind, setSubs } = mqtt;
 
 
     // To keep track of client id => installation
@@ -58,13 +61,13 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
 
         // This is a flag to prevent new fetches during the initial fetch
         let done = false;
-        const fnFetchers = installations.map(async (i) => {
+        const fnFetchers = installations.map(async(i) => {
             const fns = await lynxClient.getFunctions(i.id);
-            return {functions: fns, installationId: i.id};
+            return { functions: fns, installationId: i.id };
         });
-        const devFetchers = installations.map(async (i) => {
+        const devFetchers = installations.map(async(i) => {
             const devs = await lynxClient.getDevices(i.id);
-            return {devices: devs, installationId: i.id};
+            return { devices: devs, installationId: i.id };
         });
 
         const newDeviceMap = new Map<number, Devicex[]>();
@@ -79,7 +82,7 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
                     }
                 });
                 fnDone = true;
-                if (fnDone && devDone) resolve();
+                if (fnDone && devDone) {resolve();}
             }).catch(reject);
 
             Promise.allSettled(devFetchers).then((devsResult) => {
@@ -89,35 +92,44 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
                     }
                 });
                 devDone = true;
-                if (fnDone && devDone) resolve();
+                if (fnDone && devDone) {resolve();}
             }).catch(reject);
         });
-        work.finally(() => {
+    work.finally(() => {
             setClientIdMap(() => newClientIdMap);
             setInstallationMap(() => newInstallationMap);
             setFunctionMap(() => newFunctionMap);
             setDeviceMap(() => newDeviceMap);
-            // Now we can accept updates from mqtt
             done = true;
-        });
+    }).catch((e) => {
+        console.warn('Error in work.finally:', e);
+    });
 
         const fnRefresh = (topic: string) => {
-            if (!done) return;
+            if (!done) {return;}
             const cid = Number(topic.split('/')[0]);
             const inst = newClientIdMap.get(cid);
-            if (inst === undefined) return;
-            lynxClient.getFunctions(inst.id).then((fns) => {
-                setFunctionMap((p) => new Map([...p, [inst.id, fns]]));
-            });
+            if (inst === undefined) {return;}
+            lynxClient.getFunctions(inst.id)
+                .then((fns) => {
+                    setFunctionMap((p) => new Map([...p, [inst.id, fns]]));
+                })
+                .catch((e) => {
+                    console.warn('Failed to update function map for', inst.id, e);
+                });
         };
         const devRefresh = (topic: string) => {
-            if (!done) return;
+            if (!done) {return;}
             const cid = Number(topic.split('/')[0]);
             const inst = newClientIdMap.get(cid);
-            if (inst === undefined) return;
-            lynxClient.getDevices(inst.id).then((devs) => {
-                setDeviceMap((p) => new Map([...p, [inst.id, devs]]));
-            });
+            if (inst === undefined) {return;}
+            lynxClient.getDevices(inst.id)
+                .then((devs) => {
+                    setDeviceMap((p) => new Map([...p, [inst.id, devs]]));
+                })
+                .catch((e) => {
+                    console.warn('Failed to update device map for', inst.id, e);
+                });
         };
         setSubs(newTopics);
 
@@ -135,6 +147,6 @@ export const useMultiLiveInstallation = (installations: Installation[]) => {
         deviceMap,
         mqtt,
         toClientId,
-        toInstallationId
-    } as MultiLiveInstallation;
+        toInstallationId,
+    };
 };

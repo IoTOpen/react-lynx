@@ -1,6 +1,10 @@
-import {useGlobalLynxClient} from '../Contexts';
-import {useCallback, useLayoutEffect, useState} from 'react';
-import {ErrorResponse, Functionx, MetaObject, OKResponse} from '@iotopen/node-lynx';
+import { useCallback, useEffect, useState } from 'react';
+
+import type { ErrorResponse, Functionx, MetaObject } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
+
+import { parseResourceId } from './resourceId';
 
 const zeroFunction = {
     id: 0,
@@ -13,79 +17,82 @@ const zeroFunction = {
 };
 
 export const useFunction = (installationId: number | string, functionId: number | string) => {
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const id = typeof functionId === 'string' ? Number.parseInt(functionId) : functionId;
+    const iid = parseResourceId(installationId, 'installationId');
+    const id = parseResourceId(functionId, 'functionId');
 
-    if (isNaN(iid) || isNaN(id)) {
-        throw new Error('invalid installationId or functionId');
-    }
-
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [loading, setLoading] = useState(true);
-    const [func, setFunc] = useState<Functionx>({...zeroFunction});
+    const [func, setFunc] = useState<Functionx>({ ...zeroFunction });
     const [error, setError] = useState<ErrorResponse | undefined>();
 
-    useLayoutEffect(() => {
-        lynxClient.getFunction(iid, id).then(fn => {
-            setError((err) => err !== undefined ? undefined : err);
-            setFunc(fn);
-        }).catch(e => {
-            setError(e);
-        }).finally(() => {
-            setLoading(false);
+    useEffect(() => {
+        let cancelled = false;
+
+        void Promise.resolve().then(() => {
+            if (cancelled) {return;}
+
+            setLoading(true);
+            setError(undefined);
+            setFunc({ ...zeroFunction });
+
+            void lynxClient.getFunction(iid, id).then(fn => {
+                if (!cancelled) {
+                    setFunc(fn);
+                }
+            }).catch((e: unknown) => {
+                if (!cancelled) {
+                    setError(e as ErrorResponse);
+                }
+            }).finally(() => {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            });
         });
+
+        return () => {cancelled = true;};
     }, [lynxClient, iid, id]);
 
     const update = useCallback(() => {
-        return new Promise<Functionx>(() => {
-            if (!func) {
-                throw new Error('update on undefined function');
-            }
-            return lynxClient.updateFunction(func);
-        });
+        return lynxClient.updateFunction(func);
     }, [lynxClient, func]);
 
     const setType = useCallback((t: string) => {
-        if (func) setFunc({...func, type: t});
+        if (func) {setFunc({ ...func, type: t });}
     }, [func, setFunc]);
 
     const remove = useCallback(() => {
-        return new Promise<OKResponse>(() => {
-            if (!func) {
-                throw new Error('delete on undefined function');
-            }
-            return lynxClient.deleteFunction(func);
-        });
+        return lynxClient.deleteFunction(func);
     }, [func, lynxClient]);
 
     return {
-        loading: loading,
-        error: error,
+        loading,
+        error,
         Function: func,
         setFunction: setFunc,
-        update: update,
-        remove: remove,
-        setType: setType,
+        update,
+        remove,
+        setType,
     };
 };
 
 export const useFunctionMeta = (installationId: number | string, functionId?: number | string) => {
-    const iid = typeof installationId === 'string' ? Number.parseInt(installationId) : installationId;
-    const fnId = typeof functionId === 'string' ? Number.parseInt(functionId) : functionId;
+    const iid = parseResourceId(installationId, 'installationId');
+    const fnId = functionId === undefined ? undefined : parseResourceId(functionId, 'functionId');
 
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const create = useCallback((key: string, meta: MetaObject, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.createFunctionMeta(iid, id, key, meta, silent);
     }, [lynxClient, iid, fnId]);
 
     const update = useCallback((key: string, meta: MetaObject, createMissing?: boolean, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.updateFunctionMeta(iid, id, key, meta, silent, createMissing);
     }, [lynxClient, iid, fnId]);
 
     const remove = useCallback((key: string, funId?: number, silent?: boolean) => {
-        const id = funId ? funId : fnId ?? 0;
+        const id = funId ?? fnId ?? 0;
         return lynxClient.deleteFunctionMeta(iid, id, key, silent);
     }, [lynxClient, iid, fnId]);
 

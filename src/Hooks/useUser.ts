@@ -1,6 +1,8 @@
-import {User} from '@iotopen/node-lynx';
-import {useCallback, useState} from 'react';
-import {useGlobalLynxClient} from '../Contexts';
+import { useCallback, useEffect, useState } from 'react';
+
+import type { User } from '@iotopen/node-lynx';
+
+import { useGlobalLynxClient } from '../Contexts';
 
 const zeroUser = {
     id: 0,
@@ -30,22 +32,26 @@ export const useUser = (userId: number | string) => {
     if (isNaN(id)) {
         throw new Error('invalid userId');
     }
-    const [user, setUser] = useState<User>({...zeroUser});
+    const [user, setUser] = useState<User>({ ...zeroUser });
     const [loading, setLoading] = useState<boolean>(true);
-    const {lynxClient} = useGlobalLynxClient();
+    const { lynxClient } = useGlobalLynxClient();
     const [error, setError] = useState<Error | undefined>();
 
     const refresh = useCallback(() => {
         setLoading(true);
-        lynxClient.getUser(id).then((user) => {
+        lynxClient.getUser(id).then((fetchedUser) => {
             setError((err) => err !== undefined ? undefined : err);
-            setUser(user);
+            setUser(fetchedUser);
         }).catch(e => {
-            setError(e);
+            setError(e as Error);
         }).finally(() => {
             setLoading(false);
         });
     }, [lynxClient, id]);
+
+    useEffect(() => {
+        queueMicrotask(refresh);
+    }, [refresh]);
 
     const update = useCallback(() => {
         return lynxClient.updateUser(user);

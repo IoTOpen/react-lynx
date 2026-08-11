@@ -1,6 +1,8 @@
-import {usePahoMQTTClient} from './usePahoMQTTClient';
-import {useCallback, useEffect, useRef} from 'react';
-import Paho, {Qos, TypedArray} from 'paho-mqtt';
+import { useCallback, useEffect, useRef } from 'react';
+
+import type { ConnectionOptions, Message, MQTTError, Qos, TypedArray } from 'paho-mqtt';
+
+import { usePahoMQTTClient } from './usePahoMQTTClient';
 
 export type Binding = (topic: string, payload: string, qos: Qos, retained: boolean) => void;
 
@@ -24,37 +26,31 @@ function isEq<T>(a: T[], b: T[]): boolean {
     return false;
 }
 
-type Unsub = (topic: string) => void | Promise<void>;
+type Unsub = (topic: string) => Promise<void>;
 
-function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
-    return new Promise<void>((resolve) => {
-        subs.forEach(async (topic) => {
-            try {
-                await unsub(topic);
-            } catch (e) {
-                console.warn('failed to unsubscribe to', topic, e);
-            }
-        });
-        resolve();
-    });
+async function unsubscribe(unsub: Unsub, subs: string[]): Promise<void> {
+    await Promise.all(subs.map(async(topic) => {
+        try {
+            await unsub(topic);
+        } catch (e) {
+            console.warn('failed to unsubscribe to', topic, e);
+        }
+    }));
 }
 
-function subscribe(sub: (topic: string, qos?: Qos) => void | Promise<Qos>, subs: string[]): Promise<void> {
-    return new Promise<void>((resolve) => {
-        subs.forEach(async (topic) => {
-            try {
-                await sub(topic);
-            } catch (e) {
-                console.warn('failed to subscribe to', topic, e);
-            }
-        });
-        resolve();
-    });
+async function subscribe(sub: (topic: string, qos?: Qos) => Promise<Qos>, subs: string[]): Promise<void> {
+    await Promise.all(subs.map(async(topic) => {
+        try {
+            await sub(topic);
+        } catch (e) {
+            console.warn('failed to subscribe to', topic, e);
+        }
+    }));
 }
 
 export interface SimpleMQTT {
     setSubs: (subscriptions: string[]) => void;
-    error?: Paho.MQTTError;
+    error?: MQTTError;
     connected: boolean;
     bind: Binder;
     unbind: Unbinder;
@@ -72,9 +68,11 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         }
     }
     const subs = useRef<string[]>([]);
+    const activeSubs = useRef<string[]>([]);
+    const pendingSubscriptionUpdates = useRef(Promise.resolve());
     const bindings = useRef(new Map<string, Binding[]>([]));
     const exactBindings = useRef(new Map<string, Binding[]>([]));
-    const onMessage = useCallback((msg: Paho.Message) => {
+    const onMessage = useCallback((msg: Message) => {
         const tmp = exactBindings.current.get(msg.destinationName);
         if (tmp) {
             tmp.forEach((cb) => {
@@ -96,7 +94,7 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         cleanSession: true,
         reconnect: true,
         keepAliveInterval: 5,
-    } as Paho.ConnectionOptions;
+    } as ConnectionOptions;
     if (username) {
         options.userName = username;
     }
@@ -110,10 +108,17 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
         unsub,
         pub
     } = usePahoMQTTClient(uri, {
-        onMessage: onMessage, onConnected: () => {
-            subs.current.forEach(s => {
-                sub(s).then().catch();
+        onMessage, onConnected: () => {
+            c.current = true;
+            const nextSubs = [...subs.current];
+            const update = pendingSubscriptionUpdates.current.then(async() => {
+                activeSubs.current = [];
+                await subscribe(sub, nextSubs);
+                activeSubs.current = nextSubs;
+            }).catch((e) => {
+                console.warn('Failed to restore subscriptions', e);
             });
+            pendingSubscriptionUpdates.current = update;
         },
     }, options);
 
@@ -164,24 +169,42 @@ export const useSimpleMQTT = (uri?: string, username?: string, password?: string
 
     const unbindExact = useCallback((topic: string, binder: Binding) => {
         const binds = exactBindings.current.get(topic);
-        if (binds === undefined) return;
+        if (binds === undefined) {return;}
         exactBindings.current.set(topic, binds.filter((b) => b !== binder));
     }, []);
 
-    const updateSubs = useCallback((s: string[]) => {
-        if (isEq(subs.current, s)) {
-            return;
+    const updateSubs = useCallback((s: string[]): Promise<void> => {
+        const nextSubs = [...s];
+        if (isEq(subs.current, nextSubs)) {
+            return pendingSubscriptionUpdates.current;
         }
-        if (c.current) {
-            unsubscribe(unsub, subs.current).then(() => {
-                return subscribe(sub, s);
+        subs.current = nextSubs;
+
+        const update = pendingSubscriptionUpdates.current.then(async() => {
+            if (!c.current) {
+                return;
+            }
+            await unsubscribe(unsub, activeSubs.current);
+            activeSubs.current = [];
+            if (!isEq(subs.current, nextSubs)) {
+                return;
+            }
+            await subscribe(sub, nextSubs);
+            activeSubs.current = nextSubs;
+        })
+            .catch((e) => {
+                console.warn('Failed to update subscriptions', e);
             });
-        }
-        subs.current = s;
+        pendingSubscriptionUpdates.current = update;
+        return update;
     }, [sub, unsub]);
 
+    const setSubs = useCallback((s: string[]): void => {
+        void updateSubs(s);
+    }, [updateSubs]);
+
     return {
-        setSubs: updateSubs,
+        setSubs,
         error,
         connected,
         bind,
