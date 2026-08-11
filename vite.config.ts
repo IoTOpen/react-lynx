@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import { builtinModules } from 'module';
 import { fileURLToPath } from 'url';
 import react from '@vitejs/plugin-react';
-import dts from 'unplugin-dts/vite';
 import { defineConfig } from 'vite';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
@@ -24,7 +23,7 @@ function isExternal(id: string): boolean {
 }
 
 export default defineConfig({
-  plugins: [react(), dts({ bundleTypes: true, entryRoot: 'src', pathsToAliases: false })],
+  plugins: [react()],
   build: {
     sourcemap: true,
     target: 'es2023',

@@ -21,7 +21,7 @@
     "test:watch": "vitest",
     "prepare": "node scripts/prepare.cjs",
     "prepack": "node scripts/prepare.cjs && node scripts/verify-dist.cjs",
-    "build": "vite build --config ./vite.config.ts",
+    "build": "vite build --config ./vite.config.ts && tsc --noEmit false --emitDeclarationOnly --incremental false",
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run lint && pnpm run test",
     "dev": "vite",
@@ -45,8 +45,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@iotopen/node-lynx": "2.6.0-rc.21",
-    "@microsoft/api-extractor": "^7.58.12",
+    "@iotopen/node-lynx": "2.6.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^22.20.1",
     "@types/react": "^19.2.18",
@@ -60,17 +59,17 @@
     "globals": "^17.9.0",
     "jsdom": "^27.4.0",
     "paho-mqtt": "^1.1.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.66.0",
-    "unplugin-dts": "^1.0.3",
     "vite": "^8.2.1",
     "vitest": "^4.1.10"
   },
   "peerDependencies": {
-    "@iotopen/node-lynx": "^2.6.0-rc.20",
+    "@iotopen/node-lynx": "^2.6.0",
     "paho-mqtt": "^1.1.0",
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "^18 || ^19"
   },
   "exports": {
     ".": {

@@ -31,6 +31,9 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
 
+    "declaration": true,
+    "declarationDir": "./dist",
+    "rootDir": "./src",
     "noEmit": true,
 
     "incremental": true,
